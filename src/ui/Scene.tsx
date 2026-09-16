@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { WordId } from "../domain/world.ts";
+import type { Entity } from "../domain/world.ts";
+import { shuffled } from "../game/random.ts";
 import type { Step } from "../content/story.ts";
 import type { Session, Input } from "../game/session.ts";
 import { assetPath } from "../content/assets.ts";
@@ -41,6 +43,8 @@ export function Scene({
   reveal = false,
   cue,
   cuePhase = 2,
+  before,
+  seed = 1,
   projection,
   disabled = false,
 }: {
@@ -51,6 +55,8 @@ export function Scene({
   reveal?: boolean;
   cue?: FeedbackDefinition;
   cuePhase?: number;
+  before?: Entity;
+  seed?: number;
   projection?: { word: WordId; rest: boolean; repeated: boolean } | null;
   disabled?: boolean;
 }) {
@@ -68,7 +74,12 @@ export function Scene({
   const pointer = usePointerDrop((source, target) => {
     if (step?.type === "place") place(source, target);
   });
-  const entities = Object.values(session.world.entities);
+  const entities = shuffled(Object.values(session.world.entities), seed).map(
+    (e) =>
+      cue?.kind === "morph" && before?.id === e.id && cuePhase < 2 ? before : e,
+  );
+  const done = (id: string) =>
+    session.events.some((e) => e.correct && e.stepId === id);
   const act = step?.act ?? 3;
   const targets = sceneTargets(session.world, act);
   const arrived = session.events.some((e) => e.correct && e.stepId === "s11");
@@ -83,10 +94,23 @@ export function Scene({
     >
       <div className="scenery" aria-hidden="true">
         <span className="sun" />
-        <span className="tree tree-one" />
-        <span className="tree tree-two" />
-        <span className="trail" />
-        <span className="house">⌂</span>
+        <span
+          className={`tree tree-one repair-region ${done("s06") ? "restored" : ""}`}
+        />
+        <span
+          className={`tree tree-two repair-region ${done("s07") ? "restored" : ""}`}
+        />
+        <span
+          className={`trail repair-region ${done("s03") ? "restored" : ""}`}
+        />
+        <span
+          className={`house repair-region ${done("s02") ? "restored" : ""}`}
+        >
+          ⌂
+        </span>
+        <span
+          className={`picnic-patch repair-region ${done("s08") ? "restored" : ""}`}
+        />
       </div>
       <p className="scene-caption">
         {act === 1
@@ -96,16 +120,16 @@ export function Scene({
               ? "小猫过来了，小径留在身后。"
               : "一张纸，也能成为一条路。"
             : "把故事里的物品，放回故事里。"}
+        {mapReady && (
+          <span className="map-direction">
+            {arrived
+              ? "✓ 地图终点：野餐地"
+              : session.world.flags.includes("crossed-ink")
+                ? "地图指向 → 树荫与草地"
+                : "地图指向 → 林间小径"}
+          </span>
+        )}
       </p>
-      {mapReady && (
-        <span className="map-direction">
-          {arrived
-            ? "✓ 地图终点：野餐地"
-            : session.world.flags.includes("crossed-ink")
-              ? "地图指向 → 树荫与草地"
-              : "地图指向 → 林间小径"}
-        </span>
-      )}
       {cue && (
         <p className="scene-response" role="status">
           {cue.response}
@@ -144,7 +168,8 @@ export function Scene({
           {session.world.flags.includes("crossed-ink")
             ? "✓ 已走过的小径"
             : "湿墨小径"}
-          {session.world.entities["route-sheet"]?.location.kind === "zone" && (
+          {entities.find((e) => e.id === "route-sheet")?.location.kind ===
+            "zone" && (
             <span className="road-mat">
               <Art word="mat" />
             </span>
@@ -176,6 +201,7 @@ export function Scene({
                   aria-label={name}
                   aria-pressed={selected === entity.id}
                   data-entity={entity.id}
+                  data-word={entity.word}
                   data-drop={region?.id}
                   aria-description={
                     region
@@ -201,7 +227,14 @@ export function Scene({
                   }
                 >
                   <Art word={entity.word} />
-                  {cue?.kind === 'try-hat' && entity.id === 'cat-companion' && <span className="try-hat-prop" aria-label="短暂试戴，不改变物品位置"><Art word="hat" /></span>}
+                  {cue?.kind === "try-hat" && entity.id === "cat-companion" && (
+                    <span
+                      className="try-hat-prop"
+                      aria-label="短暂试戴，不改变物品位置"
+                    >
+                      <Art word="hat" />
+                    </span>
+                  )}
                   {entity.word === "mat" && children.length > 0 && (
                     <span className="on-mat">
                       {children.map((child) => (
@@ -227,6 +260,13 @@ export function Scene({
                     {children.map((child) => NAMES[child.word]).join("、")}
                     在垫子上面
                   </span>
+                )}
+                {act === 2 && entity.id === "cat-companion" && (
+                  <small className="bank-state">
+                    {session.world.flags.includes("crossed-ink")
+                      ? "已到对岸"
+                      : "小径这边"}
+                  </small>
                 )}
                 {children.length > 0 && entity.word !== "mat" && (
                   <div
@@ -263,7 +303,9 @@ export function Scene({
           className="drag-ghost"
           style={{ left: pointer.ghost.x, top: pointer.ghost.y }}
         >
-          放到目标处
+          {session.world.entities[pointer.ghost.label]
+            ? NAMES[session.world.entities[pointer.ghost.label].word]
+            : "放到目标处"}
         </div>
       )}
       <span className="asset-note">原创临时纸片插画 · 待正式美术替换</span>

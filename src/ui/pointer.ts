@@ -29,7 +29,7 @@ export function usePointerDrop(
       const a = active.current;
       if (!a || a.id !== e.pointerId) return;
       if (Math.hypot(e.clientX - a.x, e.clientY - a.y) > 8) a.moved = true;
-      if (a.moved) setGhost({ x: e.clientX, y: e.clientY, label: "移动中" });
+      if (a.moved) setGhost({ x: e.clientX, y: e.clientY, label: a.source });
     };
     const up = (e: globalThis.PointerEvent) => {
       const a = active.current;

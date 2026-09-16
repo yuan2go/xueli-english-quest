@@ -2,6 +2,7 @@ import { isWord, transition } from "../domain/world.ts";
 import type { World } from "../domain/world.ts";
 import { INITIAL_WORLD, STEPS } from "../content/story.ts";
 import type { Step } from "../content/story.ts";
+import { instructionIssue } from "../content/instructions.ts";
 import { AUDIO } from "../content/manifest.ts";
 import { audioStatuses } from "./audio-evidence.ts";
 import type { AudioObservation } from "./audio-evidence.ts";
@@ -121,6 +122,8 @@ export function run(session: Session, command: Command, steps = STEPS): Result {
       ? response(receipt.outcome, "这次操作已经记录。")
       : response("conflict", "操作已更新，请再试一次。");
   const step = steps[session.step];
+  if (step && instructionIssue(step, session.world))
+    return response("conflict", "任务指令与物品不一致，请返回首页。");
   // Success audio belongs to the just-committed event, including the ending.
   let observation: AudioObservation | undefined;
   if (command.type === "observe") {

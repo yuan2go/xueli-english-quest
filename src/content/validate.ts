@@ -1,4 +1,5 @@
 import { STEPS } from "./story.ts";
+import { instructionIssue } from "./instructions.ts";
 import { correctInput, initialSession, run } from "../game/session.ts";
 import { isWord, singleLetterChange } from "../domain/world.ts";
 import type { Step } from "./story.ts";
@@ -89,6 +90,8 @@ export function validateStory(steps: Step[] = STEPS): void {
   ];
   let state = initialSession("validation");
   steps.forEach((s, index) => {
+    if (s && instructionIssue(s, state.world))
+      throw new Error(instructionIssue(s, state.world)!);
     if (
       !s ||
       Object.keys(s).some((k) => !fields.includes(k)) ||

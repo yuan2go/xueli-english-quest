@@ -36,6 +36,7 @@ export function summarize(session: Session) {
     }
   >();
   const confusions = new Map<string, number>();
+  const seen = new Map<string, string>();
   for (const e of session.events) {
     const s = STEPS.find((s) => s.id === e.stepId)!;
     const key = `${s.word}/${e.taskType}`;
@@ -60,8 +61,8 @@ export function summarize(session: Session) {
       else if (e.outcome === "independent-correct") g.independent++;
       else if (e.outcome === "unverified-correct") g.unverified++;
       else if (e.taskType !== "interaction") g.assisted++;
-      if (["s03", "s04a", "s05", "s08", "s11"].includes(s.id))
-        g.revisit.push(s.id);
+      if (seen.has(s.word) && seen.get(s.word) !== s.id) g.revisit.push(s.id);
+      if (!seen.has(s.word)) seen.set(s.word, s.id);
     }
     // Replays are cumulative per step; count only once per step, never as errors.
     groups.set(key, g);

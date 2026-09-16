@@ -85,7 +85,10 @@ export function validateResources(
       !a.text ||
       !a.locale ||
       (a.path &&
-        (!a.path.endsWith(ext) || !a.durationMs || !Number.isFinite(a.durationMs) || a.durationMs <= 0)) ||
+        (!a.path.endsWith(ext) ||
+          !a.durationMs ||
+          !Number.isFinite(a.durationMs) ||
+          a.durationMs <= 0)) ||
       (!a.path &&
         (a.bytes !== null || a.sha256 !== null || a.durationMs !== null))
     )
@@ -97,6 +100,9 @@ export function matchesFormat(
   type: ImageAsset["type"] | AudioAsset["type"],
 ): boolean {
   const text = new TextDecoder().decode(data.slice(0, 512));
+  const marker = (offset: number, value: string) =>
+    data.length >= offset + value.length &&
+    [...value].every((c, i) => data[offset + i] === c.charCodeAt(0));
   switch (type) {
     case "image/svg+xml":
       return (
@@ -106,13 +112,13 @@ export function matchesFormat(
     case "image/png":
       return [137, 80, 78, 71, 13, 10, 26, 10].every((b, i) => data[i] === b);
     case "image/webp":
-      return text.startsWith("RIFF") && text.slice(8, 12) === "WEBP";
+      return data.length >= 12 && marker(0, "RIFF") && marker(8, "WEBP");
     case "audio/mpeg":
       return (
         text.startsWith("ID3") || (data[0] === 255 && (data[1] & 224) === 224)
       );
     case "audio/wav":
-      return text.startsWith("RIFF") && text.slice(8, 12) === "WAVE";
+      return data.length >= 12 && marker(0, "RIFF") && marker(8, "WAVE");
     case "audio/ogg":
       return text.startsWith("OggS");
   }

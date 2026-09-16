@@ -82,6 +82,15 @@ async function touchDrag(p, source, target, cancel = false, multi = false) {
   });
   await cdp.detach();
 }
+test('LAN HTTP capability fallback starts without randomUUID or SubtleCrypto', async ({ browser }) => {
+  const c = await browser.newContext({ hasTouch: true });
+  await c.addInitScript(() => {
+    Object.defineProperty(crypto, 'randomUUID', { value: undefined });
+    Object.defineProperty(crypto, 'subtle', { value: undefined });
+  });
+  const p = await c.newPage(); await start(p); await spell(p, 'cat'); await at(p, 's02');
+  await expect(p.getByRole('alert')).toHaveCount(0); await c.close();
+});
 test("phone: normal entrance, true letter interaction, ink boundaries, all thirteen actions, records", async ({
   browser,
 }) => {

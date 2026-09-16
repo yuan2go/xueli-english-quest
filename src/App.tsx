@@ -15,6 +15,7 @@ import {
   save,
 } from "./platform/save.ts";
 import { StoryAudio } from "./platform/audio.ts";
+import { localId } from "./platform/id.ts";
 import { Letters } from "./ui/Letters.tsx";
 import { Art, AssetContext, Scene } from "./ui/Scene.tsx";
 import { isWord, WORDS } from "./domain/world.ts";
@@ -171,7 +172,7 @@ function Preview() {
 export default function App() {
   const [loaded] = useState(load);
   const [session, setSession] = useState(
-    () => loaded.session ?? initialSession(crypto.randomUUID()),
+    () => loaded.session ?? initialSession(localId()),
   );
   const current = useRef(session);
   const canSave = useRef(!loaded.blocked);
@@ -261,7 +262,7 @@ export default function App() {
     const result = run(before, {
       sessionId: before.id,
       stepId: s.id,
-      attemptId: crypto.randomUUID(),
+      attemptId: localId(),
       expectedRevision: before.revision,
       type,
       input,
@@ -298,7 +299,7 @@ export default function App() {
       );
     }
     canSave.current = safe;
-    const fresh = initialSession(crypto.randomUUID());
+    const fresh = initialSession(localId());
     current.current = fresh;
     setSession(fresh);
     setFeedback("");
@@ -313,7 +314,7 @@ export default function App() {
       localStorage.removeItem(SAVE_KEY);
       localStorage.removeItem(ARCHIVE_KEY);
       canSave.current = true;
-      const fresh = initialSession(crypto.randomUUID());
+      const fresh = initialSession(localId());
       current.current = fresh;
       setSession(fresh);
       setArchive(null);

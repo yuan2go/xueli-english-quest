@@ -142,14 +142,15 @@ export function Scene({
                       {children.map((child) => (
                         <span key={child.id}>
                           <Art word={child.word} />
-                          <small>{NAMES[child.word]}在上面</small>
+                        <small className="sr-only">{NAMES[child.word]}在上面</small>
                         </span>
                       ))}
                     </span>
                   )}
                   <span>{reveal ? entity.word : name}</span>
                   {selected === entity.id && <small>已选中 ✓</small>}
-                </button>
+              </button>
+              {entity.word === 'mat' && children.length > 0 && <span className="placement-caption">{children.map(child => NAMES[child.word]).join('、')}在垫子上面</span>}
                 {children.length > 0 && entity.word !== "mat" && (
                   <div
                     className="placed inside"

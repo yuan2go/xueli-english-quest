@@ -11,12 +11,16 @@ export async function checkAssets(): Promise<string[]> {
         });
         if (!response.ok) return asset.id;
         const data = await response.arrayBuffer();
+        if (data.byteLength !== asset.bytes || !new TextDecoder().decode(data).includes('<svg')) return asset.id;
+        // Asset tests verify SHA-256 unconditionally. LAN HTTP lacks SubtleCrypto;
+        // still allow that preview with a structural/size check and image fallback.
+        if (!crypto.subtle) return '';
         const hash = [
           ...new Uint8Array(await crypto.subtle.digest("SHA-256", data)),
         ]
           .map((b) => b.toString(16).padStart(2, "0"))
           .join("");
-        if (data.byteLength !== asset.bytes || hash !== asset.sha256)
+        if (hash !== asset.sha256)
           return asset.id;
       } catch {
         return asset.id;

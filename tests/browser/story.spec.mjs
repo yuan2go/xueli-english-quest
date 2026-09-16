@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
-const evidence = "docs/evidence/playable-story";
+const evidence = "docs/evidence/story-experience";
 const KEY = "wordspell.story.v1";
 const button = (p, name) => p.getByRole("button", { name, exact: true });
 async function start(p) {
@@ -10,18 +10,25 @@ async function start(p) {
   await button(p, "我来试试").click();
 }
 async function at(p, id) {
+  await closeResult(p);
   await expect(p.locator(".game-layout")).toHaveAttribute("data-step", id);
+}
+async function closeResult(p) {
+  const close = button(p, "收好这一页");
+  if (await close.isVisible()) await close.click();
 }
 async function spell(p, word) {
   for (const c of word) await button(p, `字母 ${c}`).tap();
   await p.getByRole("button", { name: "施法" }).tap();
 }
 async function transform(p, from, to) {
+  await closeResult(p);
   await button(p, `第3格 ${from}`).tap();
   await button(p, `字母 ${to}`).tap();
   await p.getByRole("button", { name: "施法" }).tap();
 }
 async function help(p) {
+  await closeResult(p);
   await button(p, "文字辅助").click();
 }
 async function reload(p, id) {
@@ -40,7 +47,10 @@ async function screenshot(p, name) {
       [...document.images].map((img) => img.decode().catch(() => {})),
     );
   });
-  await p.screenshot({ path: `${evidence}/${name}.png`, fullPage: true });
+  const folder = ["phone-transform", "small-phone-crossing"].includes(name)
+    ? "test-results"
+    : evidence;
+  await p.screenshot({ path: `${folder}/${name}.png`, fullPage: true });
 }
 async function touchDrag(p, source, target, cancel = false, multi = false) {
   await source.scrollIntoViewIfNeeded();
@@ -82,14 +92,20 @@ async function touchDrag(p, source, target, cancel = false, multi = false) {
   });
   await cdp.detach();
 }
-test('LAN HTTP capability fallback starts without randomUUID or SubtleCrypto', async ({ browser }) => {
+test("LAN HTTP capability fallback starts without randomUUID or SubtleCrypto", async ({
+  browser,
+}) => {
   const c = await browser.newContext({ hasTouch: true });
   await c.addInitScript(() => {
-    Object.defineProperty(crypto, 'randomUUID', { value: undefined });
-    Object.defineProperty(crypto, 'subtle', { value: undefined });
+    Object.defineProperty(crypto, "randomUUID", { value: undefined });
+    Object.defineProperty(crypto, "subtle", { value: undefined });
   });
-  const p = await c.newPage(); await start(p); await spell(p, 'cat'); await at(p, 's02');
-  await expect(p.getByRole('alert')).toHaveCount(0); await c.close();
+  const p = await c.newPage();
+  await start(p);
+  await spell(p, "cat");
+  await at(p, "s02");
+  await expect(p.getByRole("alert")).toHaveCount(0);
+  await c.close();
 });
 test("phone: normal entrance, true letter interaction, ink boundaries, all thirteen actions, records", async ({
   browser,
@@ -131,7 +147,8 @@ test("phone: normal entrance, true letter interaction, ink boundaries, all thirt
   await at(p, "s03");
   await spell(p, "mat");
   await at(p, "s03");
-  await expect(p.locator(".projection")).toBeVisible();
+  await expect(p.locator(".scene-projection")).toBeVisible();
+  await expect(p.locator(".scene")).toHaveClass(/cat-rest/);
   await expect(p.locator('[data-entity="picnic-mat"]')).toHaveCount(0);
   await button(p, "给我一点提示").tap();
   await help(p);
@@ -139,13 +156,19 @@ test("phone: normal entrance, true letter interaction, ink boundaries, all thirt
   await button(p, "字母 p").tap();
   await p.getByRole("button", { name: "施法" }).tap();
   await at(p, "s04a");
-  await expect(p.locator(".projection")).toHaveCount(0);
+  await expect(p.locator(".scene-projection")).toHaveCount(0);
   await screenshot(p, "phone-transform");
   await transform(p, "p", "t");
   await at(p, "s04b");
   await reload(p, "s04b");
   await expect(p.getByText("已完成 3 / 12", { exact: true })).toBeVisible();
-  const before = await p.evaluate((key) => localStorage.getItem(key), KEY);
+  const before = await p.evaluate(
+    (key) =>
+      JSON.parse(localStorage.getItem(key)).journal.filter(
+        (c) => c.type === "submit",
+      ),
+    KEY,
+  );
   await touchDrag(
     p,
     p.locator('[data-entity="route-sheet"]'),
@@ -153,9 +176,15 @@ test("phone: normal entrance, true letter interaction, ink boundaries, all thirt
     true,
     true,
   );
-  expect(await p.evaluate((key) => localStorage.getItem(key), KEY)).toBe(
-    before,
-  );
+  expect(
+    await p.evaluate(
+      (key) =>
+        JSON.parse(localStorage.getItem(key)).journal.filter(
+          (c) => c.type === "submit",
+        ),
+      KEY,
+    ),
+  ).toEqual(before);
   await touchDrag(
     p,
     p.locator('[data-entity="route-sheet"]'),
@@ -183,26 +212,28 @@ test("phone: normal entrance, true letter interaction, ink boundaries, all thirt
   await screenshot(p, "phone-placement");
   await help(p);
   await button(p, "鸭舌帽").tap();
-  await button(p, "背包上面").tap();
+  await button(p, "垫子").tap();
   await at(p, "s09");
   await button(p, "鸭舌帽").tap();
-  await button(p, "背包里面").tap();
+  await button(p, "背包").tap();
   await at(p, "s10");
   await help(p);
   await button(p, "宽檐帽").tap();
-  await button(p, "垫子上面").tap();
+  await touchDrag(p, button(p, "宽檐帽"), button(p, "垫子"));
   await at(p, "s11");
   await help(p);
   await button(p, "地图").tap();
   await at(p, "s12");
   await help(p);
   await button(p, "小猫").tap();
-  await button(p, "垫子上面").tap();
+  await button(p, "垫子").tap();
   await expect(p.getByRole("heading", { name: "野餐开始啦。" })).toBeVisible();
   await noOverflow(p);
   await screenshot(p, "phone-ending");
-  await button(p, "回顾本次练习").tap();
-  await expect(p.locator(".records li")).toHaveCount(15);
+  await expect(p.locator(".ending .repair-pages .repaired")).toHaveCount(3);
+  await button(p, "重听单词 map").tap();
+  await button(p, "陪伴者：回顾本次练习").tap();
+  await expect(p.locator(".records > ol > li")).toHaveCount(15);
   await expect(p.locator(".records")).toContainText("辅助完成");
   await expect(p.locator(".records")).toContainText("铺路操作");
   await p.reload();
@@ -214,6 +245,83 @@ test("phone: normal entrance, true letter interaction, ink boundaries, all thirt
   expect(errors).toEqual([]);
   expect(failed).toEqual([]);
   await context.close();
+});
+test("result timing, background recovery, wrong-word rehearsal and help survive reload without auto-completion", async ({
+  browser,
+}) => {
+  const c = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    hasTouch: true,
+  });
+  await c.addInitScript(() => {
+    window.probe = [];
+    Object.defineProperty(window, "speechSynthesis", {
+      value: {
+        cancel() {},
+        speak(u) {
+          window.probe.push(u);
+          u.onstart?.();
+        },
+      },
+    });
+  });
+  const p = await c.newPage();
+  await start(p);
+  await spell(p, "cat");
+  await expect(p.locator('[data-feedback="s01"]')).toBeVisible();
+  await expect(p.getByRole("button", { name: "施法" })).toHaveCount(0);
+  await expect(p.locator('[data-phase="1"]')).toBeVisible();
+  expect(await p.evaluate(() => window.probe.at(-1).text)).toBe("cat");
+  // With no end callback, the finite presentation and audio watchdog still release.
+  await expect(p.locator(".game-layout")).toHaveAttribute("data-step", "s02", {
+    timeout: 5000,
+  });
+  expect(await p.evaluate(() => window.probe.at(-1).text)).toBe("bag");
+  await spell(p, "bag");
+  await p.evaluate(() => window.dispatchEvent(new Event("pagehide")));
+  await expect(p.getByRole("dialog")).toBeVisible();
+  await expect(p.locator("[data-feedback]")).toHaveCount(0);
+  await button(p, "继续故事").click();
+  await at(p, "s03");
+  await spell(p, "mat");
+  await expect(p.locator(".rest-projection")).toContainText("可以休息了吗");
+  await p.getByRole("button", { name: "施法" }).click();
+  await expect(p.locator(".rest-projection")).toContainText("还是 mat");
+  await expect(button(p, "第3格 t")).toBeVisible();
+  await button(p, "给我一点提示").click();
+  await button(p, "看示范").click();
+  await expect(p.locator(".demonstration")).toHaveAttribute("data-frame", "4");
+  await expect(p.locator(".game-layout")).toHaveAttribute("data-step", "s03");
+  await reload(p, "s03");
+  await expect(p.locator(".demonstration")).toBeVisible();
+  await expect(p.locator(".scene-projection")).toHaveCount(0);
+  await spell(p, "map");
+  await at(p, "s04a");
+  await transform(p, "p", "t");
+  await expect(p.locator('[data-feedback="s04a"]')).toBeVisible();
+  await screenshot(p, "phone-morph-result");
+  await reload(p, "s04b");
+  await button(p, "垫子").tap();
+  await button(p, "湿墨小径").tap();
+  await reload(p, "s05");
+  const journal = await p.evaluate(
+    (key) => JSON.parse(localStorage.getItem(key)).journal,
+    KEY,
+  );
+  expect(
+    journal.filter((c) => c.type === "submit" && c.stepId === "s04b"),
+  ).toHaveLength(1);
+  expect(journal.some((c) => c.type === "demo" && c.stepId === "s03")).toBe(
+    true,
+  );
+  expect(
+    journal.some(
+      (c) =>
+        c.type === "observe" &&
+        JSON.parse(c.input.observation).purpose === "success",
+    ),
+  ).toBe(true);
+  await c.close();
 });
 test("audio replacement, stale callbacks, leaving page and volume use one service", async ({
   browser,

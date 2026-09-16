@@ -47,12 +47,19 @@ export function usePointerDrop(
     const pointerCancel = (e: globalThis.PointerEvent) => {
       if (active.current?.id === e.pointerId) cancel();
     };
+    const otherPointer = (e: globalThis.PointerEvent) => {
+      if (active.current && active.current.id !== e.pointerId) cancel();
+    };
+    window.addEventListener("pointerdown", otherPointer);
+    document.addEventListener("visibilitychange", cancel);
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
     window.addEventListener("pointercancel", pointerCancel);
     window.addEventListener("resize", cancel);
     window.addEventListener("blur", cancel);
     return () => {
+      window.removeEventListener("pointerdown", otherPointer);
+      document.removeEventListener("visibilitychange", cancel);
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", up);
       window.removeEventListener("pointercancel", pointerCancel);

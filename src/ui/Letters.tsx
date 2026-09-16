@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Step } from "../content/story.ts";
 import { usePointerDrop } from "./pointer.ts";
+import { letterLayout } from "../game/interaction.ts";
 
 export function Letters({
   step,
@@ -9,18 +10,20 @@ export function Letters({
   step: Step;
   submit: (word: string) => void;
 }) {
-  const tokens = [...step.letters].map((letter, i) => ({
-    id: `letter-${i}`,
-    letter,
-  }));
+  const { tokens, fixed } = letterLayout(step);
   const initial =
     step.type === "transform"
-      ? [null, null, tokens.find((t) => t.letter === step.from?.[2])!.id]
+      ? [0, 1, 2].map((i) =>
+          fixed(i) ? null : tokens.find((t) => t.letter === step.from?.[i])!.id,
+        )
       : [null, null, null];
   const [slots, setSlots] = useState<(string | null)[]>(initial);
   const [selected, setSelected] = useState<number | null>(null);
-  const fixed = (i: number) => step.type === "transform" && i < 2;
+  const [lesson, setLesson] = useState(0);
   function move(token: string, destination: number | null) {
+    setLesson((n) =>
+      destination === null ? Math.max(n, 2) : n === 0 ? 1 : n >= 2 ? 3 : n,
+    );
     setSlots((old) => {
       const next = [...old];
       const origin = next.indexOf(token);
@@ -98,6 +101,18 @@ export function Letters({
         ))}
       </div>
       <p className="micro">点字母填入 · 点格子取回 · 拖动可交换</p>
+      {step.mode === "teaching" && (
+        <p className="tutorial-live" role="status">
+          {
+            [
+              "先点一个字母，把印块放进格子。",
+              "放进去了！试着点刚才的格子，把字母取回来。",
+              "取回来了。现在选择格子，再点字母，就能重新放入或替换。",
+              "你会调整字母了。按 c、a、t 排好，点「施法」叫醒小猫。",
+            ][lesson]
+          }
+        </p>
+      )}
       <button
         className="primary spell"
         disabled={word.length !== 3}

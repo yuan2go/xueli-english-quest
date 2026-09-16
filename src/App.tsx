@@ -3,7 +3,12 @@ import type { ReactNode } from "react";
 import { ACTS, STEPS } from "./content/story.ts";
 import { validateStory } from "./content/validate.ts";
 import { checkAssets } from "./content/assets.ts";
-import { completedChallenges, initialSession, run } from "./game/session.ts";
+import {
+  completedChallenges,
+  initialSession,
+  run,
+  helpFor,
+} from "./game/session.ts";
 import type { Command, Input, Session } from "./game/session.ts";
 import {
   ARCHIVE_KEY,
@@ -19,6 +24,16 @@ import { localId } from "./platform/id.ts";
 import { Letters } from "./ui/Letters.tsx";
 import { Art, AssetContext, Scene } from "./ui/Scene.tsx";
 import { isWord, WORDS } from "./domain/world.ts";
+import type { WordId } from "./domain/world.ts";
+import type { Step } from "./content/story.ts";
+import type { AudioObservation } from "./game/audio-evidence.ts";
+import { FEEDBACK } from "./content/feedback.ts";
+import {
+  RepairPages,
+  PracticeSummary,
+  Demonstration,
+} from "./ui/Experience.tsx";
+import "./experience.css";
 
 function Modal({
   title,
@@ -81,15 +96,17 @@ const taskNames: Record<string, string> = {
   interaction: "铺路操作",
 };
 const outcomes: Record<string, string> = {
-  "independent-correct": "无提示完成（开发语音）",
+  "independent-correct": "无提示完成（音频来源见明细）",
   "assisted-correct": "辅助完成",
   demonstrated: "演示后复现",
   incorrect: "调整后再试",
   "interaction-complete": "操作完成",
+  "unverified-correct": "完成（未确认任务音频）",
 };
 function Records({ session }: { session: Session }) {
   return (
     <div className="records">
+      <PracticeSummary session={session} />
       <p>
         仅记录这次真实操作，保存在当前浏览器。开发语音未经审核，这些记录不代表学习提升或正式听力测评。
       </p>
@@ -125,6 +142,8 @@ function Records({ session }: { session: Session }) {
               <small>
                 {e.answerVisible ? "答案/文字辅助可见" : "未显示完整答案"} ·
                 本题第 {e.priorAttempts + 1} 次提交
+                {" · "}
+                {e.inputMode} · 音频观察 {e.audio.length} 条
               </small>
             </li>
           ))}
@@ -189,7 +208,14 @@ export default function App() {
   const [assetEpoch, setAssetEpoch] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [feedbackType, setFeedbackType] = useState("");
-  const [projection, setProjection] = useState<string | null>(null);
+  const [projection, setProjection] = useState<{
+    word: WordId;
+    rest: boolean;
+    repeated: boolean;
+    eventId: string;
+  } | null>(null);
+  const [cue, setCue] = useState<{ step: Step; eventId: string } | null>(null);
+  const [phase, setPhase] = useState(0);
   const [audioMessage, setAudioMessage] =
     useState("开发语音未经审核；可选择文字辅助。");
   const [volume, setVolume] = useState(0.8);
@@ -197,9 +223,40 @@ export default function App() {
   const [archive, setArchive] = useState<Session | null>(null);
   const [preview, setPreview] = useState(location.hash === "#design");
   const audio = useRef(new StoryAudio()).current;
-  const step = STEPS[session.step];
+  const step = cue?.step ?? STEPS[session.step];
   const activeRef = useRef(false);
-  activeRef.current = screen === "game" && !modal;
+  const playingRef = useRef(false);
+  playingRef.current = screen === "game" && !modal;
+  activeRef.current = screen === "game" && !modal && !cue;
+  function observe(o: AudioObservation, owner: string) {
+    const before = current.current;
+    if (before.id !== owner) return;
+    const result = run(before, {
+      sessionId: before.id,
+      stepId: o.stepId,
+      attemptId: localId(),
+      expectedRevision: before.revision,
+      type: "observe",
+      input: { observation: JSON.stringify(o) },
+    });
+    if (result.session !== before) {
+      current.current = result.session;
+      setSession(result.session);
+      if (canSave.current) {
+        const message = save(result.session);
+        if (message) setWarning(message);
+      }
+    }
+  }
+  function playTask(s: Step) {
+    const owner = current.current.id;
+    audio.play(s.prompt, setAudioMessage, {
+      stepId: s.id,
+      purpose: "task",
+      eventId: "",
+      observe: (o) => observe(o, owner),
+    });
+  }
   useEffect(() => {
     let live = true;
     try {
@@ -223,10 +280,12 @@ export default function App() {
     };
   }, [audio]);
   useEffect(() => {
-    const stop = () => {
+    const stop = (event: Event) => {
+      if (!document.hidden && event.type !== "pagehide") return;
       audio.stop();
-      if (document.hidden)
-        setModal((m) => m ?? (activeRef.current ? "pause" : null));
+      setCue(null);
+      setProjection(null);
+      setModal((m) => m ?? (playingRef.current ? "pause" : null));
     };
     window.addEventListener("pagehide", stop);
     document.addEventListener("visibilitychange", stop);
@@ -237,13 +296,51 @@ export default function App() {
   }, [audio]);
   useEffect(() => {
     audio.stop();
-    if (screen === "game" && !modal && step)
-      audio.play(step.prompt, setAudioMessage);
+    if (screen === "game" && !modal && !cue && !preview && step) playTask(step);
     return () => audio.stop();
-  }, [session.step, screen, modal, audio, step]);
+  }, [session.step, screen, modal, audio, cue, preview]);
+  useEffect(() => {
+    if (!cue) return;
+    setPhase(0);
+    const voice = setTimeout(() => {
+      setPhase(1);
+      const owner = current.current.id;
+      audio.play(
+        cue.step.word,
+        setAudioMessage,
+        {
+          stepId: cue.step.id,
+          purpose: "success",
+          eventId: cue.eventId,
+          observe: (o) => observe(o, owner),
+        },
+        2400,
+      );
+    }, 450);
+    const response = setTimeout(() => setPhase(2), 1400);
+    const finish = setTimeout(() => setCue(null), 3600);
+    return () => {
+      clearTimeout(voice);
+      clearTimeout(response);
+      clearTimeout(finish);
+      audio.stop();
+    };
+  }, [cue, audio]);
+  useEffect(() => {
+    if (modal || screen !== "game" || preview) {
+      setCue(null);
+      setProjection(null);
+      audio.stop();
+    }
+    if (screen === "game" && !cue && session.step === STEPS.length)
+      setScreen("end");
+  }, [modal, screen, cue, session.step, preview, audio]);
   useEffect(() => {
     if (!projection) return;
-    const t = setTimeout(() => setProjection(null), 1000);
+    const t = setTimeout(
+      () => setProjection(null),
+      projection.repeated ? 1400 : 4500,
+    );
     return () => clearTimeout(t);
   }, [projection]);
   useEffect(() => {
@@ -256,7 +353,7 @@ export default function App() {
       !s ||
       !activeRef.current ||
       before.id !== session.id ||
-      before.revision !== session.revision
+      before.step !== session.step
     )
       return;
     const result = run(before, {
@@ -276,11 +373,22 @@ export default function App() {
       if (message) setWarning(message);
     }
     if (result.outcome === "incorrect") {
-      if (input.word && isWord(input.word)) setProjection(input.word);
-      audio.play(s.prompt, setAudioMessage);
+      if (input.word && isWord(input.word))
+        setProjection({
+          word: input.word,
+          rest: s.id === "s03" && input.word === "mat",
+          repeated: before.events.some(
+            (e) => e.stepId === s.id && e.submitted.word === input.word,
+          ),
+          eventId: result.session.events.at(-1)!.eventId,
+        });
+      else setProjection(null);
+      playTask(s);
     }
-    if (result.outcome === "success") setProjection(null);
-    if (result.session.step === STEPS.length) setScreen("end");
+    if (result.outcome === "success" && result.session !== before) {
+      setProjection(null);
+      setCue({ step: s, eventId: result.session.events.at(-1)!.eventId });
+    }
   }
   function enter() {
     audio.unlock();
@@ -357,6 +465,31 @@ export default function App() {
         {warning && (
           <div className="notice" role="alert">
             {warning}
+            <button
+              className="quiet"
+              onClick={() => {
+                try {
+                  const raw = localStorage.getItem(SAVE_KEY);
+                  const previous = localStorage.getItem(ARCHIVE_KEY);
+                  const url = URL.createObjectURL(
+                    new Blob([JSON.stringify({ current: raw, previous })], {
+                      type: "application/json",
+                    }),
+                  );
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = "wordspell-original-saves.json";
+                  a.click();
+                  setTimeout(() => URL.revokeObjectURL(url), 1000);
+                } catch {
+                  setWarning(
+                    "无法访问本地原档。当前会话仍可在练习记录中导出。",
+                  );
+                }
+              }}
+            >
+              导出原始存档
+            </button>
           </div>
         )}
         {missing.length > 0 && (
@@ -442,6 +575,7 @@ export default function App() {
         )}
         {screen === "game" && step && (
           <>
+            <RepairPages session={session} />
             <div className="chapter">
               <p>{ACTS[step.act - 1]}</p>
               <span>已完成 {completedChallenges(session)} / 12</span>
@@ -463,7 +597,12 @@ export default function App() {
                 ))}
               </div>
             </div>
-            <div className="game-layout" data-step={step.id}>
+            <div
+              className="game-layout"
+              data-step={cue ? undefined : step.id}
+              data-feedback={cue?.step.id}
+              data-phase={phase}
+            >
               <Scene
                 key={`${step.id}-${assetEpoch}`}
                 session={session}
@@ -474,118 +613,127 @@ export default function App() {
                   setFeedbackType("interaction");
                 }}
                 reveal={answerVisible}
+                cue={cue ? FEEDBACK[cue.step.id] : undefined}
+                projection={projection}
+                disabled={!!cue}
               />
               <section className="task-panel" aria-labelledby="task-title">
-                <p className="eyebrow">
-                  第 {String(step.challenge).padStart(2, "0")} 个挑战
-                  {step.id.startsWith("s04")
-                    ? ` · ${step.id === "s04a" ? "换字" : "铺路"}`
-                    : ""}
-                </p>
-                <h1 id="task-title">{step.title}</h1>
-                <p className="story-line">{step.story}</p>
-                <div className="audio-row">
-                  <button
-                    className="listen"
-                    onClick={() => {
-                      audio.unlock();
-                      send("replay");
-                      audio.play(step.prompt, setAudioMessage);
-                    }}
-                  >
-                    ▷ 重听任务
-                  </button>
-                  <button className="quiet" onClick={() => send("text")}>
-                    文字辅助
-                  </button>
-                </div>
-                <p className="audio-note" role="status">
-                  {audioMessage}
-                </p>
-                {answerVisible && (
-                  <div className="answer" lang="en">
-                    {step.prompt}
-                    <small lang="zh-CN">
-                      {session.demo
-                        ? "示范：照着操作，再亲手完成"
-                        : "文字辅助 · 本题如实记录"}
+                {cue ? (
+                  <div className="result-story" role="status">
+                    <p className="eyebrow">
+                      {cue.step.type === "transform"
+                        ? "同一件物品，新的用途"
+                        : "这一页发生了变化"}
+                    </p>
+                    <h1 id="task-title">{FEEDBACK[cue.step.id].title}</h1>
+                    {cue.step.type === "transform" && (
+                      <p className="word-change" lang="en">
+                        {cue.step.from?.slice(0, 2)}
+                        <del>{cue.step.from?.[2]}</del> →{" "}
+                        {cue.step.word.slice(0, 2)}
+                        <strong>{cue.step.word[2]}</strong>
+                      </p>
+                    )}
+                    <p className="result-word" lang="en">
+                      {cue.step.word}
+                    </p>
+                    <p>{FEEDBACK[cue.step.id].response}</p>
+                    <p className="audio-note">{audioMessage}</p>
+                    <button
+                      className="secondary"
+                      onClick={() => {
+                        audio.stop();
+                        setCue(null);
+                      }}
+                    >
+                      收好这一页
+                    </button>
+                    <small>
+                      结果已经保存。可跳过演出，继续亲手完成下一个任务。
                     </small>
                   </div>
-                )}
-                {session.hint > 0 && (
-                  <p className="hint">
-                    提示 {session.hint}：
-                    {step.hints[Math.min(session.hint - 1, 1)]}
-                  </p>
-                )}
-                {session.demo && (
-                  <ol className="demo">
-                    {step.type === "spell" ? (
-                      <>
-                        <li>依次点 {step.word.split("").join(" → ")}。</li>
-                        <li>检查三个格子，再点施法。</li>
-                      </>
-                    ) : step.type === "transform" ? (
-                      <>
-                        <li>点第三格，取回 {step.from?.[2]}。</li>
-                        <li>点字母 {step.word[2]}，再点施法。</li>
-                      </>
-                    ) : (
-                      <>
-                        <li>{step.hints[1]}</li>
-                        <li>
-                          {step.type === "select"
-                            ? "亲手点选场景里的目标物品。"
-                            : "先选物品，再点对应放置区。"}
-                        </li>
-                      </>
-                    )}
-                  </ol>
-                )}
-                {step.type === "spell" || step.type === "transform" ? (
-                  <Letters
-                    key={step.id}
-                    step={step}
-                    submit={(word) =>
-                      send("submit", {
-                        word,
-                        ...(step.source ? { source: step.source } : {}),
-                      })
-                    }
-                  />
                 ) : (
-                  <p className="interaction-guide">
-                    {step.type === "select"
-                      ? "听清楚后，点选场景中的物品。"
-                      : "先点物品，再点放置区；也可拖动。"}
-                  </p>
-                )}
-                <div className="help-row">
-                  <button className="quiet" onClick={() => send("hint")}>
-                    给我一点提示
-                  </button>
-                  {session.hint >= 2 && (
-                    <button className="quiet" onClick={() => send("demo")}>
-                      看示范
-                    </button>
-                  )}
-                </div>
-                <p
-                  className={`feedback ${feedbackType}`}
-                  role="status"
-                  aria-live="polite"
-                >
-                  {feedback || "慢慢来，故事会等你。"}
-                </p>
-                {projection && isWord(projection) && (
-                  <div className="projection" role="status">
-                    <Art word={projection} />
-                    <p>
-                      这是 {projection}，只是短暂的想象。
-                      <br />
-                      再听听这次需要什么。
+                  <>
+                    <p className="eyebrow">
+                      第 {String(step.challenge).padStart(2, "0")} 个挑战
+                      {step.id.startsWith("s04")
+                        ? ` · ${step.id === "s04a" ? "换字" : "铺路"}`
+                        : ""}
                     </p>
-                  </div>
+                    <h1 id="task-title">{step.title}</h1>
+                    <p className="story-line">{step.story}</p>
+                    <div className="audio-row">
+                      <button
+                        className="listen"
+                        onClick={() => {
+                          audio.unlock();
+                          send("replay");
+                          playTask(step);
+                        }}
+                      >
+                        ▷ 重听任务
+                      </button>
+                      <button className="quiet" onClick={() => send("text")}>
+                        文字辅助
+                      </button>
+                    </div>
+                    <p className="audio-note" role="status">
+                      {audioMessage}
+                    </p>
+                    {answerVisible && (
+                      <div className="answer" lang="en">
+                        {step.prompt}
+                        <small lang="zh-CN">
+                          {session.demo
+                            ? "示范：照着操作，再亲手完成"
+                            : "文字辅助 · 本题如实记录"}
+                        </small>
+                      </div>
+                    )}
+                    {session.hint > 0 && (
+                      <p className="hint">
+                        提示 {session.hint}：{helpFor(session, step)}
+                      </p>
+                    )}
+                    {session.demo && (
+                      <Demonstration key={step.id} step={step} />
+                    )}
+                    {step.type === "spell" || step.type === "transform" ? (
+                      <Letters
+                        key={step.id}
+                        step={step}
+                        submit={(word) =>
+                          send("submit", {
+                            word,
+                            ...(step.source ? { source: step.source } : {}),
+                          })
+                        }
+                      />
+                    ) : (
+                      <p className="interaction-guide">
+                        {step.type === "select"
+                          ? "听清楚后，点选场景中的物品。"
+                          : "先点物品，再点放置区；也可拖动。"}
+                      </p>
+                    )}
+                    <div className="help-row">
+                      <button className="quiet" onClick={() => send("hint")}>
+                        给我一点提示
+                      </button>
+                      {session.hint >= 2 && (
+                        <button className="quiet" onClick={() => send("demo")}>
+                          看示范
+                        </button>
+                      )}
+                    </div>
+                    <p
+                      className={`feedback ${feedbackType}`}
+                      role="status"
+                      aria-live="polite"
+                    >
+                      {feedback || "慢慢来，故事会等你。"}
+                    </p>
+                  </>
                 )}
               </section>
             </div>
@@ -602,27 +750,39 @@ export default function App() {
               onMiss={() => {}}
               reveal
             />
+            <RepairPages session={session} expanded />
             <div className="word-cards">
               {WORDS.map((w) => (
-                <span key={w} lang="en">
+                <button
+                  key={w}
+                  lang="en"
+                  onClick={() => {
+                    audio.unlock();
+                    audio.play(w, setAudioMessage);
+                  }}
+                  aria-label={`重听单词 ${w}`}
+                >
                   {w}
-                </span>
+                </button>
               ))}
             </div>
+            <p className="audio-note" role="status">
+              {audioMessage}
+            </p>
             <p>
               本局完成 {completedChallenges(session)}{" "}
               个挑战。每一次提示和尝试，都在练习记录里。
             </p>
             <button
-              className="primary"
+              className="quiet"
               onClick={() => {
                 setArchive(null);
                 setScreen("records");
               }}
             >
-              回顾本次练习
+              陪伴者：回顾本次练习
             </button>
-            <button className="quiet" onClick={() => setModal("restart")}>
+            <button className="primary" onClick={() => setModal("restart")}>
               再读一次故事
             </button>
           </section>
@@ -669,9 +829,7 @@ export default function App() {
         )}
         {modal === "tutorial" && (
           <Modal title="用字母，把故事叫醒" close={() => setModal(null)}>
-            <p>① 点字母，填进空格。点格子可以取回，也可以拖动交换。</p>
-            <p>② 拼好后，点「施法」。只有施法才提交答案。</p>
-            <p>③ 摆物品时先点物品，再点目标；拖过去也可以。</p>
+            <p>从三个字母开始，把小猫叫醒。操作区会陪你试放、取回和施法。</p>
             <p className="notice">
               语音是未经审核的浏览器开发替代。听不清时可选「文字辅助」，不影响完成故事。
             </p>

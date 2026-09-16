@@ -1,0 +1,41 @@
+import { CONTENT_SIGNATURE, PACK } from '../content/story.ts';
+import { initialSession, run } from '../game/session.ts';
+import type { Command, Session } from '../game/session.ts';
+
+export const SAVE_KEY = 'wordspell.story.v1';
+export const ARCHIVE_KEY = 'wordspell.previous.v1';
+export function encode(session: Session): string {
+  return JSON.stringify({ schema: 1, pack: PACK.version, content: CONTENT_SIGNATURE, id: session.id, journal: session.journal });
+}
+function record(value: unknown): value is Record<string, unknown> { return !!value && typeof value === 'object' && !Array.isArray(value); }
+export function decode(raw: string): Session {
+  if (raw.length > 2_000_000) throw new Error('存档过大，无法安全恢复。');
+  const value: unknown = JSON.parse(raw);
+  if (!record(value) || value.schema !== 1 || value.pack !== PACK.version || value.content !== CONTENT_SIGNATURE) throw new Error('这是其他版本的存档，暂时无法恢复。原始数据已保留。');
+  if (Object.keys(value).sort().join() !== 'content,id,journal,pack,schema' || typeof value.id !== 'string' || value.id.length > 100 || !Array.isArray(value.journal) || value.journal.length > 4000) throw new Error('存档结构损坏，原始数据已保留。');
+  let state = initialSession(value.id);
+  for (const item of value.journal) {
+    if (!record(item) || Object.keys(item).sort().join() !== 'attemptId,expectedRevision,input,sessionId,stepId,type' || typeof item.attemptId !== 'string' || !/^[a-zA-Z0-9-]{1,100}$/.test(item.attemptId) || typeof item.stepId !== 'string' || typeof item.sessionId !== 'string' || !Number.isSafeInteger(item.expectedRevision) || !['submit', 'hint', 'text', 'demo', 'replay'].includes(String(item.type)) || !record(item.input) || Object.entries(item.input).some(([k, v]) => !['word', 'source', 'target', 'relation'].includes(k) || typeof v !== 'string' || v.length > 64)) throw new Error('存档操作损坏，原始数据已保留。');
+    const result = run(state, item as Command);
+    if (result.session === state) throw new Error('存档步骤顺序不正确，原始数据已保留。');
+    state = result.session;
+  }
+  return state;
+}
+export type Loaded = { session?: Session; warning: string; blocked: boolean };
+export function load(): Loaded {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return { warning: '', blocked: false };
+    try { return { session: decode(raw), warning: '', blocked: false }; }
+    catch (e) { return { warning: e instanceof Error ? e.message : '存档损坏，原始数据已保留。', blocked: true }; }
+  } catch { return { warning: '本次进度可能不保留：浏览器不允许本地存储。', blocked: false }; }
+}
+export function save(session: Session): string {
+  try { localStorage.setItem(SAVE_KEY, encode(session)); return ''; }
+  catch { return '本次进度可能不保留：保存失败。可在练习记录中导出本局存档。'; }
+}
+export function archiveCurrent(): void {
+  const raw = localStorage.getItem(SAVE_KEY);
+  if (raw) localStorage.setItem(ARCHIVE_KEY, raw);
+}

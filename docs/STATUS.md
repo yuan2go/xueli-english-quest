@@ -43,7 +43,7 @@
 | 在线 Provider/正式生图 | NOT_RUN；主线不需要调用 |
 | 公开发布/比赛提交 | NOT_DONE |
 
-截图、测试边界、Anti-AI-Generic Review 和包体测量方法见 [工程证据](evidence/playable-story/README.md)。CI 已配置 npm ci/类型/构建/浏览器，远端实际运行状态以 PR checks 为准，不用本地 PASS 代替。
+截图、测试边界、Anti-AI-Generic Review 和包体测量方法见 [工程证据](evidence/playable-story/README.md)。保留原 CI：现有锁文件使安装步骤走 npm ci，随后类型检查/构建。当前 OAuth 缺 workflow 权限，含工作流修改的首次推送被 GitHub 拒绝；浏览器 CI 扩展已保存为 [待授权补丁](evidence/playable-story/browser-ci.patch)，未写入实际工作流。浏览器 6 项在本地生产 HTTP 服务实测通过；远端既有检查以 PR checks 为准。
 
 ## 启动、预览与继续工作
 

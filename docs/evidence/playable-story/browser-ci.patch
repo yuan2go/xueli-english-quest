@@ -1,0 +1,34 @@
+diff --git a/.github/workflows/check.yml b/.github/workflows/check.yml
+index 2dd82ea..d8d01eb 100644
+--- a/.github/workflows/check.yml
++++ b/.github/workflows/check.yml
+@@ -27,22 +27,21 @@ jobs:
+       - name: Domain tests
+         run: npm test
+       - name: Install dependencies
+-        run: |
+-          if [ -f package-lock.json ]; then
+-            npm ci
+-          else
+-            echo '::warning::Bootstrap only: commit the generated package-lock.json before WP-01 is complete.'
+-            npm install
+-          fi
++        run: npm ci
+       - name: Type check
+         run: npm run typecheck
+       - name: Production build
+         run: npm run build
++      - name: Browser checks against production HTTP app
++        run: |
++          npx playwright install --with-deps chromium
++          npm run test:browser
+       - name: Save build and resolved lockfile
+         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+         with:
+-          name: wordspell-bootstrap-build
++          name: wordspell-playable-story
+           path: |
+             dist/
+             package-lock.json
++            docs/evidence/playable-story/
+           retention-days: 3

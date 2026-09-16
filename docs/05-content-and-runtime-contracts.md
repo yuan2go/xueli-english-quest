@@ -4,7 +4,7 @@
 
 ## 当前主线实现合同
 
-`content/story.ts` 的十三个 Step 消费于会话和 UI；当前 pack `3.0.0-dev`。运行时检查字段、效果、词表、来源当前词形、字母多重集、可编辑/锁定位置、场景可选实体与自然目标、帮助和反馈引用。字母布局与目标检查复用 UI 的 `letterLayout`、`sceneTargets`；合法路径通过同一个 `game/session.run` 执行。内容 SHA-256 覆盖 pack、步骤、图片、音频与受限 feedback 定义；测试核对实际哈希。静态内容待教研审核，不支持导入任意外部关卡。
+`content/story.ts` 的十三个 Step 消费于会话和 UI；当前 pack `3.1.0-dev`。运行时检查字段、效果、词表、来源当前词形、字母多重集、可编辑/锁定位置、场景可选实体与自然目标、帮助和反馈引用。字母布局与目标检查复用 UI 的 `letterLayout`、`sceneTargets`；合法路径通过同一个 `game/session.run` 执行。内容 SHA-256 覆盖 pack、步骤、图片、音频、有限指令与受限 feedback 定义；测试核对实际哈希。静态内容待教研审核，不支持导入任意外部关卡。
 
 实际存档 envelope 为 `{schema:2, pack, content, id, journal}`：pack 是内容版本，content 是 SHA-256，id 是本地会话 ID，journal 是已接受命令日志。每个命令携带 sessionId、stepId、attemptId、expectedRevision、type、input；type 为 submit/hint/text/demo/replay/observe。恢复严格检查结构、版本与未知字段，再从初始世界重放同一会话转换链；World、步骤、学习证据、去重回执重新推导。日志上限 4000 条/JSON 2 MB，达到上限提示导出并重开。临时字母、拖影和音频对象不入档。
 
@@ -22,7 +22,7 @@ localStorage key 仍为 `wordspell.story.v1`（key 不是 schema），确认重�
 
 WordId 为 cat | bag | map | mat | hat | cap。Lexeme 含 wordId、spelling、graphemes、wordAudioId、可选经审核的 phonemeAudioIds、imageAssetId、reviewStatus。不得从字母名自动推导音素。
 
-Entity 含 id、word、kind(actor/object/token)、location。Location 为 stage、zone(ink-road) 或 relation(in/on,targetId)。权威位置只有一个；不同时维护多个可能互相矛盾的 inventory 数组。场景可见性是投影，进入背包不等于实例删除。
+Entity 含 id、word、kind(actor/object/token)、location。Location 为 stage、zone(ink-road)、relation(in/on,targetId) 或 worn(targetId)。worn 是持久换装位置，只接受帽子指向角色、每角色一顶，不是新增教学关系。权威位置只有一个；不同时维护多个可能互相矛盾的 inventory 数组。场景可见性是投影，进入背包不等于实例删除。
 
 WorldState = { revision, entities: Record<id,Entity>, flags: string[] }。flags 只接受已定义事件，例如 crossed-ink；不允许 AI 构造任意执行指令。
 
@@ -70,7 +70,7 @@ s04b 的审核后成功效果包含 crossed-ink；s05 前置条件必须检查�
 ## 4. 必须保持的不变量
 
 1. 实例 ID 唯一，word 在已知集合，location 引用存在；关系不指向自身、不构成环。
-2. cat-companion actor 不变形；cat-card token 可以 cat→cap。
+2. cat-companion actor 不变形；cat-card token 主线只允许 cat→cap；picnic 模式允许 cap→cat，仍为纸偶。
 3. map↔mat 是同一 route-sheet；另一个 mat 必须拥有不同实例 ID。
 4. 变形不能使依附于原容器/支撑物的对象悬空；有孩子节点则拒绝或经明确任务先移走。
 5. ink-road 只能接收允许铺路的 mat；crossed-ink 由指定成功步骤写入。
@@ -105,3 +105,14 @@ taskType 区分 spelling / substitution / lexical-listening / sentence-placement
 实际存档使用本章开头的 schema 2 命令日志，代替原设计的 World/evidence 快照。恢复重放生产转换并验证内容版本及不变量；unknown future schema 拒绝恢复但保留原档并可确认重开，不能按新关卡数组索引续接旧记录。
 
 正式 pack 发布后不原地修改同一版本。代码构建号、内容版本和资源版本分别记录，便于定位“代码没变但音频改了”的问题。参赛期间只需简单静态版本文件，不建设复杂发布平台。
+
+
+## WP-PLAYFUL-GAME-03 协议增量
+
+`content/instructions.ts` 登记有限 word/find/cross/place 指令，place 明确 source word/relation/target word。文本从固定模板生成，与 audio 文本、步骤类型、当前来源词形、目标和 effect 一起检查；`validateStory` 与生产 `run` 共用 `instructionIssue`。任意另一条已登记指令也不能替换目标句通过判题。故事文案与受限判题指令分离，教研仍未审核。当前内容哈希 `0400c42731deac0c728566185d7c6a2fb2e3970a4b1e38a475e67462caeef7fb`。
+
+只兼容一个已验证旧版本：schema2、pack3.0.0-dev、hash `a6bf55d43c1e7bda54ce71c42980260e73d395b8ae257aebc3faef0f474e4854`。十三步与资源不变，原命令逐条通过新规则重放，帮助/音频证据保留；加载先备份原文到 `wordspell.story.v1.legacy.<sessionId>` 并提示。备份失败不覆盖原文。其他未知版本或损坏数据保留、导出并确认重开，不猜测进度。
+
+野餐/活动使用独立 key `wordspell.play.v1.<free|dress|find|helper>`，envelope `{version:1,id,mode,seed,journal}`；同样重放生产命令，不信任世界快照，最多 2000 条/1.5 MB。`wordspell.play.active` 只记当前入口，不解锁主线。重置前备份 `<key>.previous`，备份失败不覆盖；活动退出不改自由布置。模式不兼容或损坏时保留原档、提示导出/确认重置。
+
+RIFF 的 WAV/WebP 固定标识按原始字节偏移检查，最小 12 字节；长度字段含 C2 A9 的合法 PCM WAV 是回归反例。格式检查不代替真实音频听审。摘要按真实成功事件的词形首次位置区分首次/回访，换字与完整拼写保留各自题型，不推断长期掌握。

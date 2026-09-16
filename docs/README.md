@@ -17,6 +17,7 @@
 | [10 决策、风险与来源](10-decisions-risks-and-sources.md) | 对话中的取舍与修正、依据及未确认事项 |
 | [WP-01](work-packages/WP-01.md) | 下一步直接开发的完整工作包 |
 | [WP-PLAYABLE-STORY-01](work-packages/WP-PLAYABLE-STORY-01.md) | 完整主线接续交付、覆盖关系与剩余门槛 |
+| [WP-PLAYFUL-GAME-03](work-packages/WP-PLAYFUL-GAME-03.md) | 主线手感、魔法野餐、三个短玩法和本次交付 |
 | [设计说明模板](submission/design-description.md) | 比赛提交材料；必须按实际交付更新 |
 | [AI 使用记录](submission/ai-usage-log.md) | 实际 AI 制作证据，不是营销陈述 |
 

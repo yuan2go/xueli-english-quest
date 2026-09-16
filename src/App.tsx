@@ -387,6 +387,7 @@ export default function App() {
     }
     if (result.outcome === "success" && result.session !== before) {
       setProjection(null);
+      setPhase(0);
       setCue({ step: s, eventId: result.session.events.at(-1)!.eventId });
     }
   }
@@ -614,6 +615,7 @@ export default function App() {
                 }}
                 reveal={answerVisible}
                 cue={cue ? FEEDBACK[cue.step.id] : undefined}
+                cuePhase={phase}
                 projection={projection}
                 disabled={!!cue}
               />
@@ -637,7 +639,7 @@ export default function App() {
                     <p className="result-word" lang="en">
                       {cue.step.word}
                     </p>
-                    <p>{FEEDBACK[cue.step.id].response}</p>
+                    <p className="result-response">{FEEDBACK[cue.step.id].response}</p>
                     <p className="audio-note">{audioMessage}</p>
                     <button
                       className="secondary"

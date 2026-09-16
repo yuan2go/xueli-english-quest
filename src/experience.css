@@ -91,6 +91,11 @@
   line-height: 1.6;
   color: #665b48;
 }
+.game-layout[data-phase='0'] .result-word,
+.game-layout[data-phase='0'] .result-response,
+.game-layout[data-phase='1'] .result-response,
+.scene[data-cue-phase='0'] .scene-response,
+.scene[data-cue-phase='1'] .scene-response { visibility:hidden; }
 .result-word,
 .word-change {
   font-family: Georgia, serif;

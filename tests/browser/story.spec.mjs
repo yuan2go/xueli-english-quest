@@ -299,6 +299,7 @@ test("result timing, background recovery, wrong-word rehearsal and help survive 
   await at(p, "s04a");
   await transform(p, "p", "t");
   await expect(p.locator('[data-feedback="s04a"]')).toBeVisible();
+  await expect(p.locator('[data-feedback="s04a"]')).toHaveAttribute('data-phase','2');
   await screenshot(p, "phone-morph-result");
   await reload(p, "s04b");
   await button(p, "垫子").tap();

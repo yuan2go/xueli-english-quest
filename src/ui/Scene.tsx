@@ -40,6 +40,7 @@ export function Scene({
   onMiss,
   reveal = false,
   cue,
+  cuePhase = 2,
   projection,
   disabled = false,
 }: {
@@ -49,6 +50,7 @@ export function Scene({
   onMiss: () => void;
   reveal?: boolean;
   cue?: FeedbackDefinition;
+  cuePhase?: number;
   projection?: { word: WordId; rest: boolean; repeated: boolean } | null;
   disabled?: boolean;
 }) {
@@ -76,6 +78,7 @@ export function Scene({
       className={`scene act-${act} ${session.world.flags.includes("crossed-ink") ? "crossed" : ""} ${projection?.rest ? "cat-rest" : ""}`}
       data-performance={cue?.kind}
       data-performing-entity={cue?.entityId}
+      data-cue-phase={cue ? cuePhase : undefined}
       aria-label="故事场景"
     >
       <div className="scenery" aria-hidden="true">

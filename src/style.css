@@ -1,0 +1,22 @@
+* { box-sizing: border-box; }
+:root { font-family: system-ui, sans-serif; color: #26382f; background: #f4f5ec; }
+body { margin: 0; }
+main { width: min(900px, 100%); margin: auto; padding: 24px 18px 40px; }
+h1 { font-size: clamp(1.8rem, 6vw, 2.8rem); margin: 10px 0; }
+h2 { font-size: 1.25rem; }
+p { line-height: 1.65; }
+.eyebrow { letter-spacing: .14em; font-size: .8rem; }
+.notice { padding: 16px 20px; background: #fff2ce; border-radius: 16px; }
+.stage { margin: 20px 0; padding: 20px; background: white; border-radius: 20px; }
+.objects { display: flex; gap: 16px; flex-wrap: wrap; }
+article { background: #e6eee5; border-radius: 16px; padding: 20px; flex: 1 1 160px; }
+.word { font-size: 3rem; display: block; }
+small { overflow-wrap: anywhere; }
+.controls { display: flex; gap: 12px; flex-wrap: wrap; }
+button { min-height: 56px; padding: 12px 20px; border: 0; border-radius: 14px; background: #285e49; color: white; font: inherit; cursor: pointer; touch-action: manipulation; }
+button.secondary { background: #e0e8df; color: #26382f; }
+button:disabled { opacity: .65; cursor: default; }
+button:focus-visible { outline: 3px solid #ac6528; outline-offset: 3px; }
+footer { padding-top: 24px; line-height: 1.6; font-size: .9rem; }
+@media (max-width: 480px) { .controls button { width: 100%; } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }

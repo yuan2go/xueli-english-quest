@@ -1,0 +1,202 @@
+{
+  "schemaVersion": 1,
+  "id": "picnic-world-plan-v1",
+  "status": "DRAFT_NOT_PLAYABLE",
+  "scope": "world-effect-plan-only",
+  "notice": "世界效果正确路径草案，不含正式音频、完整教学数据或运行时结构校验，不能作为发布内容包。",
+  "initialWorld": {
+    "revision": 0,
+    "entities": {},
+    "flags": []
+  },
+  "steps": [
+    {
+      "id": "s01",
+      "challengeId": "01",
+      "assessmentMode": "teaching",
+      "effect": {
+        "type": "spawn",
+        "entity": {
+          "id": "cat-companion",
+          "word": "cat",
+          "kind": "actor",
+          "location": {
+            "kind": "stage"
+          }
+        }
+      }
+    },
+    {
+      "id": "s02",
+      "challengeId": "02",
+      "assessmentMode": "guided",
+      "effect": {
+        "type": "spawn",
+        "entity": {
+          "id": "bag-main",
+          "word": "bag",
+          "kind": "object",
+          "location": {
+            "kind": "stage"
+          }
+        }
+      }
+    },
+    {
+      "id": "s03",
+      "challengeId": "03",
+      "assessmentMode": "independent",
+      "effect": {
+        "type": "spawn",
+        "entity": {
+          "id": "route-sheet",
+          "word": "map",
+          "kind": "object",
+          "location": {
+            "kind": "stage"
+          }
+        }
+      }
+    },
+    {
+      "id": "s04a",
+      "challengeId": "04",
+      "assessmentMode": "guided",
+      "effect": {
+        "type": "transform",
+        "sourceId": "route-sheet",
+        "to": "mat"
+      }
+    },
+    {
+      "id": "s04b",
+      "challengeId": "04",
+      "assessmentMode": "interaction",
+      "effect": {
+        "type": "place",
+        "sourceId": "route-sheet",
+        "target": {
+          "kind": "zone",
+          "id": "ink-road"
+        }
+      }
+    },
+    {
+      "id": "s05",
+      "challengeId": "05",
+      "assessmentMode": "guided",
+      "requiresFlags": [
+        "crossed-ink"
+      ],
+      "effect": {
+        "type": "transform",
+        "sourceId": "route-sheet",
+        "to": "map"
+      }
+    },
+    {
+      "id": "s06",
+      "challengeId": "06",
+      "assessmentMode": "independent",
+      "effect": {
+        "type": "spawn",
+        "entity": {
+          "id": "hat-main",
+          "word": "hat",
+          "kind": "object",
+          "location": {
+            "kind": "stage"
+          }
+        }
+      }
+    },
+    {
+      "id": "s07",
+      "challengeId": "07",
+      "assessmentMode": "guided",
+      "onEnter": [
+        {
+          "type": "spawn",
+          "entity": {
+            "id": "cat-card",
+            "word": "cat",
+            "kind": "token",
+            "location": {
+              "kind": "stage"
+            }
+          }
+        }
+      ],
+      "effect": {
+        "type": "transform",
+        "sourceId": "cat-card",
+        "to": "cap"
+      }
+    },
+    {
+      "id": "s08",
+      "challengeId": "08",
+      "assessmentMode": "independent",
+      "effect": {
+        "type": "spawn",
+        "entity": {
+          "id": "picnic-mat",
+          "word": "mat",
+          "kind": "object",
+          "location": {
+            "kind": "stage"
+          }
+        }
+      }
+    },
+    {
+      "id": "s09",
+      "challengeId": "09",
+      "assessmentMode": "guided",
+      "effect": {
+        "type": "place",
+        "sourceId": "cat-card",
+        "target": {
+          "kind": "relation",
+          "relation": "in",
+          "targetId": "bag-main"
+        }
+      }
+    },
+    {
+      "id": "s10",
+      "challengeId": "10",
+      "assessmentMode": "guided",
+      "effect": {
+        "type": "place",
+        "sourceId": "hat-main",
+        "target": {
+          "kind": "relation",
+          "relation": "on",
+          "targetId": "picnic-mat"
+        }
+      }
+    },
+    {
+      "id": "s11",
+      "challengeId": "11",
+      "assessmentMode": "independent",
+      "selectEntityId": "route-sheet",
+      "expectedWord": "map"
+    },
+    {
+      "id": "s12",
+      "challengeId": "12",
+      "assessmentMode": "independent",
+      "effect": {
+        "type": "place",
+        "sourceId": "cat-companion",
+        "target": {
+          "kind": "relation",
+          "relation": "on",
+          "targetId": "picnic-mat"
+        }
+      }
+    }
+  ]
+}

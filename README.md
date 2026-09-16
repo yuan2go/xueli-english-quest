@@ -1,5 +1,48 @@
 # 雪梨单词魔法师 · WordSpell
 
-Touch-first English storybook adventure: spell words, create objects, change the story.
+**拼出单词，创造物品；改变字母，改变故事。**
 
-项目初始化中：产品与玩法规格、技术设计、可运行工程骨架及 Codex / Claude Code 开发工作包将保存在本仓库。当前不代表参赛游戏已完成。
+首个故事：**小猫的野餐冒险**。面向有基础拼读经验的儿童，使用手机或平板，通过拼词造物、换字变物和听音互动修复三页绘本。
+
+> 当前是开发初始化基线，不是完成的参赛作品。玩法与技术规格已整理；工程包含 React / TypeScript / Vite 启动骨架及确定性世界状态内核。完整十二关、正式音画、在线 AI 工坊、真机验收和公开体验地址均不得由本 README 推断为已完成。实际验证见 [项目状态](docs/STATUS.md)。
+
+## 开发入口
+
+- [完整文档导航](docs/README.md)：产品、逐关规则、交互、架构、内容协议、AI 工坊、测试和发布。
+- [第一个工作包 WP-01](docs/work-packages/WP-01.md)：把 map → mat → 铺路 → map 做成触屏可玩闭环。
+- [Codex 启动提示词](docs/prompts/codex-start.md) / [Claude Code 启动提示词](docs/prompts/claude-start.md)。
+- 两种工具共同遵循 [AGENTS.md](AGENTS.md)，不要分别建立引擎或相互覆盖工作区。
+
+## 本地启动
+
+运行环境：Node.js 22.12+；建议使用仍受支持的 Node.js LTS。初始化环境为 Node.js 22.16.0。
+
+```sh
+npm install
+npm run dev -- --host 0.0.0.0
+```
+
+首次完成依赖解析后必须提交 package-lock.json，之后改用 npm ci。初始化环境无法解析 npm registry，依赖安装与构建不应被报告为通过；WP-01 需要关闭这一缺口。
+
+```sh
+npm test                 # 领域内核测试；使用 Node 原生测试器，无第三方测试依赖
+npm run typecheck        # 依赖安装后执行
+npm run build            # 依赖安装后执行
+npm run preview -- --host 0.0.0.0
+```
+
+Vite 开发或预览服务器用于本地体验；交付时部署 dist 静态产物，不要求评委安装 Node.js。尚未配置托管服务，不把仓库地址当成游戏地址。
+
+## 首版边界
+
+三幕、十二个教学挑战、十三个底层操作步骤；核心词汇 cat / bag / map / mat / hat / cap；位置关系 in / on。第四关拆为换字与铺路两步，但仍是一个挑战。
+
+主线内容预生成、经检查后发布，不依赖实时模型回答。AI 的产品加分项是限定词表与既有组件下的关卡编排，不是自由聊天，也不是生成并执行任意代码。
+
+## 工程原则
+
+世界状态是权威，动画是状态的表现；单词不等于物品实例；换字不复制原物品；操作失误不算英语错误；提示后完成不算独立掌握。先交付真实可玩闭环，再做美术和 AI 工坊，不建设大型教学平台。
+
+## 权利与资料
+
+本仓库为公开仓库。不提交 API 密钥、儿童个人信息、公司内部课件或未经授权的品牌素材。项目未自行选择开源许可证；公开可见不等于获得第三方素材复用许可。公司品牌、图像、语音及后续发布范围由项目负责人确认。公开产品资料仅用于产品定位，来源与局限见 [来源与决策](docs/10-decisions-risks-and-sources.md)。

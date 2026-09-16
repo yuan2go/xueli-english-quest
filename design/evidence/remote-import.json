@@ -1,0 +1,60 @@
+{
+  "status": "BINARY_IMPORT_VERIFIED",
+  "scope": "byte integrity only; not art, teaching-audio, device or release approval",
+  "files": [
+    {
+      "path": "public/assets/game/audio/map.mp3",
+      "bytes": 4510,
+      "sha256": "1d7b4e83b169dd7c2e6cb554a4876fcd1c7e6c4a2bc4ffcdd84030ad7450cac1",
+      "git_blob_sha": "16994aad60445d31e592a6c55069c81cb8fee420"
+    },
+    {
+      "path": "public/assets/game/audio/mat.mp3",
+      "bytes": 4406,
+      "sha256": "1ed16b70192b77fdeb811df415aa3fed250d1977097d439367ff89355fb3d6d8",
+      "git_blob_sha": "8de3e700dded78eec2142580d87533eab188e0de"
+    },
+    {
+      "path": "public/assets/game/bag.webp",
+      "bytes": 4498,
+      "sha256": "cc0d80a3ae5688a6932e04529bcb71873f45ad66c22a99b404d167a41a1d9c68",
+      "git_blob_sha": "430fbf2c367b6b0acb0d0db5fd5a2eead1e60c40"
+    },
+    {
+      "path": "public/assets/game/cap.webp",
+      "bytes": 2654,
+      "sha256": "2baab6224f1b37892083d9b59c02109e8eb29dab3db9289f0400c266e8ecde3d",
+      "git_blob_sha": "c85c352c03a56f97ab3d8878c1fce9d47d9c00a6"
+    },
+    {
+      "path": "public/assets/game/cat-content.webp",
+      "bytes": 7962,
+      "sha256": "388e5aa3684567da7e5bd80fea1de5b08837f10856e5298d1b7b9e6ba474ad05",
+      "git_blob_sha": "6518c149c62f52e5f35fefe15abf097a27ce61ca"
+    },
+    {
+      "path": "public/assets/game/cat-idle.webp",
+      "bytes": 7936,
+      "sha256": "5938f8c9ecae5abf67bb2dc5c1514cd6125758678ae9092835e4ff7c5d709888",
+      "git_blob_sha": "d2b87626e253e2bda6bf88b2e6e25201a8437ced"
+    },
+    {
+      "path": "public/assets/game/hat.webp",
+      "bytes": 3478,
+      "sha256": "3015979ee68d0b48d3b45323c32fb6c0925c4306176fe2cd628e9e1cf722bb1e",
+      "git_blob_sha": "6869e76fd742d6b73e6db6900a637e0f573dd944"
+    },
+    {
+      "path": "public/assets/game/map.webp",
+      "bytes": 5490,
+      "sha256": "3252894519cb71a7c68252517aee654be966a87bd5358ca7c845214f97d402be",
+      "git_blob_sha": "709f6b6eade7a35595cf87c3ce721df85261f4e1"
+    },
+    {
+      "path": "public/assets/game/mat.webp",
+      "bytes": 5434,
+      "sha256": "9d03d2b5cbcfd54ed2fd188e2bd988dfce93b14f1dd8dc360173c0f0fe6fe675",
+      "git_blob_sha": "8f039a21a2fb514babf974cb2340a3aad953fd51"
+    }
+  ]
+}

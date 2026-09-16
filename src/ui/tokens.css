@@ -1,0 +1,14 @@
+:root {
+  --paper: #f5efdf;
+  --paper-light: #fffaf0;
+  --paper-dark: #e9dfc4;
+  --ink: #254b3d;
+  --muted: #636653;
+  --ochre: #c89845;
+  --ochre-dark: #87633c;
+  --ochre-pale: #efdfb2;
+  --sage: #b4c5a5;
+  --line: #cfc5aa;
+  --body: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --display: "Songti SC", "STSong", Georgia, serif;
+}

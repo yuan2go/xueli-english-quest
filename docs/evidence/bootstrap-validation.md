@@ -14,7 +14,7 @@ npm test
 # todo 0
 
 npm run typecheck:domain
-# tsc --noEmit --strict --target ES2022 --module ESNext --moduleResolution Bundler src/domain/world.ts
+# tsc --project tsconfig.domain.json
 # exit 0
 ```
 
@@ -23,6 +23,8 @@ npm run typecheck:domain
 另 2 个用例检查完整十二挑战十三步的预设世界效果路径，以及删除 s04b 后 crossed-ink 前置条件失败。这是正确路径证据，不是整个游戏或全部可操作分支的验证。
 
 首次测试暴露 Node strip-only 不支持参数属性语法，已改为显式字段并重跑通过；未通过的初次运行不作为最终 PASS。实际失败已修复，不依赖增加转译框架回避。
+
+最初领域类型检查直接在命令行传文件名，并已在 TypeScript 5.8.3 下通过。复核 [TypeScript 6.0 官方说明](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-6-0.html) 后，发现这种调用在存在 tsconfig.json 时会产生 TS5112；最终改成独立 tsconfig.domain.json 和 --project，重跑领域类型检查及全部 16 项测试通过。此项是对已确认版本差异的兼容修正，不代表本地安装过 TypeScript 6.0.2。
 
 ## 测试源码锚点（Git blob SHA）
 

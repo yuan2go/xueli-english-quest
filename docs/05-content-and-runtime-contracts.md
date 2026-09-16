@@ -1,6 +1,18 @@
 # 05 · 内容、领域和存档协议
 
-本文件描述目标协议；初始化的 src/domain 为其最小实现，不表示 ContentPack/Session/工坊已全部落地。新增字段先在此定义语义，再补对应校验和测试。
+本文件保留产品合同，并记录已落地的 WP-PLAYABLE-STORY-01 主线协议；在线工坊未实现。
+
+## 当前主线实现合同
+
+`content/story.ts` 的十三个 Step 消费于会话和 UI，运行时检查字段、效果、词表、字母可用性与完整可达路径。验证路径通过同一个 `game/session.run` 执行，不放宽当前题/效果规则。内容 SHA-256 覆盖 pack、步骤、图片与音频 manifest；测试核对实际哈希。静态内容是待教研审核的开发包，不支持导入任意外部关卡。
+
+实际存档 envelope 为 `{schema:1, pack, content, id, journal}`：pack 是内容版本，content 是 SHA-256，id 是本地会话 ID，journal 是已提交命令日志。每个命令携带 sessionId、stepId、attemptId、expectedRevision、type、input；type 为 submit/hint/text/demo/replay。恢复严格检查结构、版本与未知字段，然后从初始世界重放同一会话转换链；World、当前步骤、学习证据、去重回执全部重新推导。日志上限 4000 条/JSON 2 MB，达到上限提示导出并重开。临时字母、拖影和音频不入档。
+
+错误答案不改变 World；未填满、落空、过期和冲突命令不加入语言事件。帮助/重听命令也持久化，刷新不会丢失已看答案的辅助口径。每步成功原子更新世界、事件、步骤，再保存；s04a 后仍为 s04b，s04b 后已有 crossed-ink。重复 attempt 返回已登记 outcome 和当前状态，不重复推进；同 ID 不同输入拒绝。
+
+localStorage key 为 `wordspell.story.v1`，确认重开先将原始存档备份到 `wordspell.previous.v1`，会明确提示替换更早上一局；备份失败只临时游玩，不覆盖旧存档。损坏/不兼容数据原样保留，确认清除才删除本局和上一局；正常记录可下载 JSON。没有实现跨版本自动迁移，也不会猜测旧进度。
+
+正式录音缺失时 inputMode 标记 audio-dev；文字可见时为 text-assisted。outcome 区分 independent-correct（仅指本题未辅助，不是审核听力结果）、assisted-correct、demonstrated、incorrect、interaction-complete。页面记录按题型展示，不计算混合能力分数。
 
 ## 1. 词、实例和资源
 

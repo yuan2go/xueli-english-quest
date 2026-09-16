@@ -9,9 +9,11 @@ npm test
 npm run typecheck
 npm run build
 npm run preview -- --host 0.0.0.0
+npx playwright install chromium
+npm run test:browser  # build 后运行；自动启动生产 HTTP 预览
 ```
 
-npm test 使用 Node 原生测试器与 TypeScript 类型擦除，可在 Node 22.16 无 npm 依赖环境执行。它运行逻辑，不代替静态类型检查。typecheck/build 需要安装依赖。初始化未生成锁文件；首次联网安装并审查 package-lock.json 后，CI 必须改用 npm ci，禁止长期依赖浮动解析。
+npm test 使用 Node 原生测试器与 TypeScript 类型擦除。它运行逻辑，不代替静态类型检查。锁文件已生成，CI 使用 npm ci、类型检查、构建和 Playwright。Playwright 启动实际生产 HTTP 服务；模拟触控、视口和故障注入均不是实体设备验收。最新结果见 STATUS 与 evidence/playable-story。
 
 ## 2. 分层必要覆盖
 

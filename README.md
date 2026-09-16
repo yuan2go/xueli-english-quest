@@ -4,12 +4,12 @@
 
 首个故事：**小猫的野餐冒险**。面向有基础拼读经验的儿童，使用手机或平板，通过拼词造物、换字变物和听音互动修复三页绘本。
 
-> 当前是开发初始化基线，不是完成的参赛作品。玩法与技术规格已整理；工程包含 React / TypeScript / Vite 启动骨架及确定性世界状态内核。完整十二关、正式音画、在线 AI 工坊、真机验收和公开体验地址均不得由本 README 推断为已完成。实际验证见 [项目状态](docs/STATUS.md)。
+> 完整故事工程现可玩：三幕十二挑战十三步骤、字母操作、触控摆物、暂停恢复与本地练习记录。插画为明确标注的原创临时 SVG；语音为未审核的浏览器开发替代，可选文字辅助。正式美术、教研、真机与公开发布尚未通过。实际验证见 [项目状态](docs/STATUS.md)。
 
 ## 开发入口
 
 - [完整文档导航](docs/README.md)：产品、逐关规则、交互、架构、内容协议、AI 工坊、测试和发布。
-- [第一个工作包 WP-01](docs/work-packages/WP-01.md)：把 map → mat → 铺路 → map 做成触屏可玩闭环。
+- [WP-PLAYABLE-STORY-01](docs/work-packages/WP-PLAYABLE-STORY-01.md)：接续 WP-01～03 的完整故事工程与交付证据。
 - [Codex 启动提示词](docs/prompts/codex-start.md) / [Claude Code 启动提示词](docs/prompts/claude-start.md)。
 - 两种工具共同遵循 [AGENTS.md](AGENTS.md)，不要分别建立引擎或相互覆盖工作区。
 
@@ -18,17 +18,19 @@
 运行环境：Node.js 22.12+；建议使用仍受支持的 Node.js LTS。初始化环境为 Node.js 22.16.0。
 
 ```sh
-npm install
+npm ci
 npm run dev -- --host 0.0.0.0
 ```
 
-首次完成依赖解析后必须提交 package-lock.json，之后改用 npm ci。初始化环境无法解析 npm registry，依赖安装与构建不应被报告为通过；WP-01 需要关闭这一缺口。
+锁文件由真实 npm 安装生成并提交。浏览器打开终端给出的本地 URL；`/#design` 是复用正式组件的轻量设计预览。主线无需模型 Key 或后端。局域网 HTTP 的安全上下文限制见 STATUS；手机发布需 HTTPS。
 
 ```sh
 npm test                 # 领域内核测试；使用 Node 原生测试器，无第三方测试依赖
 npm run typecheck        # 依赖安装后执行
 npm run build            # 依赖安装后执行
 npm run preview -- --host 0.0.0.0
+npx playwright install chromium
+npm run test:browser     # 先 build；自动启动 127.0.0.1:4174 的生产预览
 ```
 
 Vite 开发或预览服务器用于本地体验；交付时部署 dist 静态产物，不要求评委安装 Node.js。尚未配置托管服务，不把仓库地址当成游戏地址。

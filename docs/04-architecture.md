@@ -1,10 +1,14 @@
 # 04 · 技术架构与运行设计
 
+当前实现：WP-PLAYABLE-STORY-01 已建立下列 game/content/ui/platform 边界。`game/session.ts` 是唯一会话命令入口；`domain/world.ts` 保持原有领域规则。所有提交同步完成校验、领域变更和事件记录，React 再呈现结果，因此没有等待 animationend 的推进锁。UI 的旧 revision 回调直接失效；语音使用 generation 取消过期回调。
+
+`Session.revision` 覆盖所有已接受命令（含帮助/重听），`World.revision` 只覆盖世界变更。调用者提交会话 revision；会话内调用领域转换时使用世界 revision。存档采用版本化命令日志重建世界与事件，具体实现合同见 05。此选择避免信任任意保存的步数或 World 快照；不引入另一套状态模拟器。
+
 ## 1. 架构决策
 
 一个轻量 React + TypeScript + Vite 应用，HTML/CSS/SVG 场景和必要动画。主线部署为静态文件；AI 工坊如实现在线功能，再增加一个小型同源服务。无需数据库、微服务、复杂消息总线、物理引擎或模型训练。
 
-TypeScript 严格模式；npm 为唯一包管理器。初始化直接依赖写在 package.json；锁文件必须由真实安装生成，不能伪造 integrity。当前环境 registry DNS 不通，因此 build/依赖锁定是否完成由 STATUS 记录。初始化没有安装开发热刷新插件；需要时在工作包中有针对性增加，而不是重建工程。
+TypeScript 严格模式；npm 为唯一包管理器。锁文件已通过真实安装生成，使用 npm ci。原 React/TypeScript/Vite 版本保留；新增精确锁定的 Playwright 仅用于实际 HTTP 浏览器回归。
 
 ## 2. 模块边界
 

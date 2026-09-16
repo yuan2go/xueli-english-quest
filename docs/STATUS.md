@@ -1,34 +1,63 @@
-# 项目状态 · 初始化基线
+# 项目状态 · 完整故事工程可玩 / 发布未就绪
 
-更新：2026-09-16。起始仓库为空；首个 README 提交为 d5065fb4186fa508be749bcbafd9835e61b75884。本文件随初始化实现一并提交；实际最终 SHA 以 Git 历史为准。
+更新：2026-09-17。工作包 [WP-PLAYABLE-STORY-01](work-packages/WP-PLAYABLE-STORY-01.md)，分支 `feat/wp-playable-story-01`。
 
-## 已交付
+基线完整 SHA：`080d70d95790ed3c37c188214a4a6b8ffeefc93a`。
+已验证实现 SHA：`b037005d8cb50bf18bbc4b94da10172cccdc0131`（此后交接文档提交不改变运行代码；最终交付 SHA 见 PR head/交付回复）。
 
-完整产品/玩法/交互/技术/内容/AI 工坊/教研/测试发布规格；AGENTS.md 与 CLAUDE.md；六个开发工作包的路线图及 WP-01 详细任务；两套启动提示词；设计说明和 AI 使用记录模板。
+## 三项独立结论
 
-React / TypeScript / Vite 工程结构、开发验证页面、确定性 World 状态内核、十二挑战十三步的世界效果草案、Node 原生测试、CI 配置和 PR 模板。验证页用调试按钮执行状态命令，不是孩子可玩的最终界面。
-
-## 实际验证
-
-| 检查 | 状态 | 说明 |
+| 项目 | 状态 | 边界 |
 | --- | --- | --- |
-| npm test | PASS | 本地 Node 22.16.0，16 项通过、0 失败；14 项领域与 2 项世界路径检查 |
-| npm run typecheck:domain | PASS | 本地预装 TypeScript 5.8.3，仅领域内核；不冒充 package.json 中 6.0.2 的完整类型检查 |
-| npm 依赖安装/锁文件 | BLOCKED_LOCAL | registry.npmjs.org DNS 解析失败；未伪造 package-lock.json |
-| npm run typecheck / build | BLOCKED_LOCAL | 缺少完整依赖，未声明全应用构建通过 |
-| GitHub Actions | 配置已提交 | 运行结果需实际查询；此处不预填 PASS |
-| 浏览器/真机/正式音频 | NOT_RUN | 没有已验证的设备与教学音频证据 |
-| 真实 Provider/教研/儿童试玩 | NOT_RUN | 未调用运行时模型；没有真实审核和试玩记录 |
-| 发布/比赛提交 | NOT_DONE | 未配置公开体验站点，仓库链接不是游戏链接 |
+| 完整主线工程 | PLAYABLE / 自动化验证通过 | 正常入口走完三幕十二挑战十三步骤，无跳关按钮、无模型 Key、无后端依赖 |
+| 正式美术、教学语音、教研 | PENDING / 未具备 | 六张原创临时 SVG＋CSS 场景；六词四句为浏览器开发 TTS；未调用付费生图，未伪称 GPT Image 素材 |
+| 公开发布条件 | NOT_READY | 真机、正式资源/教研/授权审核、公开 HTTPS 地址和目标用户试玩未完成；没有部署生产 |
 
-测试范围与源文件 blob 哈希见 [初始化验证记录](evidence/bootstrap-validation.md)。
+## 已实现
 
-## 尚未实现
+开始/继续/首次教学/确认重开、三幕主线、暂停/音量/静音/回首页、结局和本地练习详情/导出。字母点击、取回、拖动和交换，明确施法；物品 Pointer Events 拖放及点击等价操作。落空、pointercancel、多指与旋转有取消退路；键盘按钮、弹窗焦点循环及 reduced-motion 已验证。
 
-真实字母盘、拖放、GameSession/step runner、步骤与 attemptId 去重、教学反馈、存档恢复、完整十二关 UI、正式音画、内容解析/审核发布、在线工坊、真机验收和正式部署。
+原领域内核不变。唯一会话入口落实步骤、session revision、attemptId 去重与过期守卫；正确提交同步改变世界和学习事件，音画不推进业务。route-sheet 保持身份，cat-card 与同伴独立，picnic-mat 独立创建；第四关必须铺路。已知非目标词仅短暂投影。
 
-世界内核只拒绝不合法物品转换，不负责当前题目和步骤顺序。测试中的正确路径模拟不是生产会话引擎。尤其禁止用“领域测试通过”宣称 s04b 不能被 UI 绕过；WP-01 必须实现真实步骤守卫。
+内容结构/词表/效果/可达性校验、资源 manifest 与哈希、启动检查与图像失败重试。文字辅助/提示/演示/重听记录分开；既有关卡固定复现 map/mat，不宣称学习提升。存档绑定版本和内容 SHA-256，重放生产命令恢复；s04a/s04b 两个边界经过刷新实测。损坏/不兼容原始数据保留，重开需确认且备份上一局，存储不可用可临时游玩，清除需确认。
 
-## 下一步
+## 本次实际验证
 
-进入 [WP-01](work-packages/WP-01.md)，一个 agent 为实现负责人，另一个独立审查或领取不冲突任务。先解决联网依赖锁定和真实 map→mat→铺路→map 切片，不扩建平台，不因缺运行时模型 Key 停止主线。
+环境：macOS arm64；Node 26.3.1，npm 11.16.0；React 19.2.8、TypeScript 6.0.2、Vite 8.3.0，新增 Playwright 1.63.0 / Chromium 153.0.8010.12。原应用依赖版本未升级或降级。
+
+| 命令/检查 | 实际结果 |
+| --- | --- |
+| npm ci | PASS，真实依赖和锁文件；安装审计 0 vulnerabilities |
+| npm test | PASS，24 项、0 失败、0 skipped；包含原有 16 项及会话/资源回归 |
+| npm run typecheck:domain | PASS |
+| npm run typecheck | PASS（生产 build 内也执行） |
+| npm run build | PASS；Vite 报告 JS 233.04 kB / gzip 75.24 kB；CSS 13.65 kB / gzip 3.98 kB |
+| npm run test:browser | PASS，6 个实际 HTTP 集成测试；自动启动生产预览 127.0.0.1:4174 |
+| 手机视口 390×844 | 正常入口完整十三步、真实 CDP 触控字母交换/铺路、两次恢复、错误/提示、结局/记录；非真机 |
+| Pad 1024×768、桌面 1440×1000、小屏 360×640 | 核心切片、键盘、布局与旋转；非真机 |
+| 控制台/请求/尺寸 | 完整主线无 pageerror/console error/HTTP 4xx+；视口无横向溢出；字母命中宽度≥56px |
+| 故障注入 | 图像请求失败与恢复、语音失败/重试/取消旧回调、存储拒绝、损坏存档保留与确认清除、缺少安全上下文 API 均通过 |
+| UI 截图自检 | 已执行，修复手机过高留白、旧投影残留、无关放置区、物品位置文案遮挡、弹窗 Tab；不是美术验收 |
+| iPhone/Android/iPad 真机、微信/大陆外网 | NOT_RUN |
+| 教研/实际语音听审/儿童试玩 | NOT_RUN |
+| 在线 Provider/正式生图 | NOT_RUN；主线不需要调用 |
+| 公开发布/比赛提交 | NOT_DONE |
+
+截图、测试边界、Anti-AI-Generic Review 和包体测量方法见 [工程证据](evidence/playable-story/README.md)。CI 已配置 npm ci/类型/构建/浏览器，远端实际运行状态以 PR checks 为准，不用本地 PASS 代替。
+
+## 启动、预览与继续工作
+
+```sh
+npm ci
+npm run dev -- --host 0.0.0.0
+# 浏览器打开输出地址；设计预览为同源 /#design
+npm test
+npm run typecheck
+npm run build
+npx playwright install chromium
+npm run test:browser
+```
+
+生产静态产物在 dist；`npm run preview -- --host 0.0.0.0` 只作本地验证。局域网 HTTP 已兼容缺少 randomUUID/SubtleCrypto 的环境：ID 使用 getRandomValues；资源在非安全上下文按大小/结构校验，安全上下文额外校验 SHA-256；资源单测始终核对 SHA。公开体验仍应使用 HTTPS。
+
+下一步：在 `src/content/manifest.ts` 替换并登记真实审核资源，提升内容版本/hash，执行资源/主线回归；由真实审核者完成教研和美术/授权，再做三类实体设备验收及经授权的公开发布。工坊仍属后续 P1。本包未发现需要修改的既有无关代码问题，原初始化域规则与原测试保持原样。

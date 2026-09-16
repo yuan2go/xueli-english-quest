@@ -5,6 +5,7 @@
 | 日期 | 工具 | 实际任务 | 产物 | 人工/工程检查 | 范围限制 |
 | --- | --- | --- | --- | --- | --- |
 | 2026-09-16 | ChatGPT | 整理项目对话、核对公开技术资料、设计文档与初始化 | 本仓库初始化文件；实际提交号见 Git 历史 | 实际检查见 docs/STATUS.md | 非真实教学效果或儿童试玩证据 |
+| 2026-09-17 | Codex / GPT-6 | 实现 WP-PLAYABLE-STORY-01、编写原创临时 SVG、生产 HTTP 浏览器回归与截图自检 | src/game、content、platform、ui；tests/browser；evidence/playable-story | 类型/构建/领域与浏览器检查见 STATUS；工程自检非人工教研验收 | 未调用生图或在线教学 Provider；无 GPT Image 成品；费用/token unknown |
 
 后续每行填写：工具及可确认版本、任务与关键输入摘要、产物路径/提交、人工修改、素材来源/权利、测试或审核结果、已报告 usage 与成本（未知留 unknown）。
 

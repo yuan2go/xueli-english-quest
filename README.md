@@ -10,6 +10,7 @@
 
 - [完整文档导航](docs/README.md)：产品、逐关规则、交互、架构、内容协议、AI 工坊、测试和发布。
 - [WP-PLAYABLE-STORY-01](docs/work-packages/WP-PLAYABLE-STORY-01.md)：接续 WP-01～03 的完整故事工程与交付证据。
+- [WP-STORY-EXPERIENCE-02](docs/work-packages/WP-STORY-EXPERIENCE-02.md)：因果演出、场景直接摆物、渐进帮助、绘本修复与资源接入证据。
 - [Codex 启动提示词](docs/prompts/codex-start.md) / [Claude Code 启动提示词](docs/prompts/claude-start.md)。
 - 两种工具共同遵循 [AGENTS.md](AGENTS.md)，不要分别建立引擎或相互覆盖工作区。
 
@@ -28,6 +29,8 @@ npm run dev -- --host 0.0.0.0
 npm test                 # 领域内核测试；使用 Node 原生测试器，无第三方测试依赖
 npm run typecheck        # 依赖安装后执行
 npm run build            # 依赖安装后执行
+npm run check:resources  # 开发资源、哈希、引用与可操作性
+npm run check:release    # 当前会拒绝未审核资源；不是已具备发布条件
 npm run preview -- --host 0.0.0.0
 npx playwright install chromium
 npm run test:browser     # 先 build；自动启动 127.0.0.1:4174 的生产预览

@@ -1,63 +1,60 @@
-# 项目状态 · 完整故事工程可玩 / 发布未就绪
+# 项目状态 · 主线体验闭环可玩 / 发布未就绪
 
-更新：2026-09-17。工作包 [WP-PLAYABLE-STORY-01](work-packages/WP-PLAYABLE-STORY-01.md)，分支 `feat/wp-playable-story-01`。
+更新：2026-09-17。[WP-STORY-EXPERIENCE-02](work-packages/WP-STORY-EXPERIENCE-02.md) 接续已合入的 WP-PLAYABLE-STORY-01。独立分支 `feat/wp-story-experience-02`；本包只做本地提交，未 push、合并或部署。
 
-基线完整 SHA：`080d70d95790ed3c37c188214a4a6b8ffeefc93a`。
-已验证实现 SHA：`b037005d8cb50bf18bbc4b94da10172cccdc0131`（此后交接文档提交不改变运行代码；最终交付 SHA 见 PR head/交付回复）。
+实际 origin/main 基线：`6b06c9efa149ea3643b3957d98a349b845b9c7fb`。已验证运行代码 SHA：`5ff8551157ec3f1246d0e4c43205c0794a0a2b6c`。原工作树与独立美术分支未修改。其后提交仅整理文档与截图，最终 SHA 见交付回复；历史验证不替代本次结果。
 
-## 三项独立结论
+| 维度 | 实际状态 |
+| --- | --- |
+| 工程实现 | 完整三幕、十二挑战、十三步骤可玩；造物→变物→使用→角色/场景响应→三页修复贯通 |
+| 自动化 | 29 项 Node 测试、7 项真实 HTTP 浏览器测试通过；类型检查、领域检查、构建通过 |
+| 正式美术/教学音频/教研 | PENDING：现有临时 SVG、CSS 表演、浏览器开发 TTS；正式录音接入合同已支持，不代表已获得正式录音 |
+| 真机/儿童试玩/听审 | NOT_RUN；浏览器触控与视口模拟不冒充真机或教学效果 |
+| 公开发布 | NOT_READY；发布检查实际拒绝未审核资源，未创建公开部署 |
 
-| 项目 | 状态 | 边界 |
-| --- | --- | --- |
-| 完整主线工程 | PLAYABLE / 自动化验证通过 | 正常入口走完三幕十二挑战十三步骤，无跳关按钮、无模型 Key、无后端依赖 |
-| 正式美术、教学语音、教研 | PENDING / 未具备 | 六张原创临时 SVG＋CSS 场景；六词四句为浏览器开发 TTS；未调用付费生图，未伪称 GPT Image 素材 |
-| 公开发布条件 | NOT_READY | 真机、正式资源/教研/授权审核、公开 HTTPS 地址和目标用户试玩未完成；没有部署生产 |
+## 本包实际变化
 
-## 已实现
+每步成功原子提交 World、步骤和证据后，运行绑定 eventId/entityId 的有限演出。词尾变化、目标词音、形态与用途分阶段呈现；可跳过/暂停/后台/超时，刷新直接进入稳定态。绘本修复从正确事件派生，没有第二套修复存档。
 
-开始/继续/首次教学/确认重开、三幕主线、暂停/音量/静音/回首页、结局和本地练习详情/导出。字母点击、取回、拖动和交换，明确施法；物品 Pointer Events 拖放及点击等价操作。落空、pointercancel、多指与旋转有取消退路；键盘按钮、弹窗焦点循环及 reduced-motion 已验证。
+场景内背包、垫子、湿墨提供语义目标，点击与 Pointer Events 拖放共用命令；不提供不自然关系，不暗示唯一正确目标。s03 的 mat 投影和小猫休息误会只在表现层，输入保留、重复缩短、离页清理。教程随实际字母操作推进，摆物时再教学；帮助按错误类型，示范可观察但不代做。
 
-原领域内核不变。唯一会话入口落实步骤、session revision、attemptId 去重与过期守卫；正确提交同步改变世界和学习事件，音画不推进业务。route-sheet 保持身份，cat-card 与同伴独立，picnic-mat 独立创建；第四关必须铺路。已知非目标词仅短暂投影。
+儿童结局保留真实野餐、三页修复和重听词卡；成人摘要按词/题型/帮助/混淆/固定回访汇总。音频观察区分来源、任务、资源版本及播放状态，未播放不记成已听，音频不判题。帮助暴露与观察通过同一日志恢复。
 
-内容结构/词表/效果/可达性校验、资源 manifest 与哈希、启动检查与图像失败重试。文字辅助/提示/演示/重听记录分开；既有关卡固定复现 map/mat，不宣称学习提升。存档绑定版本和内容 SHA-256，重放生产命令恢复；s04a/s04b 两个边界经过刷新实测。损坏/不兼容原始数据保留，重开需确认且备份上一局，存储不可用可临时游玩，清除需确认。
+资源支持 SVG/PNG/WebP 和 MP3/WAV/OGG，校验路径、字节、哈希、元数据、引用与实际可操作路径。开发/发布策略分开。pack 升至 `3.0.0-dev`、save schema 2；旧档保留并可导出/确认重开，不猜测迁移音频证据。
 
 ## 本次实际验证
 
-环境：macOS arm64；Node 26.3.1，npm 11.16.0；React 19.2.8、TypeScript 6.0.2、Vite 8.3.0，新增 Playwright 1.63.0 / Chromium 153.0.8010.12。原应用依赖版本未升级或降级。
+macOS arm64，Node 26.3.1 / npm 11.16.0，沿用 React 19.2.8、TypeScript 6.0.2、Vite 8.3.0、Playwright 1.63.0。`npm ci` 实际安装 26 包，审计 0 vulnerabilities；依赖和锁文件未升级。
 
-| 命令/检查 | 实际结果 |
+| 命令/检查 | 结果与边界 |
 | --- | --- |
-| npm ci | PASS，真实依赖和锁文件；安装审计 0 vulnerabilities |
-| npm test | PASS，24 项、0 失败、0 skipped；包含原有 16 项及会话/资源回归 |
-| npm run typecheck:domain | PASS |
-| npm run typecheck | PASS（生产 build 内也执行） |
-| npm run build | PASS；Vite 报告 JS 233.04 kB / gzip 75.24 kB；CSS 13.65 kB / gzip 3.98 kB |
-| npm run test:browser | PASS，6 个实际 HTTP 集成测试；自动启动生产预览 127.0.0.1:4174 |
-| 手机视口 390×844 | 正常入口完整十三步、真实 CDP 触控字母交换/铺路、两次恢复、错误/提示、结局/记录；非真机 |
-| Pad 1024×768、桌面 1440×1000、小屏 360×640 | 核心切片、键盘、布局与旋转；非真机 |
-| 控制台/请求/尺寸 | 完整主线无 pageerror/console error/HTTP 4xx+；视口无横向溢出；字母命中宽度≥56px |
-| 故障注入 | 图像请求失败与恢复、语音失败/重试/取消旧回调、存储拒绝、损坏存档保留与确认清除、缺少安全上下文 API 均通过 |
-| UI 截图自检 | 已执行，修复手机过高留白、旧投影残留、无关放置区、物品位置文案遮挡、弹窗 Tab；不是美术验收 |
-| iPhone/Android/iPad 真机、微信/大陆外网 | NOT_RUN |
-| 教研/实际语音听审/儿童试玩 | NOT_RUN |
-| 在线 Provider/正式生图 | NOT_RUN；主线不需要调用 |
-| 公开发布/比赛提交 | NOT_DONE |
+| `npm test` | PASS，29/29，0 skipped；原关键断言保留，替换“音频必须为空/SVG 固定格式”的过时前提 |
+| `npm run typecheck` / `npm run typecheck:domain` | PASS |
+| `npm run build` | PASS；JS 250.49 kB / gzip 81.33 kB，CSS 19.66 kB / gzip 5.50 kB，HTML 0.58 kB |
+| `npm run check:resources` | PASS；磁盘格式/字节/哈希、引用、生产转换路径与输入可操作性 |
+| `npm run check:release` | BLOCKED，实际拒绝 `cat` 未审核；这是正确执行门槛，不是发布通过 |
+| `npm run test:browser` | PASS，7/7；最终演出首帧修正后另跑 `--grep 'result timing'` 1/1；自动启动生产 HTTP `127.0.0.1:4174` |
+| 手机 390×844 | 正常入口完整十三步、真 DOM 字母操作、CDP 模拟触控拖放、场景点击、两处铺路恢复、结局和记录 |
+| Pad 1024×768 / 桌面 1440×1000 / 小屏 360×640 | 核心切片、键盘/旋转/弹窗焦点，无横向溢出，字母≥56px |
+| 新风险与故障 | 无回调超时、跳过、演出后台恢复、错词重复抑制、帮助示范恢复、正式录音边界失败/取消、资源与存储失败退路均有覆盖 |
+| 控制台/请求 | 完整主线无 pageerror/console error/HTTP 4xx+；故障用例的注入失败单列 |
+| UI 自检 | 对真实截图执行 Anti-AI-Generic Review 并修复；不是正式美术或用户验收 |
 
-截图、测试边界、Anti-AI-Generic Review 和包体测量方法见 [工程证据](evidence/playable-story/README.md)。保留原 CI：现有锁文件使安装步骤走 npm ci，随后类型检查/构建。当前 OAuth 缺 workflow 权限，含工作流修改的首次推送被 GitHub 拒绝；浏览器 CI 扩展已保存为 [待授权补丁](evidence/playable-story/browser-ci.patch)，未写入实际工作流。浏览器 6 项在本地生产 HTTP 服务实测通过；远端既有检查以 PR checks 为准。
+真实截图与限制见 [本包证据](evidence/story-experience/README.md)。保留历史 [浏览器 CI 补丁](evidence/playable-story/browser-ci.patch)，本次未改凭据或工作流；远端 CI 本包 NOT_RUN。没有用本地 PASS 冒称远端已通过。
 
-## 启动、预览与继续工作
+## 启动和继续入口
 
 ```sh
 npm ci
-npm run dev -- --host 0.0.0.0
-# 浏览器打开输出地址；设计预览为同源 /#design
+npm run dev -- --host 127.0.0.1 --port 5175
+# 首页 http://127.0.0.1:5175/；共享组件预览 /#design
 npm test
 npm run typecheck
 npm run build
-npx playwright install chromium
+npm run check:resources
 npm run test:browser
 ```
 
-生产静态产物在 dist；`npm run preview -- --host 0.0.0.0` 只作本地验证。局域网 HTTP 已兼容缺少 randomUUID/SubtleCrypto 的环境：ID 使用 getRandomValues；资源在非安全上下文按大小/结构校验，安全上下文额外校验 SHA-256；资源单测始终核对 SHA。公开体验仍应使用 HTTPS。
+工作树：`/Users/yuan/projects/xueli-wordspell-story-experience-02`。本次已启动并打开首页。HTTP 局域网缺 SubtleCrypto 时不执行浏览器哈希，仍检查格式/字节/解码尺寸；Node 资源检查始终核对 SHA-256。首次离线加载、iOS/Android/iPad 实机、微信、大陆公网、正式授权/听审/儿童试玩均未验收。
 
-下一步：在 `src/content/manifest.ts` 替换并登记真实审核资源，提升内容版本/hash，执行资源/主线回归；由真实审核者完成教研和美术/授权，再做三类实体设备验收及经授权的公开发布。工坊仍属后续 P1。本包未发现需要修改的既有无关代码问题，原初始化域规则与原测试保持原样。
+下一步是按 manifest 接入经审核资产、教研及真机试玩，再经授权发布。工坊仍是后续独立包，最小接口条件见本包交接；当前没有模型接口、后台、遥测或新增付费资源。

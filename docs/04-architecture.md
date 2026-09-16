@@ -1,8 +1,8 @@
 # 04 · 技术架构与运行设计
 
-当前实现：WP-PLAYABLE-STORY-01 已建立下列 game/content/ui/platform 边界。`game/session.ts` 是唯一会话命令入口；`domain/world.ts` 保持原有领域规则。所有提交同步完成校验、领域变更和事件记录，React 再呈现结果，因此没有等待 animationend 的推进锁。UI 的旧 revision 回调直接失效；语音使用 generation 取消过期回调。
+当前实现：WP-STORY-EXPERIENCE-02 接续已有 game/content/ui/platform 边界。`game/session.ts` 是唯一会话命令入口；`domain/world.ts` 保持原有领域规则。所有提交同步完成校验、领域变更和事件记录，React 再呈现结果。结果演出绑定成功 eventId、stepId 与 entityId，最多 3.6 秒；跳过、暂停、后台、刷新均进入已提交稳定态，不依赖 animationend/音频回调推进。语音任务使用 requestId 和资源版本隔离旧回调。
 
-`Session.revision` 覆盖所有已接受命令（含帮助/重听），`World.revision` 只覆盖世界变更。调用者提交会话 revision；会话内调用领域转换时使用世界 revision。存档采用版本化命令日志重建世界与事件，具体实现合同见 05。此选择避免信任任意保存的步数或 World 快照；不引入另一套状态模拟器。
+`Session.revision` 覆盖所有已接受命令（含帮助/重听/音频观察），`World.revision` 只覆盖世界变更。交互边界从当前会话读取 revision，核对渲染所绑定的 session/step；会话内调用领域转换时使用世界 revision。存档采用版本化命令日志重建世界与事件，具体实现合同见 05。不信任任意保存的步数或 World 快照。
 
 ## 1. 架构决策
 
@@ -15,27 +15,27 @@ TypeScript 严格模式；npm 为唯一包管理器。锁文件已通过真实�
 | 目录/模块 | 责任 | 禁止依赖 |
 | --- | --- | --- |
 | src/domain | 词汇约束、物品状态、不变量、确定性转换 | React、DOM、网络、storage、音频 |
-| src/game（后续） | 步骤状态机、判题、提示、学习事件 | Provider 的实时判断 |
-| src/content（后续） | 已审核内容包、运行时结构校验与资源索引 | 任意模型代码执行 |
-| src/ui（后续）/App | 场景、字母盘、触屏、可访问性 | 直接绕过命令修改权威世界 |
-| src/platform（后续） | AudioService、存档、资源加载 | 学习正确性判定 |
+| src/game | 步骤判题、帮助、证据、场景目标与派生摘要 | Provider 的实时判断 |
+| src/content | 静态内容包（当前待审核）、受限反馈、结构/可操作性校验、资源索引 | 任意模型代码执行 |
+| src/ui / App | 场景、字母盘、触屏、结果演出、派生修复与可访问性 | 直接绕过命令修改权威世界 |
+| src/platform | 统一音频调度、存档、资源加载 | 学习正确性判定 |
 | server/workshop（P1） | 鉴权、预算、模型调用、校验与草稿存储 | 儿童每步通关的依赖 |
 
-括注后续的目录是目标结构，不必先创建空抽象层。当前初始化源码只提供领域不变量与开发验证页面；后续由同一条主线扩展。
+工坊仍未实现。正式资源的独立设计分支不作为已审核资产；通过 manifest 契约接入，不覆盖其设计成果。
 
 ## 3. 状态分层
 
-WorldState 保存物品与位置、故事标记和 revision；GameSession 保存当前 packVersion/challengeId/stepId、阶段、已完成集合、输入草稿与学习记录；UIState 保存选中、拖影和动画；AudioState 由平台服务管理。
+World 保存物品、位置、故事标记和 revision；Session 保存 step 索引、事件、帮助、音频观察、日志与去重回执。完成页和修复物品从成功事件派生，不另存进度。UI 保存字母草稿、选中、拖影、投影和演出；音频对象由平台服务管理。
 
 单一入口：UI command → 当前步骤和世界校验 → 原子状态变化＋学习事件 → 持久化 → UI/音频表现。不能由 CSS 动画回调直接发奖励或创建物品。
 
-GameSession 阶段：loading → presenting → awaiting-input → evaluating → feedback → transitioning → awaiting-input/completed。错误从 feedback 回 awaiting-input；pause 是可恢复标记而非另一套游戏。evaluating 期间忽略或拒绝重复请求。动画用 effectId 与 stepId 绑定，过期回调不推进新步骤。
+表现顺序为 loading → task → committed result → task/end；这些不是第二套持久化步骤。同步提交时拒绝重复请求。演出期间下一题操作不挂载，世界已经提交；暂停丢弃演出，不回滚世界。错误投影仅 UI 所有，重复错误缩短，改对或离页清理。
 
 领域内核只验证世界转换不变量，不知道当前题答案；Game 层负责 expected answer 和 step ownership。不能只调用合法 transform 就跳过 s04b。通关必须来自 challenge 的全部步骤完成，而非数组下标被随意递增。
 
 ## 4. 命令一致性
 
-生产命令包含 sessionId、stepId、attemptId、expectedRevision、type 和 payload。初始化内核已有 revision 守卫，完整去重与步骤守卫属于 WP-01/02。
+生产命令包含 sessionId、stepId、attemptId、expectedRevision、type 和 input。会话已经实施完整去重与步骤守卫。observe 是边界注入的音频观察，只能绑定当前任务或最近成功事件，不触发领域效果。
 
 判题错误不改变 WorldState；UI 落空不形成语言尝试。成功时原子变更世界、已完成集合与事件。相同 attemptId 重放返回原结果，不重复生成物品；同 ID 不同 payload 拒绝。旧 revision 和旧 stepId 拒绝。去重记录只保留本次会话需要的有界范围，不建设分布式事务系统。
 
@@ -43,7 +43,7 @@ GameSession 阶段：loading → presenting → awaiting-input → evaluating �
 
 ## 5. 恢复与存档
 
-首版可用 localStorage 小型 JSON 快照，schemaVersion + packId + packVersion + contentHash + lastCommittedStep + world + evidence。不要存拖影、音频对象、计时器或临时投影。
+实际 localStorage 存储 schema 2 的版本化命令日志（见 05），不保存 World 快照、输入草稿、拖影、音频对象、计时器或临时投影。音频观察是日志中的普通数据，可以重放为证据，不会重播声音。
 
 在已提交的原子步骤边界保存；s04a 后恢复仍需完成 s04b；s04b 已提交则 crossed-ink 保留，刷新后不再要求重复过路。动画恢复为提交后的稳定画面。保存失败不影响本次通关，但显示不能持久保存。
 

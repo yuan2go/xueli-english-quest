@@ -6,7 +6,7 @@ export const SAVE_KEY = "wordspell.story.v1";
 export const ARCHIVE_KEY = "wordspell.previous.v1";
 export function encode(session: Session): string {
   return JSON.stringify({
-    schema: 1,
+    schema: 2,
     pack: PACK.version,
     content: CONTENT_HASH,
     id: session.id,
@@ -26,7 +26,7 @@ export function decode(raw: string): Session {
   }
   if (
     !record(value) ||
-    value.schema !== 1 ||
+    value.schema !== 2 ||
     value.pack !== PACK.version ||
     value.content !== CONTENT_HASH
   )
@@ -50,15 +50,17 @@ export function decode(raw: string): Session {
       typeof item.stepId !== "string" ||
       typeof item.sessionId !== "string" ||
       !Number.isSafeInteger(item.expectedRevision) ||
-      !["submit", "hint", "text", "demo", "replay"].includes(
+      !["submit", "hint", "text", "demo", "replay", "observe"].includes(
         String(item.type),
       ) ||
       !record(item.input) ||
       Object.entries(item.input).some(
         ([k, v]) =>
-          !["word", "source", "target", "relation"].includes(k) ||
+          !["word", "source", "target", "relation", "observation"].includes(
+            k,
+          ) ||
           typeof v !== "string" ||
-          v.length > 64,
+          v.length > (k === "observation" ? 1200 : 64),
       )
     )
       throw new Error("存档操作损坏，原始数据已保留。");

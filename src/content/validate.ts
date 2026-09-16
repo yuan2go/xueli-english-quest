@@ -2,6 +2,10 @@ import { STEPS } from "./story.ts";
 import { correctInput, initialSession, run } from "../game/session.ts";
 import { isWord, singleLetterChange } from "../domain/world.ts";
 import type { Step } from "./story.ts";
+import { letterLayout, sceneTargets } from "../game/interaction.ts";
+import { IMAGES, AUDIO } from "./manifest.ts";
+import { FEEDBACK, FEEDBACK_KINDS } from "./feedback.ts";
+import { validateResources } from "./resource-contract.ts";
 
 function exact(
   value: unknown,
@@ -56,6 +60,7 @@ function effect(v: unknown): boolean {
 
 /** Runs the production command path. This is reachability, never teaching approval. */
 export function validateStory(steps: Step[] = STEPS): void {
+  validateResources(IMAGES, AUDIO);
   if (
     !Array.isArray(steps) ||
     steps.length !== 13 ||
@@ -80,6 +85,7 @@ export function validateStory(steps: Step[] = STEPS): void {
     "effect",
     "enter",
     "requires",
+    "editable",
   ];
   let state = initialSession("validation");
   steps.forEach((s, index) => {
@@ -147,6 +153,55 @@ export function validateStory(steps: Step[] = STEPS): void {
       (!s.from || !singleLetterChange(s.from, s.word))
     )
       throw new Error("换字规则错误");
+    if (
+      !IMAGES.some((a) => a.id === s.word) ||
+      !AUDIO.some((a) => a.text === s.prompt) ||
+      !FEEDBACK[s.id]
+    )
+      throw new Error(`资源或反馈引用缺失 ${s.id}`);
+    if ((s.type === "spell" || s.type === "transform") && s.prompt !== s.word)
+      throw new Error("任务语音与目标不一致");
+    if (
+      s.source &&
+      state.world.entities[s.source]?.word !==
+        (s.type === "transform" ? s.from : s.word)
+    )
+      throw new Error(`来源词形不一致 ${s.id}`);
+    if (s.type === "spell" || s.type === "transform") {
+      const { editable } = letterLayout(s);
+      if (
+        !editable.length ||
+        new Set(editable).size !== editable.length ||
+        editable.some((i) => !Number.isInteger(i) || i < 0 || i > 2)
+      )
+        throw new Error("可编辑位置错误");
+      const bank = [...s.letters];
+      for (let i = 0; i < 3; i++) {
+        if (!editable.includes(i)) {
+          if (s.from?.[i] !== s.word[i]) throw new Error("目标位置被锁定");
+        } else {
+          const n = bank.indexOf(s.word[i]);
+          if (n < 0) throw new Error("操作字母不足");
+          bank.splice(n, 1);
+          if (s.type === "transform" && !s.letters.includes(s.from![i]))
+            throw new Error("来源字母不足");
+        }
+      }
+    }
+    if (s.type === "place") {
+      const input = correctInput(s);
+      if (
+        !sceneTargets(state.world, s.act).some(
+          (t) => t.id === `${input.target}:${input.relation}`,
+        )
+      )
+        throw new Error("场景目标不可达");
+    }
+    if (
+      (s.type === "place" || s.type === "select") &&
+      state.world.entities[s.source!]?.location.kind !== "stage"
+    )
+      throw new Error("来源不能通过场景选择");
     const result = run(
       state,
       {
@@ -160,6 +215,15 @@ export function validateStory(steps: Step[] = STEPS): void {
       steps,
     );
     if (result.outcome !== "success") throw new Error(`不可达步骤 ${s.id}`);
+    const feedback = FEEDBACK[s.id];
+    if (
+      !FEEDBACK_KINDS.includes(feedback.kind) ||
+      !result.session.world.entities[feedback.entityId] ||
+      ![feedback.title, feedback.response, feedback.repaired].every(
+        (v) => typeof v === "string" && v.length > 0 && v.length < 160,
+      )
+    )
+      throw new Error(`结果表现绑定无效 ${s.id}`);
     state = result.session;
   });
   if (

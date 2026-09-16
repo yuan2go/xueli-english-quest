@@ -1,7 +1,8 @@
 import type { WordId } from "../domain/world.ts";
+import type { ImageAsset, AudioAsset } from "./resource-contract.ts";
 
 /** Original temporary vectors. No image-generation service was invoked. */
-export const IMAGES = [
+export const IMAGES: ImageAsset[] = [
   [
     "cat",
     601,
@@ -46,7 +47,7 @@ export const IMAGES = [
   review: "TEMPORARY_PENDING_ART_REVIEW",
   source: "Original SVG authored in this work package; not GPT Image output",
 }));
-export const AUDIO = [
+export const AUDIO: AudioAsset[] = [
   "cat",
   "bag",
   "map",
@@ -68,4 +69,6 @@ export const AUDIO = [
   version: "speech-dev-v1",
   source:
     "Browser speech development substitute; no phonemes; reviewed recording missing",
+  type: "audio/mpeg",
+  durationMs: null,
 }));

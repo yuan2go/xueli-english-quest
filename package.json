@@ -11,6 +11,8 @@
     "dev": "vite",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
     "test:browser": "playwright test",
+    "check:resources": "node --experimental-strip-types scripts/check-resources.mjs",
+    "check:release": "node --experimental-strip-types scripts/check-resources.mjs --release",
     "typecheck": "tsc --noEmit",
     "typecheck:domain": "tsc --project tsconfig.domain.json",
     "build": "npm run typecheck && vite build",

@@ -1,5 +1,6 @@
 import type { Effect, Location, WordId, World } from "../domain/world.ts";
 import { IMAGES, AUDIO } from "./manifest.ts";
+import { FEEDBACK } from "./feedback.ts";
 
 export interface Step {
   id: string;
@@ -19,6 +20,7 @@ export interface Step {
   effect?: Effect;
   enter?: Effect;
   requires?: string;
+  editable?: number[];
 }
 const spawn = (
   id: string,
@@ -250,8 +252,8 @@ export const STEPS: Step[] = [
 ];
 export const PACK = {
   id: "picnic",
-  version: "2.0.0-dev",
-  schema: 1,
+  version: "3.0.0-dev",
+  schema: 2,
   review: "PENDING",
   assetVersion: "paper-placeholder-v1",
   audioVersion: "speech-dev-v1",
@@ -262,9 +264,10 @@ export const CONTENT_SIGNATURE = JSON.stringify({
   steps: STEPS,
   images: IMAGES,
   audio: AUDIO,
+  feedback: FEEDBACK,
 });
 export const CONTENT_HASH =
-  "a8f278ede05eb0b192d80ac0f8ecbe76863937f0d5fbeba3910431b5917cb442";
+  "a6bf55d43c1e7bda54ce71c42980260e73d395b8ae257aebc3faef0f474e4854";
 export const INITIAL_WORLD: World = { revision: 0, entities: {}, flags: [] };
 export const ACTS = [
   "家门口 · 出发之前",

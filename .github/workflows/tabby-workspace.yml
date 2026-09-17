@@ -1,0 +1,29 @@
+name: Tabby UI workspace
+on:
+  push:
+    branches: [design/tabby-identity-ui-20260917]
+    paths: [.github/workflows/tabby-workspace.yml]
+permissions:
+  contents: read
+jobs:
+  workspace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version: '22.16.0'
+      - run: npm ci
+      - run: |
+          git archive HEAD -o tracked-source.tar
+          tar -czf node-dependencies.tar.gz node_modules
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: tabby-ui-workspace
+          path: |
+            tracked-source.tar
+            node-dependencies.tar.gz
+          retention-days: 1

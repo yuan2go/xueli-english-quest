@@ -1,0 +1,27 @@
+name: Tabby UI workspace
+on:
+  push:
+    branches: [feat/tabby-production-ui-20260917]
+    paths: [.github/workflows/tabby-workspace.yml]
+permissions:
+  contents: read
+jobs:
+  workspace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Prepare source and resolved dependencies for isolated UI work
+        run: tar --exclude=.git --exclude=workspace.tgz --exclude=.env --exclude='.env.*' -czf /tmp/wordspell-workspace.tgz .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wordspell-workspace
+          path: /tmp/wordspell-workspace.tgz
+          retention-days: 2

@@ -1,0 +1,15 @@
+{
+  "version": "paper-trail-final-art-v1",
+  "baseline": "0ff79584a96da53e512a6702c7987d4ab65e1d20",
+  "assets": [
+    {"asset_id":"cat-idle","path":"public/assets/game/final/characters/cat-idle.webp","kind":"character","width":384,"height":384,"alpha":true,"bytes":38784,"sha256":"0e9f507038024b430a748f8b888608b36ec392603bb01fab391cbdde45ed98f5","version":"paper-trail-final-art-v1","status":"APPROVED_RUNTIME"},
+    {"asset_id":"cat-happy","path":"public/assets/game/final/characters/cat-happy.webp","kind":"character","width":384,"height":384,"alpha":true,"bytes":31588,"sha256":"1eb056e44c2dba6bcfd6172767f4ea05edbdcac71578281969ff516884586c67","version":"paper-trail-final-art-v1","status":"APPROVED_RUNTIME"},
+    {"asset_id":"scene-act1","path":"public/assets/game/final/scenes/scene-act1.webp","kind":"scene","width":768,"height":432,"alpha":false,"bytes":43526,"sha256":"db6b4e94c0d68a5245aecbea5ffaa8699dcaf7fdf4832ddd6f5111ad41562ead","version":"paper-trail-final-art-v1","status":"APPROVED_RUNTIME"},
+    {"asset_id":"scene-act2","path":"public/assets/game/final/scenes/scene-act2.webp","kind":"scene","width":768,"height":432,"alpha":false,"bytes":54876,"sha256":"aa951c26bbd00b6a5be99e965fb21b78a97fea7886d7351917a20c05927317b8","version":"paper-trail-final-art-v1","status":"APPROVED_RUNTIME"},
+    {"asset_id":"map","path":"public/assets/game/map.webp","kind":"prop","status":"APPROVED_RUNTIME"},
+    {"asset_id":"mat","path":"public/assets/game/mat.webp","kind":"prop","status":"APPROVED_RUNTIME"},
+    {"asset_id":"bag","path":"public/assets/game/bag.webp","kind":"prop","status":"APPROVED_RUNTIME"},
+    {"asset_id":"hat","path":"public/assets/game/hat.webp","kind":"prop","status":"APPROVED_RUNTIME"},
+    {"asset_id":"cap","path":"public/assets/game/cap.webp","kind":"prop","status":"APPROVED_RUNTIME"}
+  ]
+}

@@ -1,6 +1,7 @@
 import type { Effect, Location, WordId, World } from "../domain/world.ts";
 import { IMAGES, AUDIO } from "./manifest.ts";
 import { FEEDBACK } from "./feedback.ts";
+import { INSTRUCTIONS } from "./instructions.ts";
 
 export interface Step {
   id: string;
@@ -252,7 +253,7 @@ export const STEPS: Step[] = [
 ];
 export const PACK = {
   id: "picnic",
-  version: "3.0.0-dev",
+  version: "3.1.0-dev",
   schema: 2,
   review: "PENDING",
   assetVersion: "paper-placeholder-v1",
@@ -265,9 +266,10 @@ export const CONTENT_SIGNATURE = JSON.stringify({
   images: IMAGES,
   audio: AUDIO,
   feedback: FEEDBACK,
+  instructions: INSTRUCTIONS,
 });
 export const CONTENT_HASH =
-  "a6bf55d43c1e7bda54ce71c42980260e73d395b8ae257aebc3faef0f474e4854";
+  "0400c42731deac0c728566185d7c6a2fb2e3970a4b1e38a475e67462caeef7fb";
 export const INITIAL_WORLD: World = { revision: 0, entities: {}, flags: [] };
 export const ACTS = [
   "家门口 · 出发之前",

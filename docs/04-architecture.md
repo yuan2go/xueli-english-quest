@@ -1,6 +1,6 @@
 # 04 · 技术架构与运行设计
 
-当前实现：WP-STORY-EXPERIENCE-02 接续已有 game/content/ui/platform 边界。`game/session.ts` 是唯一会话命令入口；`domain/world.ts` 保持原有领域规则。所有提交同步完成校验、领域变更和事件记录，React 再呈现结果。结果演出绑定成功 eventId、stepId 与 entityId，最多 3.6 秒；跳过、暂停、后台、刷新均进入已提交稳定态，不依赖 animationend/音频回调推进。语音任务使用 requestId 和资源版本隔离旧回调。
+当前实现：WP-PLAYFUL-GAME-03 接续已有 game/content/ui/platform 边界。主线入口为 `game/session.ts`；野餐/活动入口为 `game/picnic.ts`，两者共用唯一 `domain/world.transition`，不共用可变会话；`domain/world.ts` 保持原有领域规则。所有提交同步完成校验、领域变更和事件记录，React 再呈现结果。结果演出绑定成功 eventId、stepId 与 entityId，普通反馈最多 1.6 秒，关键反馈最多 3.1 秒；跳过、暂停、后台、刷新均进入已提交稳定态，不依赖 animationend/音频回调推进。语音任务使用 requestId 和资源版本隔离旧回调。
 
 `Session.revision` 覆盖所有已接受命令（含帮助/重听/音频观察），`World.revision` 只覆盖世界变更。交互边界从当前会话读取 revision，核对渲染所绑定的 session/step；会话内调用领域转换时使用世界 revision。存档采用版本化命令日志重建世界与事件，具体实现合同见 05。不信任任意保存的步数或 World 快照。
 
@@ -19,9 +19,9 @@ TypeScript 严格模式；npm 为唯一包管理器。锁文件已通过真实�
 | src/content | 静态内容包（当前待审核）、受限反馈、结构/可操作性校验、资源索引 | 任意模型代码执行 |
 | src/ui / App | 场景、字母盘、触屏、结果演出、派生修复与可访问性 | 直接绕过命令修改权威世界 |
 | src/platform | 统一音频调度、存档、资源加载 | 学习正确性判定 |
-| server/workshop（P1） | 鉴权、预算、模型调用、校验与草稿存储 | 儿童每步通关的依赖 |
+| 工坊（暂停） | 本包不实现、也不预建 Provider/后台接口 | 不影响儿童游戏 |
 
-工坊仍未实现。正式资源的独立设计分支不作为已审核资产；通过 manifest 契约接入，不覆盖其设计成果。
+工坊暂停且未实现。正式资源的独立设计分支不作为已审核资产；通过 manifest 契约接入，不覆盖其设计成果。
 
 ## 3. 状态分层
 
@@ -62,3 +62,12 @@ World 保存物品、位置、故事标记和 revision；Session 保存 step 索
 Vite 构建 dist，部署静态 HTTPS 服务；base 路径必须支持子目录。初始化用相对 base；不要硬编码 /assets。正式部署由负责人选择可达的公司托管/CDN，Pages 可作为备选但不默认已配置。[Vite 官方部署资料见来源文档]
 
 未来产品集成可接收 allowlisted wordIds、packId、学习模式，返回按题型区分的摘要。iframe/postMessage 必须校验 origin、消息类型和版本；原生 WebView 接口也要明确权限。不在参赛版预置真实用户登录、支付或未提供的内部接口。
+
+
+## 野餐与短活动的最小模式边界
+
+`Picnic` 保存 id/mode/seed/revision/world/bagOpen/journal/events；`play` 接受 spell/transform/place/bag，核对 sessionId/mode/revision/attemptId，全部世界变化调用相同领域转换。换帽的“旧帽移回草地＋新帽戴上”在克隆事务内完成，失败不提交。活动目标是三个显式派生函数，没有通用关卡包/编辑器。
+
+`ui/Picnic` 复用 Letters、Pointer Events、Art、Modal、音频服务和场景语义目标；表现投影不进入 World。主线原子提交再演出；音频终态与最短观察时间协作，并有独立看门狗。野餐变形最多 2.5 秒，暂停/后台/跳过清理计时器与语音，刷新只恢复权威稳定态。普通摆放反馈不抢占语音。
+
+种子由主线 sessionId 派生，野餐显式保存 seed；排序使用确定性 shuffle，不在 render 重新随机。自由探索事件只用于布置回顾，不进入主线学习摘要。

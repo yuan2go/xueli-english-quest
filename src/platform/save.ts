@@ -4,6 +4,10 @@ import type { Command, Session } from "../game/session.ts";
 
 export const SAVE_KEY = "wordspell.story.v1";
 export const ARCHIVE_KEY = "wordspell.previous.v1";
+const legacy = (v: Record<string, unknown>) =>
+  v.pack === "3.0.0-dev" &&
+  v.content ===
+    "a6bf55d43c1e7bda54ce71c42980260e73d395b8ae257aebc3faef0f474e4854";
 export function encode(session: Session): string {
   return JSON.stringify({
     schema: 2,
@@ -27,8 +31,8 @@ export function decode(raw: string): Session {
   if (
     !record(value) ||
     value.schema !== 2 ||
-    value.pack !== PACK.version ||
-    value.content !== CONTENT_HASH
+    (!(value.pack === PACK.version && value.content === CONTENT_HASH) &&
+      !legacy(value))
   )
     throw new Error("这是其他版本的存档，暂时无法恢复。原始数据已保留。");
   if (
@@ -77,7 +81,17 @@ export function load(): Loaded {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return { warning: "", blocked: false };
     try {
-      return { session: decode(raw), warning: "", blocked: false };
+      const session = decode(raw);
+      const migrated = legacy(JSON.parse(raw));
+      if (migrated)
+        localStorage.setItem(`${SAVE_KEY}.legacy.${session.id}`, raw);
+      return {
+        session,
+        warning: migrated
+          ? "旧版主线日志已逐条验证续接，原始存档另存保留。"
+          : "",
+        blocked: false,
+      };
     } catch (e) {
       return {
         warning: e instanceof Error ? e.message : "存档损坏，原始数据已保留。",

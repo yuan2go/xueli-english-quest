@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
-const evidence = "docs/evidence/story-experience";
+const evidence = "docs/evidence/playful-game";
 const KEY = "wordspell.story.v1";
 const button = (p, name) => p.getByRole("button", { name, exact: true });
 async function start(p) {
@@ -270,7 +270,7 @@ test("result timing, background recovery, wrong-word rehearsal and help survive 
   await spell(p, "cat");
   await expect(p.locator('[data-feedback="s01"]')).toBeVisible();
   await expect(p.getByRole("button", { name: "施法" })).toHaveCount(0);
-  await expect(p.locator('[data-phase="1"]')).toBeVisible();
+  await expect(p.locator(".result-story.compact")).toBeVisible();
   expect(await p.evaluate(() => window.probe.at(-1).text)).toBe("cat");
   // With no end callback, the finite presentation and audio watchdog still release.
   await expect(p.locator(".game-layout")).toHaveAttribute("data-step", "s02", {
@@ -299,7 +299,22 @@ test("result timing, background recovery, wrong-word rehearsal and help survive 
   await at(p, "s04a");
   await transform(p, "p", "t");
   await expect(p.locator('[data-feedback="s04a"]')).toBeVisible();
-  await expect(p.locator('[data-feedback="s04a"]')).toHaveAttribute('data-phase','2');
+  await expect(p.locator('[data-entity="route-sheet"]')).toHaveAttribute(
+    "data-word",
+    "map",
+  );
+  await expect(p.locator('[data-feedback="s04a"]')).toHaveAttribute(
+    "data-phase",
+    "1",
+  );
+  await expect(p.locator('[data-feedback="s04a"]')).toHaveAttribute(
+    "data-phase",
+    "2",
+  );
+  await expect(p.locator('[data-entity="route-sheet"]')).toHaveAttribute(
+    "data-word",
+    "mat",
+  );
   await screenshot(p, "phone-morph-result");
   await reload(p, "s04b");
   await button(p, "垫子").tap();

@@ -37,21 +37,10 @@
   gap: 0.2rem 0.8rem;
 }
 .map-direction {
-  position: absolute;
-  top: 64px;
-  left: 20px;
-  z-index: 1;
+  display: block;
+  margin-top: 4px;
   font-size: 0.75rem;
   color: #4f593e;
-  background: #f7eed8df;
-  padding: 0.3rem 0.5rem;
-}
-.scene[data-performance] .map-direction {
-  position: relative;
-  display: inline-block;
-  top: auto;
-  left: auto;
-  margin-bottom: 0.5rem;
 }
 .repair-pages li {
   padding: 0.2rem 0;

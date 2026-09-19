@@ -25,6 +25,7 @@ export class StoryAudio {
       observe: (o: AudioObservation) => void;
     },
     timeoutMs = 8000,
+    settled?: (status: AudioStatus) => void,
   ) {
     this.stop();
     const asset = AUDIO.find((a) => a.text === text);
@@ -67,6 +68,7 @@ export class StoryAudio {
       }
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
       if (url) URL.revokeObjectURL(url);
+      settled?.(status);
     };
     this.cancel = () => end("cancelled", "播放已停止；可重听任务。");
     if (this.muted || this.volume === 0) {

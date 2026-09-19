@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import type { ReactNode } from "react";
+import { Modal } from "./ui/Modal.tsx";
+import { Picnic } from "./ui/Picnic.tsx";
+import { seedOf, shuffled } from "./game/random.ts";
+import type { Entity } from "./domain/world.ts";
 import { ACTS, STEPS } from "./content/story.ts";
 import { validateStory } from "./content/validate.ts";
 import { checkAssets } from "./content/assets.ts";
@@ -35,59 +38,6 @@ import {
 } from "./ui/Experience.tsx";
 import "./experience.css";
 
-function Modal({
-  title,
-  children,
-  close,
-}: {
-  title: string;
-  children: ReactNode;
-  close: () => void;
-}) {
-  const ref = useRef<HTMLDialogElement>(null);
-  useEffect(() => {
-    const before = document.activeElement as HTMLElement;
-    const dialog = ref.current;
-    dialog?.showModal();
-    return () => {
-      dialog?.close();
-      before?.focus();
-    };
-  }, []);
-  return (
-    <dialog
-      ref={ref}
-      aria-labelledby="modal-title"
-      onKeyDown={(e) => {
-        if (e.key !== "Tab") return;
-        const focusable = [
-          ...(ref.current?.querySelectorAll<HTMLElement>(
-            "button:not(:disabled), input, a[href]",
-          ) ?? []),
-        ].filter((el) => el.offsetParent !== null);
-        const first = focusable[0],
-          last = focusable.at(-1);
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last?.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first?.focus();
-        }
-      }}
-      onCancel={(e) => {
-        e.preventDefault();
-        close();
-      }}
-    >
-      <h2 id="modal-title">{title}</h2>
-      {children}
-      <button className="secondary" onClick={close}>
-        返回
-      </button>
-    </dialog>
-  );
-}
 const taskNames: Record<string, string> = {
   spelling: "拼写",
   substitution: "换字",
@@ -195,9 +145,9 @@ export default function App() {
   );
   const current = useRef(session);
   const canSave = useRef(!loaded.blocked);
-  const [screen, setScreen] = useState<"home" | "game" | "end" | "records">(
-    "home",
-  );
+  const [screen, setScreen] = useState<
+    "home" | "game" | "end" | "records" | "picnic"
+  >("home");
   const [modal, setModal] = useState<
     "pause" | "restart" | "clear" | "tutorial" | null
   >(null);
@@ -214,7 +164,11 @@ export default function App() {
     repeated: boolean;
     eventId: string;
   } | null>(null);
-  const [cue, setCue] = useState<{ step: Step; eventId: string } | null>(null);
+  const [cue, setCue] = useState<{
+    step: Step;
+    eventId: string;
+    before?: Entity;
+  } | null>(null);
   const [phase, setPhase] = useState(0);
   const [audioMessage, setAudioMessage] =
     useState("开发语音未经审核；可选择文字辅助。");
@@ -301,25 +255,43 @@ export default function App() {
   }, [session.step, screen, modal, audio, cue, preview]);
   useEffect(() => {
     if (!cue) return;
-    setPhase(0);
-    const voice = setTimeout(() => {
-      setPhase(1);
-      const owner = current.current.id;
-      audio.play(
-        cue.step.word,
-        setAudioMessage,
-        {
-          stepId: cue.step.id,
-          purpose: "success",
-          eventId: cue.eventId,
-          observe: (o) => observe(o, owner),
-        },
-        2400,
-      );
-    }, 450);
-    const response = setTimeout(() => setPhase(2), 1400);
-    const finish = setTimeout(() => setCue(null), 3600);
+    const critical = cue.step.type === "transform" || cue.step.id === "s04b";
+    setPhase(critical ? 0 : 2);
+    let live = true;
+    const started = Date.now();
+    let release: ReturnType<typeof setTimeout> | undefined;
+    const voice = setTimeout(
+      () => {
+        if (critical) setPhase(1);
+        const owner = current.current.id;
+        audio.play(
+          cue.step.word,
+          setAudioMessage,
+          {
+            stepId: cue.step.id,
+            purpose: "success",
+            eventId: cue.eventId,
+            observe: (o) => observe(o, owner),
+          },
+          critical ? 2300 : 1100,
+          (status) => {
+            if (live && status !== "cancelled")
+              release = setTimeout(
+                () => {
+                  if (live) setCue(null);
+                },
+                Math.max(0, (critical ? 1900 : 550) - (Date.now() - started)),
+              );
+          },
+        );
+      },
+      critical ? 400 : 0,
+    );
+    const response = setTimeout(() => setPhase(2), critical ? 1200 : 0);
+    const finish = setTimeout(() => setCue(null), critical ? 3100 : 1600);
     return () => {
+      live = false;
+      clearTimeout(release);
       clearTimeout(voice);
       clearTimeout(response);
       clearTimeout(finish);
@@ -388,7 +360,11 @@ export default function App() {
     if (result.outcome === "success" && result.session !== before) {
       setProjection(null);
       setPhase(0);
-      setCue({ step: s, eventId: result.session.events.at(-1)!.eventId });
+      setCue({
+        step: s,
+        eventId: result.session.events.at(-1)!.eventId,
+        before: s.source ? before.world.entities[s.source] : undefined,
+      });
     }
   }
   function enter() {
@@ -436,6 +412,12 @@ export default function App() {
     }
   }
   if (preview) return <Preview />;
+  if (screen === "picnic" && session.step === STEPS.length)
+    return (
+      <AssetContext.Provider value={{ failed: missing, epoch: assetEpoch }}>
+        <Picnic exit={() => setScreen("end")} />
+      </AssetContext.Provider>
+    );
   const answerVisible =
     session.text ||
     session.demo ||
@@ -616,12 +598,17 @@ export default function App() {
                 reveal={answerVisible}
                 cue={cue ? FEEDBACK[cue.step.id] : undefined}
                 cuePhase={phase}
+                before={cue?.before}
+                seed={seedOf(session.id)}
                 projection={projection}
                 disabled={!!cue}
               />
               <section className="task-panel" aria-labelledby="task-title">
                 {cue ? (
-                  <div className="result-story" role="status">
+                  <div
+                    className={`result-story ${cue.step.type === "transform" || cue.step.id === "s04b" ? "" : "compact"}`}
+                    role="status"
+                  >
                     <p className="eyebrow">
                       {cue.step.type === "transform"
                         ? "同一件物品，新的用途"
@@ -639,7 +626,9 @@ export default function App() {
                     <p className="result-word" lang="en">
                       {cue.step.word}
                     </p>
-                    <p className="result-response">{FEEDBACK[cue.step.id].response}</p>
+                    <p className="result-response">
+                      {FEEDBACK[cue.step.id].response}
+                    </p>
                     <p className="audio-note">{audioMessage}</p>
                     <button
                       className="secondary"
@@ -679,9 +668,15 @@ export default function App() {
                         文字辅助
                       </button>
                     </div>
-                    <p className="audio-note" role="status">
-                      {audioMessage}
-                    </p>
+                    <details
+                      className="audio-details"
+                      open={/失败|超时|静音/.test(audioMessage)}
+                    >
+                      <summary>声音说明</summary>
+                      <p className="audio-note" role="status">
+                        {audioMessage}
+                      </p>
+                    </details>
                     {answerVisible && (
                       <div className="answer" lang="en">
                         {step.prompt}
@@ -703,7 +698,13 @@ export default function App() {
                     {step.type === "spell" || step.type === "transform" ? (
                       <Letters
                         key={step.id}
-                        step={step}
+                        step={{
+                          ...step,
+                          letters: shuffled(
+                            [...step.letters],
+                            seedOf(session.id + step.id),
+                          ).join(""),
+                        }}
                         submit={(word) =>
                           send("submit", {
                             word,
@@ -784,7 +785,16 @@ export default function App() {
             >
               陪伴者：回顾本次练习
             </button>
-            <button className="primary" onClick={() => setModal("restart")}>
+            <button
+              className="primary"
+              onClick={() => {
+                audio.stop();
+                setScreen("picnic");
+              }}
+            >
+              继续野餐 →
+            </button>
+            <button className="quiet" onClick={() => setModal("restart")}>
               再读一次故事
             </button>
           </section>

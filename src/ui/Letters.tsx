@@ -125,7 +125,7 @@ export function Letters({
           className="drag-ghost"
           style={{ left: pointer.ghost.x, top: pointer.ghost.y }}
         >
-          字母
+          {tokens.find((t) => t.id === pointer.ghost?.label)?.letter ?? "字母"}
         </div>
       )}
     </div>

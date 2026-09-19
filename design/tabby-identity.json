@@ -1,0 +1,32 @@
+{
+  "version": "tabby-ui-v1",
+  "identity": "User-approved brown/grey tabby, yellow-green eyes, green scarf and backpack, round white collar tracker on viewer-right",
+  "mirrorAllowed": false,
+  "runtime": {
+    "path": "public/assets/game/tabby/companion.webp",
+    "width": 512,
+    "height": 512,
+    "format": "image/webp",
+    "alpha": true,
+    "bytes": 8602,
+    "sha256": "1910a9fc05f2ebb01c2d92813a029ed4dc458f2aac541bd2617b19a6a3adc027",
+    "gitBlob": "7ecab8a203ec7e01a3c62e609e332335607e02e6",
+    "recommendedMaxCss": 256,
+    "usage": ["start", "story-companion", "tutorial", "paper-token", "ending", "picnic"]
+  },
+  "source": {
+    "name": "欢跃探险猫咪姿态.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 1768103,
+    "sha256": "9c11b565f1057bc04c0af54331806d7d33232486a3b90389d257020f5b2afa7d",
+    "origin": "Actual user-provided GPT Image result in this conversation",
+    "modelVersion": "unknown",
+    "seed": "unknown",
+    "storage": "Original retained in conversation and local delivery package; not yet stored in this repository"
+  },
+  "processing": ["Remove boundary-connected near-white background while preserving enclosed white tracker and chin", "Review on light and dark backgrounds", "Downsample to 512 square; no upscale", "Optimize WebP and verify decoded dimensions, transparency and Git blob hash"],
+  "poses": "One illustrated pose reused. CSS feedback motion is not an independently generated pose or frame animation.",
+  "releaseReview": "PENDING",
+  "scope": "Verified runtime identity asset, not completion of the full HD art production package"
+}

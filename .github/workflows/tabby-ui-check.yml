@@ -1,0 +1,41 @@
+name: Tabby UI check
+on:
+  push:
+    branches: [feat/tabby-papertrail-ui-20260919]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: Browser checks
+        run: npm run test:browser
+      - name: Package inspectable workspace
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p /tmp/tabby-artifact
+          tar --exclude=.git --exclude=playwright-report --exclude=test-results -czf /tmp/tabby-artifact/workspace.tgz .
+          printf '%s\n' "$GITHUB_SHA" > /tmp/tabby-artifact/source-sha.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tabby-ui-workspace
+          path: |
+            /tmp/tabby-artifact/
+            test-results/
+            playwright-report/
+          retention-days: 3

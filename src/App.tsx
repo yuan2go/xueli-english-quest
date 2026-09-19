@@ -25,7 +25,8 @@ import {
 import { StoryAudio } from "./platform/audio.ts";
 import { localId } from "./platform/id.ts";
 import { Letters } from "./ui/Letters.tsx";
-import { Art, AssetContext, Scene } from "./ui/Scene.tsx";
+import { Scene } from "./ui/Scene.tsx";
+import { Art, CharacterArt, Visual, AssetContext, AssetNotice } from "./ui/Art.tsx";
 import { isWord, WORDS } from "./domain/world.ts";
 import type { WordId } from "./domain/world.ts";
 import type { Step } from "./content/story.ts";
@@ -110,7 +111,7 @@ function Preview() {
         <span>设计预览 · 复用正式组件</span>
       </header>
       <h1>纸上小径 / 操作样张</h1>
-      <p>临时插画、组件与异常状态检查；不包含另一套判题。</p>
+      <p>已接入插画、组件与异常状态检查；不包含另一套判题。</p>
       <div className="preview-art">
         {WORDS.map((word) => (
           <div key={word}>
@@ -156,6 +157,19 @@ export default function App() {
   const [fatal, setFatal] = useState("");
   const [missing, setMissing] = useState<string[]>([]);
   const [assetEpoch, setAssetEpoch] = useState(0);
+  const [retrying, setRetrying] = useState(false);
+  const assetContext = {
+    failed: missing, epoch: assetEpoch, retrying,
+    report: (id: string) => setMissing((old) => old.includes(id) ? old : [...old, id]),
+    retry: async () => {
+      if (retrying) return;
+      setRetrying(true);
+      const failed = await checkAssets();
+      setMissing(failed);
+      setAssetEpoch((n) => n + 1);
+      setRetrying(false);
+    },
+  };
   const [feedback, setFeedback] = useState("");
   const [feedbackType, setFeedbackType] = useState("");
   const [projection, setProjection] = useState<{
@@ -414,7 +428,7 @@ export default function App() {
   if (preview) return <Preview />;
   if (screen === "picnic" && session.step === STEPS.length)
     return (
-      <AssetContext.Provider value={{ failed: missing, epoch: assetEpoch }}>
+      <AssetContext.Provider value={assetContext}>
         <Picnic exit={() => setScreen("end")} />
       </AssetContext.Provider>
     );
@@ -424,8 +438,8 @@ export default function App() {
     step?.mode === "teaching" ||
     session.hint >= 2;
   return (
-    <AssetContext.Provider value={{ failed: missing, epoch: assetEpoch }}>
-      <main>
+    <AssetContext.Provider value={assetContext}>
+      <main className={`storybook screen-${screen}`}>
         <header className="topbar">
           <a
             className="brand"
@@ -475,22 +489,7 @@ export default function App() {
             </button>
           </div>
         )}
-        {missing.length > 0 && (
-          <div className="notice" role="alert">
-            部分插画加载失败，已提供文字替代。
-            <button
-              className="quiet"
-              onClick={() =>
-                checkAssets().then((failed) => {
-                  setMissing(failed);
-                  setAssetEpoch((n) => n + 1);
-                })
-              }
-            >
-              重试资源
-            </button>
-          </div>
-        )}
+        <AssetNotice />
         {screen === "home" && (
           <section className="cover">
             <div className="cover-copy">
@@ -529,12 +528,13 @@ export default function App() {
                   重新开始
                 </button>
               )}
+              {session.step === STEPS.length && <button className="secondary" onClick={() => setScreen("picnic")}>继续野餐 →</button>}
               <p className="micro">三页绘本 · 十二个挑战 · 随时暂停</p>
             </div>
             <div className="cover-picture" aria-hidden="true">
-              <div className="cover-path" />
+              <Visual id="scene-act-1" label="家门前的小径" className="cover-background" />
               <div className="cover-cat">
-                <Art word="cat" />
+                <CharacterArt />
               </div>
               <div className="cover-map">
                 <Art word="map" />
@@ -551,14 +551,12 @@ export default function App() {
               >
                 本地练习记录
               </button>
-              <span>开发体验版 · 临时插画 / 语音与内容待审核</span>
-              <a href="#design">设计预览</a>
+              <span>语音与内容待审核 · 进度保存在这台设备</span>
             </footer>
           </section>
         )}
         {screen === "game" && step && (
           <>
-            <RepairPages session={session} />
             <div className="chapter">
               <p>{ACTS[step.act - 1]}</p>
               <span>已完成 {completedChallenges(session)} / 12</span>
@@ -587,7 +585,7 @@ export default function App() {
               data-phase={phase}
             >
               <Scene
-                key={`${step.id}-${assetEpoch}`}
+                key={step.id}
                 session={session}
                 step={step}
                 submit={(input) => send("submit", input)}
@@ -595,6 +593,7 @@ export default function App() {
                   setFeedback("没有放稳，再试一次。落空不计答错。");
                   setFeedbackType("interaction");
                 }}
+                thinking={!cue && (feedbackType === "incorrect" || session.hint > 0)}
                 reveal={answerVisible}
                 cue={cue ? FEEDBACK[cue.step.id] : undefined}
                 cuePhase={phase}
@@ -603,7 +602,7 @@ export default function App() {
                 projection={projection}
                 disabled={!!cue}
               />
-              <section className="task-panel" aria-labelledby="task-title">
+              <section className="task-panel" data-feedback-kind={cue ? "correct" : feedbackType || "task"} aria-labelledby="task-title">
                 {cue ? (
                   <div
                     className={`result-story ${cue.step.type === "transform" || cue.step.id === "s04b" ? "" : "compact"}`}
@@ -740,19 +739,21 @@ export default function App() {
                 )}
               </section>
             </div>
+            <details className="progress-notebook"><summary>翻看已修复的书页</summary><RepairPages session={session} /></details>
           </>
         )}
         {screen === "end" && (
           <section className="ending">
-            <p className="eyebrow">三页绘本，已经写完</p>
-            <h1>野餐开始啦。</h1>
-            <p>你唤醒了小猫，走过湿墨小径，把野餐地布置好了。</p>
             <Scene
               session={session}
               submit={() => {}}
               onMiss={() => {}}
               reveal
             />
+            <div className="ending-copy">
+            <p className="eyebrow">三页绘本，已经写完</p>
+            <h1>野餐开始啦。</h1>
+            <p>你唤醒了小猫，走过湿墨小径，把野餐地布置好了。</p>
             <RepairPages session={session} expanded />
             <div className="word-cards">
               {WORDS.map((w) => (
@@ -797,6 +798,7 @@ export default function App() {
             <button className="quiet" onClick={() => setModal("restart")}>
               再读一次故事
             </button>
+            </div>
           </section>
         )}
         {screen === "records" && (
@@ -841,7 +843,14 @@ export default function App() {
         )}
         {modal === "tutorial" && (
           <Modal title="用字母，把故事叫醒" close={() => setModal(null)}>
-            <p>从三个字母开始，把小猫叫醒。操作区会陪你试放、取回和施法。</p>
+            <div className="tutorial-intro">
+              <CharacterArt pose="action" />
+              <ol>
+                <li><strong>点字母，放入格子</strong><span>点格子就能取回，再点新字母替换。</span></li>
+                <li><strong>拼好，再点「施法」</strong><span>字母会让绘本里的物品出现或变化。</span></li>
+                <li><strong>点物品，再点放置处</strong><span>也可以拖动。落空就再试一次。</span></li>
+              </ol>
+            </div>
             <p className="notice">
               语音是未经审核的浏览器开发替代。听不清时可选「文字辅助」，不影响完成故事。
             </p>
@@ -852,7 +861,7 @@ export default function App() {
         )}
         {modal === "pause" && (
           <Modal title="让故事歇一会儿" close={() => setModal(null)}>
-            <p>已完成的步骤会保留，回到故事后可以继续。</p>
+            <p>已完成的步骤和正在拼的字母都还在。准备好，再继续。</p>
             <label className="volume">
               音量
               <input
@@ -893,9 +902,8 @@ export default function App() {
             >
               返回首页
             </button>
-            <button className="quiet" onClick={() => setModal("clear")}>
-              清除本地记录
-            </button>
+            <button className="quiet" onClick={() => setModal("restart")}>重新开始</button>
+            <button className="quiet" onClick={() => setModal("clear")}>清除本地记录</button>
           </Modal>
         )}
         {modal === "restart" && (

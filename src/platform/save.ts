@@ -4,10 +4,10 @@ import type { Command, Session } from "../game/session.ts";
 
 export const SAVE_KEY = "wordspell.story.v1";
 export const ARCHIVE_KEY = "wordspell.previous.v1";
+// Exact prior headers only; all commands are still validated and replayed below.
 const legacy = (v: Record<string, unknown>) =>
-  v.pack === "3.0.0-dev" &&
-  v.content ===
-    "a6bf55d43c1e7bda54ce71c42980260e73d395b8ae257aebc3faef0f474e4854";
+  (v.pack === "3.0.0-dev" && v.content === "a6bf55d43c1e7bda54ce71c42980260e73d395b8ae257aebc3faef0f474e4854") ||
+  (v.pack === "3.1.0-dev" && v.content === "0400c42731deac0c728566185d7c6a2fb2e3970a4b1e38a475e67462caeef7fb");
 export function encode(session: Session): string {
   return JSON.stringify({
     schema: 2,
@@ -83,8 +83,13 @@ export function load(): Loaded {
     try {
       const session = decode(raw);
       const migrated = legacy(JSON.parse(raw));
-      if (migrated)
-        localStorage.setItem(`${SAVE_KEY}.legacy.${session.id}`, raw);
+      if (migrated) {
+        const backup = `${SAVE_KEY}.legacy.${session.id}`;
+        const existing = localStorage.getItem(backup);
+        if (existing !== null && existing !== raw)
+          throw new Error("旧存档备份位置已有另一份记录，请先导出；原始存档保留。");
+        localStorage.setItem(backup, raw);
+      }
       return {
         session,
         warning: migrated

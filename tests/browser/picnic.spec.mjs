@@ -106,7 +106,7 @@ test("normal story → reversible picnic → all three activities → isolated r
   browser,
 }) => {
   test.setTimeout(180000);
-  await mkdir("docs/evidence/playful-game", { recursive: true });
+  await mkdir("docs/evidence/tabby-cutover/flow", { recursive: true });
   const c = await browser.newContext({
     viewport: { width: 390, height: 844 },
     isMobile: true,
@@ -157,7 +157,7 @@ test("normal story → reversible picnic → all three activities → isolated r
   await button(p, "拿到草地").tap();
   await morph(p, "route-sheet", "t", "p");
   await p.screenshot({
-    path: "docs/evidence/playful-game/phone-picnic.png",
+    path: "docs/evidence/tabby-cutover/flow/phone-picnic.png",
     fullPage: true,
   });
   const free = await p.evaluate(() =>
@@ -216,7 +216,7 @@ test("normal story → reversible picnic → all three activities → isolated r
     await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
   ).toBe(true);
   await p.screenshot({
-    path: "docs/evidence/playful-game/pad-picnic.png",
+    path: "docs/evidence/tabby-cutover/flow/pad-picnic.png",
     fullPage: true,
   });
   await choose(p, "cat-card");

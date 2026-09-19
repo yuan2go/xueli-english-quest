@@ -1,12 +1,12 @@
 import type { WordId } from "../domain/world.ts";
-import { AUDIO, IMAGES, RUNTIME_ART } from "./manifest.ts";
+import { AUDIO, IMAGES } from "./manifest.ts";
 import { matchesFormat, validateResources } from "./resource-contract.ts";
 
 const withBase = (path: string) => `${import.meta.env.BASE_URL}${path}`;
 
 export function assetPathById(id: string): string {
   const lexical = IMAGES.find((asset) => asset.id === id);
-  const path = lexical?.path ?? RUNTIME_ART[id];
+  const path = lexical?.path;
   if (!path) throw new Error(`Unknown visual asset ${id}`);
   return withBase(path);
 }
@@ -37,7 +37,7 @@ export async function checkAssets(): Promise<string[]> {
   const results = await Promise.all(
     IMAGES.map(async (asset) => {
       try {
-        const response = await fetch(withBase(asset.path), { signal: AbortSignal.timeout(4000) });
+        const response = await fetch(withBase(asset.path), { signal: AbortSignal.timeout(8000), cache: "reload" });
         if (!response.ok) return asset.id;
         const data = await response.arrayBuffer();
         if (data.byteLength !== asset.bytes || !matchesFormat(new Uint8Array(data), asset.type)) return asset.id;

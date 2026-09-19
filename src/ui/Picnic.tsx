@@ -19,7 +19,7 @@ import {
 import { localId } from "../platform/id.ts";
 import { shuffled, seedOf } from "../game/random.ts";
 import { Letters } from "./Letters.tsx";
-import { Art, NAMES } from "./Scene.tsx";
+import { Art, NAMES, Visual, AssetNotice } from "./Art.tsx";
 import { ObjectButton } from "./ObjectButton.tsx";
 import { usePointerDrop } from "./pointer.ts";
 import { sceneTargets } from "../game/interaction.ts";
@@ -347,6 +347,7 @@ export function Picnic({ exit }: { exit: () => void }) {
         <strong>{MODES[state.mode]}</strong>
         <button onClick={() => setModal("pause")}>暂停</button>
       </header>
+      <AssetNotice />
       {warning && (
         <p className="notice" role="alert">
           {warning}
@@ -393,6 +394,7 @@ export function Picnic({ exit }: { exit: () => void }) {
           data-phase={morph ? phase : undefined}
           data-reaction={state.events.at(-1)?.action}
         >
+          <Visual id="scene-act-3" label="野餐草地" className="scene-background-image" />
           <div className="play-objects">
             {shuffled(
               Object.values(state.world.entities).filter(

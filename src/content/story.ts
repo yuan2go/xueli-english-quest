@@ -1,5 +1,5 @@
 import type { Effect, Location, WordId, World } from "../domain/world.ts";
-import { IMAGES, AUDIO } from "./manifest.ts";
+import { AUDIO } from "./manifest.ts";
 import { FEEDBACK } from "./feedback.ts";
 import { INSTRUCTIONS } from "./instructions.ts";
 
@@ -256,20 +256,18 @@ export const PACK = {
   version: "3.1.0-dev",
   schema: 2,
   review: "PENDING",
-  assetVersion: "paper-placeholder-v1",
   audioVersion: "speech-dev-v1",
 } as const;
-// The versioned save additionally binds to the exact authored data, not just an index.
+// Save compatibility binds to gameplay/learning data. Visual files have their own registry version.
 export const CONTENT_SIGNATURE = JSON.stringify({
   pack: PACK,
   steps: STEPS,
-  images: IMAGES,
   audio: AUDIO,
   feedback: FEEDBACK,
   instructions: INSTRUCTIONS,
 });
 export const CONTENT_HASH =
-  "0400c42731deac0c728566185d7c6a2fb2e3970a4b1e38a475e67462caeef7fb";
+  "b4704c2f4cc9db86b3f055ee48c1ae67fdee2581fd949fed8ebbfb525c1ed45c";
 export const INITIAL_WORLD: World = { revision: 0, entities: {}, flags: [] };
 export const ACTS = [
   "家门口 · 出发之前",

@@ -1,6 +1,6 @@
 import type { Entity } from "../domain/world.ts";
 import type { PointerEvent, ReactNode } from "react";
-import { Art, NAMES } from "./Scene.tsx";
+import { Art, CharacterArt, NAMES } from "./Art.tsx";
 /** Shared entity hit surface: IDs and semantic destinations survive art replacement. */
 export function ObjectButton({
   entity,
@@ -27,7 +27,7 @@ export function ObjectButton({
         : NAMES[word];
   return (
     <button
-      className={`object ${selected ? "selected" : ""}`}
+      className={`object ${entity.kind === "actor" ? "companion-object" : ""} ${entity.kind === "token" ? "paper-token" : ""} ${selected ? "selected" : ""}`}
       aria-label={name}
       aria-pressed={selected}
       data-entity={entity.id}
@@ -36,7 +36,7 @@ export function ObjectButton({
       onClick={onClick}
       onPointerDown={onPointerDown}
     >
-      <Art word={word} />
+      {entity.kind === "actor" ? <CharacterArt /> : <Art word={word} paper={entity.id === "cat-card" && word === "cat"} />}
       <span>{name}</span>
       {children}
     </button>

@@ -4,7 +4,7 @@
 
 首个故事：**小猫的野餐冒险**。面向有基础拼读经验的儿童，使用手机或平板，通过拼词造物、换字变物和听音互动修复三页绘本。
 
-> 已实现完整故事与通关后的魔法野餐：三幕十二挑战十三步骤、真实换装/收纳/取出、可逆字母魔法及三个可重玩小活动。PR #3 已接入 Paper Trail WebP 插画、场景背景与角色表情；本轮按要求免测试合并，合并后运行与视觉效果未验证。语音仍为未审核的浏览器开发替代，可选文字辅助。素材审核、教研、真机与公开发布状态见 [项目状态](docs/STATUS.md)。
+> 已实现三幕十二挑战十三步骤，以及通关后的自由野餐、换装/收纳/取出、可逆字母魔法和三个短活动。本轮将确认的带定位器狸花猫、三幕背景和独立道具接入正式 React 绘本页面；真实 HTTP 浏览器验收与截图见 [本轮交付](docs/evidence/tabby-cutover/README.md)。语音仍为未审核的浏览器开发替代，可选文字辅助。素材权利、教研、真机与公开发布仍待审核，见 [项目状态](docs/STATUS.md)。
 
 ## 开发入口
 
@@ -12,6 +12,7 @@
 - [WP-PLAYABLE-STORY-01](docs/work-packages/WP-PLAYABLE-STORY-01.md)：接续 WP-01～03 的完整故事工程与交付证据。
 - [WP-STORY-EXPERIENCE-02](docs/work-packages/WP-STORY-EXPERIENCE-02.md)：因果演出、场景直接摆物、渐进帮助、绘本修复与资源接入证据。
 - [WP-PLAYFUL-GAME-03](docs/work-packages/WP-PLAYFUL-GAME-03.md)：主线手感、自由野餐、三个短玩法与本次验证。
+- [WP-TABBY-ART-UI-CUTOVER-01](docs/work-packages/WP-TABBY-ART-UI-CUTOVER-01.md)：狸花猫资产基线、正式 UI 切换与实际运行验收。
 - [Codex 启动提示词](docs/prompts/codex-start.md) / [Claude Code 启动提示词](docs/prompts/claude-start.md)。
 - 两种工具共同遵循 [AGENTS.md](AGENTS.md)，不要分别建立引擎或相互覆盖工作区。
 

@@ -1,12 +1,14 @@
 import { test, expect } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
-const evidence = "docs/evidence/playful-game";
+const evidence = "docs/evidence/tabby-cutover/flow";
 const KEY = "wordspell.story.v1";
 const button = (p, name) => p.getByRole("button", { name, exact: true });
-async function start(p) {
+async function start(p, capture = false) {
   await p.goto("/");
   await p.waitForLoadState("networkidle");
+  if (capture) await screenshot(p, "phone-start");
   await p.getByRole("button", { name: "开始冒险" }).click();
+  if (capture) await screenshot(p, "phone-tutorial");
   await button(p, "我来试试").click();
 }
 async function at(p, id) {
@@ -127,8 +129,9 @@ test("phone: normal entrance, true letter interaction, ink boundaries, all thirt
   p.on("response", (r) => {
     if (r.status() >= 400) failed.push(r.url());
   });
-  await start(p);
+  await start(p, true);
   await at(p, "s01");
+  await screenshot(p, "phone-game");
   await expect(p.getByRole("button", { name: "施法" })).toBeDisabled();
   await button(p, "字母 a").tap();
   await button(p, "字母 c").tap();
@@ -142,6 +145,7 @@ test("phone: normal entrance, true letter interaction, ink boundaries, all thirt
   await button(p, "字母 t").tap();
   await p.getByRole("button", { name: "施法" }).tap();
   await at(p, "s02");
+  await expect(p.locator(".answer")).toHaveCount(0);
   await help(p);
   await spell(p, "bag");
   await at(p, "s03");
@@ -149,8 +153,10 @@ test("phone: normal entrance, true letter interaction, ink boundaries, all thirt
   await at(p, "s03");
   await expect(p.locator(".scene-projection")).toBeVisible();
   await expect(p.locator(".scene")).toHaveClass(/cat-rest/);
+  await screenshot(p, "phone-wrong");
   await expect(p.locator('[data-entity="picnic-mat"]')).toHaveCount(0);
   await button(p, "给我一点提示").tap();
+  await screenshot(p, "phone-hint");
   await help(p);
   await button(p, "第3格 t").tap();
   await button(p, "字母 p").tap();
@@ -159,6 +165,10 @@ test("phone: normal entrance, true letter interaction, ink boundaries, all thirt
   await expect(p.locator(".scene-projection")).toHaveCount(0);
   await screenshot(p, "phone-transform");
   await transform(p, "p", "t");
+  // Reduced motion shows the committed object immediately, without a hidden-result phase.
+  await expect(p.locator('[data-feedback="s04a"]')).toHaveAttribute("data-phase", "2");
+  await expect(p.locator('[data-entity="route-sheet"]')).toHaveAttribute("data-word", "mat");
+  await screenshot(p, "phone-correct");
   await at(p, "s04b");
   await reload(p, "s04b");
   await expect(p.getByText("已完成 3 / 12", { exact: true })).toBeVisible();
@@ -196,6 +206,7 @@ test("phone: normal entrance, true letter interaction, ink boundaries, all thirt
   await transform(p, "t", "p");
   await at(p, "s06");
   await button(p, "暂停").tap();
+  await screenshot(p, "phone-pause");
   await button(p, "静音").tap();
   await button(p, "继续故事").tap();
   await expect(p.locator(".audio-note")).toContainText("静音");
@@ -480,7 +491,8 @@ test("resource/audio/storage failures preserve playable fallback; corrupted save
     });
   });
   const p = await c.newPage();
-  await p.route("**/art/cat.svg", (r) => r.abort());
+  await p.route("**/assets/game/tabby/cat-idle.webp", (r) => r.abort());
+  await p.route("**/assets/game/tabby/scene-act-1.webp", (r) => r.abort());
   await start(p);
   await expect(p.getByRole("alert")).toContainText("插画加载失败");
   await expect(p.locator(".audio-note")).toContainText("失败");
@@ -489,7 +501,8 @@ test("resource/audio/storage failures preserve playable fallback; corrupted save
   await spell(p, "cat");
   await at(p, "s02");
   await expect(p.locator(".art-fallback").first()).toBeVisible();
-  await p.unroute("**/art/cat.svg");
+  await p.unroute("**/assets/game/tabby/cat-idle.webp");
+  await p.unroute("**/assets/game/tabby/scene-act-1.webp");
   await button(p, "重试资源").click();
   await expect(p.locator(".art-fallback")).toHaveCount(0);
   await at(p, "s02");

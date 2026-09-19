@@ -69,3 +69,16 @@ test("candidate release rejects missing/unreviewed resources, supports typed ras
     true,
   );
 });
+
+test("visual registry native masters retain bytes, dimensions and hashes independently of save content", () => {
+  for (const asset of IMAGES) {
+    if (!asset.master) continue;
+    const data = readFileSync(new URL(`../${asset.master.path}`, import.meta.url));
+    assert.equal(data.byteLength, asset.master.bytes);
+    assert.equal(createHash("sha256").update(data).digest("hex"), asset.master.sha256);
+    assert.ok(matchesFormat(data, "image/png"));
+    assert.equal(data.readUInt32BE(16), asset.master.width);
+    assert.equal(data.readUInt32BE(20), asset.master.height);
+    assert.ok(asset.master.width >= asset.width && asset.master.height >= asset.height);
+  }
+});

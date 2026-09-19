@@ -144,3 +144,17 @@ test("success after demonstration stays demonstrated; error escalation survives 
   assert.equal(s.events.at(-1).outcome, "demonstrated");
   assert.equal(s.events.at(-1).answerVisible, true);
 });
+
+test("visual cutover replays prior 3.1 saves at both ink boundaries without losing evidence", () => {
+  let s = initialSession("pre-tabby-save");
+  for (let i = 0; i < 4; i++) s = advance(s);
+  for (const expected of ["s04b", "s05"]) {
+    const old = JSON.parse(encode(s));
+    old.content = "0400c42731deac0c728566185d7c6a2fb2e3970a4b1e38a475e67462caeef7fb";
+    const restored = decode(JSON.stringify(old));
+    assert.deepEqual(restored, s);
+    assert.equal(STEPS[restored.step].id, expected);
+    assert.throws(() => decode(JSON.stringify({ ...old, content: "f".repeat(64) })));
+    s = advance(s);
+  }
+});

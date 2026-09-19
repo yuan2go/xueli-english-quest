@@ -4,7 +4,7 @@ import type { Entity } from "../domain/world.ts";
 import { shuffled } from "../game/random.ts";
 import type { Step } from "../content/story.ts";
 import type { Session, Input } from "../game/session.ts";
-import { assetPath } from "../content/assets.ts";
+import { assetPath, assetPathById } from "../content/assets.ts";
 import { usePointerDrop } from "./pointer.ts";
 import { sceneTargets } from "../game/interaction.ts";
 import type { FeedbackDefinition } from "../content/feedback.ts";
@@ -35,6 +35,23 @@ export function Art({ word, fail = false }: { word: WordId; fail?: boolean }) {
     />
   );
 }
+function CharacterArt({ happy = false }: { happy?: boolean }) {
+  const assets = useContext(AssetContext);
+  const id = happy ? "cat-happy" : "cat";
+  const [broken, setBroken] = useState(false);
+  useEffect(() => setBroken(false), [assets.epoch, id]);
+  if (broken || assets.failed.includes(id)) return <Art word="cat" fail />;
+  return (
+    <img
+      className="character-art"
+      src={assetPathById(id)}
+      alt=""
+      draggable={false}
+      onError={() => setBroken(true)}
+    />
+  );
+}
+
 export function Scene({
   session,
   step,
@@ -61,6 +78,7 @@ export function Scene({
   disabled?: boolean;
 }) {
   const [selected, setSelected] = useState<string | null>(null);
+  const assets = useContext(AssetContext);
   const place = (source: string, target: string | null) => {
     if (disabled) return;
     if (!target) {
@@ -81,17 +99,30 @@ export function Scene({
   const done = (id: string) =>
     session.events.some((e) => e.correct && e.stepId === id);
   const act = step?.act ?? 3;
+  const sceneId = `scene-act-${act}`;
+  const sceneFailed = assets.failed.includes(sceneId);
+  const happyCompanion = !!cue;
   const targets = sceneTargets(session.world, act);
   const arrived = session.events.some((e) => e.correct && e.stepId === "s11");
   const mapReady = session.world.entities["route-sheet"]?.word === "map";
   return (
     <section
-      className={`scene act-${act} ${session.world.flags.includes("crossed-ink") ? "crossed" : ""} ${projection?.rest ? "cat-rest" : ""}`}
+      className={`scene production-scene act-${act} ${session.world.flags.includes("crossed-ink") ? "crossed" : ""} ${projection?.rest ? "cat-rest" : ""}`}
       data-performance={cue?.kind}
       data-performing-entity={cue?.entityId}
       data-cue-phase={cue ? cuePhase : undefined}
       aria-label="故事场景"
     >
+      {!sceneFailed && (
+        <img
+          className="scene-background-image"
+          src={assetPathById(sceneId)}
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+        />
+      )}
+      <div className="scene-vignette" aria-hidden="true" />
       <div className="scenery" aria-hidden="true">
         <span className="sun" />
         <span
@@ -190,6 +221,7 @@ export function Scene({
                 ? "小猫纸偶"
                 : NAMES[entity.word];
             const region = targets.find((t) => t.entityId === entity.id);
+            const isCompanion = entity.id === "cat-companion";
             return (
               <div
                 key={entity.id}
@@ -197,7 +229,7 @@ export function Scene({
               >
                 <button
                   disabled={disabled}
-                  className={`object ${selected === entity.id ? "selected" : ""} ${entity.kind === "token" ? "paper-token" : ""}`}
+                  className={`object ${selected === entity.id ? "selected" : ""} ${entity.kind === "token" ? "paper-token" : ""} ${isCompanion ? "companion-object" : ""}`}
                   aria-label={name}
                   aria-pressed={selected === entity.id}
                   data-entity={entity.id}
@@ -226,7 +258,7 @@ export function Scene({
                     })
                   }
                 >
-                  <Art word={entity.word} />
+                  {isCompanion ? <CharacterArt happy={happyCompanion} /> : <Art word={entity.word} />}
                   {cue?.kind === "try-hat" && entity.id === "cat-companion" && (
                     <span
                       className="try-hat-prop"
@@ -239,7 +271,7 @@ export function Scene({
                     <span className="on-mat">
                       {children.map((child) => (
                         <span key={child.id}>
-                          <Art word={child.word} />
+                          {child.id === "cat-companion" ? <CharacterArt happy={happyCompanion} /> : <Art word={child.word} />}
                           <small className="sr-only">
                             {NAMES[child.word]}在上面
                           </small>
@@ -294,7 +326,7 @@ export function Scene({
       )}
       {entities.length === 0 && (
         <div className="empty-cat">
-          <Art word="cat" />
+          <CharacterArt />
           <span>等待你的第一个单词</span>
         </div>
       )}
@@ -308,7 +340,6 @@ export function Scene({
             : "放到目标处"}
         </div>
       )}
-      <span className="asset-note">原创临时纸片插画 · 待正式美术替换</span>
     </section>
   );
 }

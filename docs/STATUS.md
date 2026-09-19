@@ -1,4 +1,33 @@
-# 项目状态 · 故事＋魔法野餐可玩 / 发布未就绪
+# 项目状态 · 美术与玩法已合并 / 合并后未验证 / 发布未就绪
+
+## 2026-09-19 · 免测试合并与全分支发布
+
+本轮按仓库负责人的明确要求完成 Git 提交、推送和 PR 合并，不执行测试、类型检查、构建、浏览器或资源检查。下方 2026-09-17 的 PASS 均为历史结果，不适用于本轮合并后的代码。
+
+- 起始本地与远程 main：`cb7c59017296ab197e58b8c72acf25f5c6ec4563`。原有 4 个本地分支均已包含在该 main；3 个原有工作区均干净，无待提交代码。
+- 现有 [PR #3](https://github.com/yuan2go/xueli-wordspell/pull/3) 原有 3 个提交；在独立工作区解决 `src/ui/Scene.tsx` 冲突，产生合并提交 `7f5f6582f56962c90bbf2e807902d8a8b66b596c`，没有重写既有提交。
+- PR #3 已通过指定 head SHA 的普通 merge 合并，远程合并提交为 `19b04f725fe3c8d0a416de9b590eca8374655869`，本地 main 随后 fast-forward 到同一 SHA。
+- 执行全分支推送后，当时的 5 个本地分支与同名远程 SHA 全部一致，且都已被 main 包含；补建远程 `feat/wp-playful-game-03` 和 `feat/wp-story-experience-02`。本交付文档通过后续独立 PR 发布，最终 SHA、数量和全分支复核以本轮交付回复为准。
+- 已关闭本仓库 GitHub Actions；API 回读为 `enabled: false`。关闭前未发现运行中的工作流。
+
+合并后的代码接入 PR #3 的 WebP 词汇图像、场景背景、角色表情和样式，同时保留 main 的固定种子排列、同实例变形前后投影、过路后的稳定位置、按成功事件修复场景、物品词形属性和拖动名称反馈。地图方向留在场景说明内，避免新样式恢复已移除的悬浮提示。领域转换路径和既有野餐/短活动代码沿用 main。
+
+| 本轮命令或证据 | 结果 |
+| --- | --- |
+| `git fetch --all --prune`、所有分支/工作区/PR 清点 | 已执行；初始 1 个待合并 PR，4 个本地分支、3 个干净工作区 |
+| `git diff --check`、`git diff --cached --check` | PASS，仅 Git 差异空白检查；冲突文件已人工逐段合并 |
+| `git -c core.hooksPath=/dev/null commit` / `push --no-verify` | 已执行；本轮测试钩子不运行 |
+| `gh pr merge 3 --merge --match-head-commit 7f5f6582f56962c90bbf2e807902d8a8b66b596c` | MERGED；GitHub 返回上述 `19b04f7…` 合并提交 |
+| `git -c core.hooksPath=/dev/null merge --ff-only origin/main` | 已执行；本地 main 同步至 PR #3 合并结果 |
+| `git -c core.hooksPath=/dev/null push --all --no-verify origin` | 已执行；全部当时存在的本地分支已推送 |
+| `gh api repos/yuan2go/xueli-wordspell/actions/permissions` | `enabled: false`；远程 CI NOT_RUN |
+| `npm test`、`npm run typecheck`、`npm run typecheck:domain`、`npm run build` | NOT_RUN，用户要求 |
+| `npm run test:browser`、`npm run check:resources`、`npm run check:release` | NOT_RUN，用户要求 |
+| 浏览器交互、视觉复核、真机、录音听审、Provider | NOT_RUN；本轮无对应新增证据 |
+
+限制与下一包：合并完成不证明合并后运行正确、视觉完成度、素材权利或发布就绪。PR #3 中已有的 `APPROVED` / `APPROVED_RUNTIME` 元数据按原内容保留，不代表本轮进行了审核。下一包应在获得验证授权后检查合并后的真实交互、资源与视觉效果，再完成素材/录音/教研审核、真机及儿童试玩；公开发布仍为 NOT_READY，AI/Provider 仍暂停。
+
+## 历史记录 · 2026-09-17 玩法包验证
 
 更新：2026-09-17。[WP-PLAYFUL-GAME-03](work-packages/WP-PLAYFUL-GAME-03.md) 已完成本地实现与本次回归；AI 工坊、Provider、成人编辑器及预算系统暂停，未新增接口。
 

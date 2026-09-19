@@ -4,7 +4,7 @@
 
 ## 当前主线实现合同
 
-`content/story.ts` 的十三个 Step 消费于会话和 UI；当前 pack `3.1.0-dev`。运行时检查字段、效果、词表、来源当前词形、字母多重集、可编辑/锁定位置、场景可选实体与自然目标、帮助和反馈引用。字母布局与目标检查复用 UI 的 `letterLayout`、`sceneTargets`；合法路径通过同一个 `game/session.run` 执行。内容 SHA-256 覆盖 pack、步骤、图片、音频、有限指令与受限 feedback 定义；测试核对实际哈希。静态内容待教研审核，不支持导入任意外部关卡。
+`content/story.ts` 的十三个 Step 消费于会话和 UI；当前 pack `3.1.0-dev`。运行时检查字段、效果、词表、来源当前词形、字母多重集、可编辑/锁定位置、场景可选实体与自然目标、帮助和反馈引用。字母布局与目标检查复用 UI 的 `letterLayout`、`sceneTargets`；合法路径通过同一个 `game/session.run` 执行。内容 SHA-256 覆盖 pack、步骤、音频、有限指令与受限 feedback 定义；视觉资源版本与哈希独立登记，不再因插画更换使存档失效；测试核对实际哈希。静态内容待教研审核，不支持导入任意外部关卡。
 
 实际存档 envelope 为 `{schema:2, pack, content, id, journal}`：pack 是内容版本，content 是 SHA-256，id 是本地会话 ID，journal 是已接受命令日志。每个命令携带 sessionId、stepId、attemptId、expectedRevision、type、input；type 为 submit/hint/text/demo/replay/observe。恢复严格检查结构、版本与未知字段，再从初始世界重放同一会话转换链；World、步骤、学习证据、去重回执重新推导。日志上限 4000 条/JSON 2 MB，达到上限提示导出并重开。临时字母、拖影和音频对象不入档。
 
@@ -14,7 +14,7 @@ observe.input.observation 是有严格字段检查的 JSON 字符串：requestId
 
 localStorage key 仍为 `wordspell.story.v1`（key 不是 schema），确认重开先将原始存档备份到 `wordspell.previous.v1`，会明确提示替换更早上一局；备份失败只临时游玩，不覆盖旧存档。旧 schema 1 / pack 2 与损坏存档原样保留，不能猜测旧版音频/帮助证据，未做自动迁移。警告入口可导出原始两份存档；确认清除才删除，正常记录可下载 JSON。
 
-图片合同支持 SVG/PNG/WebP，录音支持 MP3/WAV/OGG；登记 id/path/type/bytes/SHA-256/version/source/review，以及图片尺寸/Alpha/用途、录音文本/locale/durationMs。开发策略允许明确标记的临时资源和空录音路径；候选发布策略拒绝缺失或未审核资源与内容。`check:resources` 检查磁盘字节/格式/哈希/引用，浏览器额外解码核对图片尺寸；`check:release` 增加发布门槛。局域网非安全 HTTP 无 SubtleCrypto 时只做尺寸/字节/格式检查，不能宣称浏览器验证过哈希。
+图片合同支持 SVG/PNG/WebP，录音支持 MP3/WAV/OGG；登记 id/path/type/bytes/SHA-256/version/source/review，以及图片尺寸/Alpha/用途、录音文本/locale/durationMs。图片登记另含原生 master 路径/尺寸/字节/SHA-256/Alpha、建议显示上限；没有 master 时明确 null。开发策略允许明确标记的临时资源和空录音路径；候选发布策略拒绝缺失或未审核资源与内容。`check:resources` 检查磁盘字节/格式/哈希/引用，浏览器额外解码核对图片尺寸；`check:release` 增加发布门槛。局域网非安全 HTTP 无 SubtleCrypto 时只做尺寸/字节/格式检查，不能宣称浏览器验证过哈希。
 
 正式录音缺失时 inputMode 标记 audio-dev；文字可见时为 text-assisted。outcome 区分 independent-correct（仅指本题未辅助，不是审核听力结果）、assisted-correct、demonstrated、incorrect、interaction-complete。页面记录按题型展示，不计算混合能力分数。
 
@@ -109,9 +109,9 @@ taskType 区分 spelling / substitution / lexical-listening / sentence-placement
 
 ## WP-PLAYFUL-GAME-03 协议增量
 
-`content/instructions.ts` 登记有限 word/find/cross/place 指令，place 明确 source word/relation/target word。文本从固定模板生成，与 audio 文本、步骤类型、当前来源词形、目标和 effect 一起检查；`validateStory` 与生产 `run` 共用 `instructionIssue`。任意另一条已登记指令也不能替换目标句通过判题。故事文案与受限判题指令分离，教研仍未审核。当前内容哈希 `0400c42731deac0c728566185d7c6a2fb2e3970a4b1e38a475e67462caeef7fb`。
+`content/instructions.ts` 登记有限 word/find/cross/place 指令，place 明确 source word/relation/target word。文本从固定模板生成，与 audio 文本、步骤类型、当前来源词形、目标和 effect 一起检查；`validateStory` 与生产 `run` 共用 `instructionIssue`。任意另一条已登记指令也不能替换目标句通过判题。故事文案与受限判题指令分离，教研仍未审核。该包原内容哈希为 `0400c42731deac0c728566185d7c6a2fb2e3970a4b1e38a475e67462caeef7fb`；本轮分离视觉资源后的内容哈希为 `b4704c2f4cc9db86b3f055ee48c1ae67fdee2581fd949fed8ebbfb525c1ed45c`，pack 仍为 3.1.0-dev，玩法与证据语义不变。
 
-只兼容一个已验证旧版本：schema2、pack3.0.0-dev、hash `a6bf55d43c1e7bda54ce71c42980260e73d395b8ae257aebc3faef0f474e4854`。十三步与资源不变，原命令逐条通过新规则重放，帮助/音频证据保留；加载先备份原文到 `wordspell.story.v1.legacy.<sessionId>` 并提示。备份失败不覆盖原文。其他未知版本或损坏数据保留、导出并确认重开，不猜测进度。
+兼容两个确切已知旧头：schema2、pack3.1.0-dev、上述 `0400c4…`，以及 schema2、pack3.0.0-dev、hash `a6bf55d43c1e7bda54ce71c42980260e73d395b8ae257aebc3faef0f474e4854`。十三步和教学语义不变，原命令逐条通过规则重放，帮助/音频证据保留；加载先备份原文到 `wordspell.story.v1.legacy.<sessionId>` 并提示。备份失败或备份位置已有不同原文时不覆盖任何旧数据。其他未知版本或损坏数据保留、导出并确认重开，不猜测进度。
 
 野餐/活动使用独立 key `wordspell.play.v1.<free|dress|find|helper>`，envelope `{version:1,id,mode,seed,journal}`；同样重放生产命令，不信任世界快照，最多 2000 条/1.5 MB。`wordspell.play.active` 只记当前入口，不解锁主线。重置前备份 `<key>.previous`，备份失败不覆盖；活动退出不改自由布置。模式不兼容或损坏时保留原档、提示导出/确认重置。
 

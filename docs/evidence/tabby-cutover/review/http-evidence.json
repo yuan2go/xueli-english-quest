@@ -1,0 +1,26 @@
+{
+  "entry": "http://127.0.0.1:4178/wordspell/",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "journey": "Start → Tutorial → wrong mat → hint → map → mat → ink → map → remaining six steps → Result",
+  "subpath": "PASS",
+  "imageUrls": [
+    "http://127.0.0.1:4178/wordspell/assets/game/tabby/scene-act-1.webp",
+    "http://127.0.0.1:4178/wordspell/assets/game/tabby/cat-idle.webp",
+    "http://127.0.0.1:4178/wordspell/assets/game/tabby/map.webp",
+    "http://127.0.0.1:4178/wordspell/assets/game/tabby/bag.webp",
+    "http://127.0.0.1:4178/wordspell/assets/game/tabby/cap.webp",
+    "http://127.0.0.1:4178/wordspell/assets/game/tabby/cat-action.webp",
+    "http://127.0.0.1:4178/wordspell/assets/game/tabby/cat-thinking.webp",
+    "http://127.0.0.1:4178/wordspell/assets/game/tabby/hat.webp",
+    "http://127.0.0.1:4178/wordspell/assets/game/tabby/mat.webp",
+    "http://127.0.0.1:4178/wordspell/assets/game/tabby/scene-act-2.webp",
+    "http://127.0.0.1:4178/wordspell/assets/game/tabby/scene-act-3.webp",
+    "http://127.0.0.1:4178/wordspell/assets/game/tabby/companion.webp"
+  ],
+  "pageErrors": [],
+  "httpFailures": [],
+  "generatedAt": "2026-09-19T14:49:41.659Z"
+}

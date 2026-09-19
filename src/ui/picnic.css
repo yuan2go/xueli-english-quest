@@ -262,11 +262,6 @@
     height: 44px;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .repair-region {
-    transition: none;
-  }
-}
 .play-scene[data-reaction="bag"] .entity-cat-companion .object > img {
   animation: picnic-peek 1s both;
 }

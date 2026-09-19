@@ -162,7 +162,7 @@ export function Scene({
                   aria-pressed={selected === entity.id}
                   data-entity={entity.id}
                   data-word={entity.word}
-                  data-drop={region?.id}
+                  data-drop={step?.type === "place" && !disabled ? region?.id : undefined}
                   aria-description={
                     region
                       ? `放置目标：${region.label}。先选物品再点这里，或拖到这里。`
@@ -207,7 +207,7 @@ export function Scene({
                       ))}
                     </span>
                   )}
-                  <span>{reveal ? entity.word : name}</span>
+                  <span className="object-label">{reveal ? entity.word : name}</span>
                   {selected === entity.id && <small>已选中 ✓</small>}
                   {step?.type === "place" && region && (
                     <small className="region-label">

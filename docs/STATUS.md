@@ -1,4 +1,32 @@
-# 项目状态 · 美术与玩法已合并 / 合并后未验证 / 发布未就绪
+# 项目状态 · 狸花猫正式 UI 已接入 / 本轮运行回归通过 / 公开发布待审
+
+## 2026-09-19 · WP-TABBY-ART-UI-CUTOVER-01
+
+正式 React 入口已使用带画面右侧定位器的狸花猫、三幕背景、五件独立道具和纸偶。Start、Tutorial、Game、Correct/Wrong/Hint、Pause、Result、记录与自由野餐统一为纸上小径；图片通过唯一 manifest 接入，旧临时 SVG、无效旧 WebP、第二套资源清单和旧布景/样式已移除。领域、会话、音频服务与十三步玩法沿用原链。资源重试保持输入，暂停恢复焦点；旧 pack3.1 的确切日志先备份、再重放，视觉哈希不再使玩法存档失效。
+
+- 原基线：`fbd322b1efd0ce13786af1d70ce0cccffc21d313`；按用户追加指令合并最新 `origin/main`：`60c30f06d006a2a3b18818fc0f9beb1ab9fc87d8`，合并提交 `451ef210348e91806e9222b8aaf28ee0301c143b`。
+- 分支：`codex/tabby-art-ui-cutover-01`；独立工作区：`/Volumes/DevSSD/Development/Workspace/projects/xueli-wordspell-tabby-cutover`。
+- ART_ASSET_BASELINE_COMMIT：`955ad10914a451bbef09317699675255cc87e38b`，先于 UI 独立提交/推送；回读 cat-idle、scene-act-2、map 二进制字节与 SHA-256 一致。
+- IMPLEMENTATION_COMMIT：`2236aa7e4eae6d3125328d59b0de5435de92a9d9`；后续手机遮挡、叠层、减少动态效果、结局构图修复及证据由 PR head 标识。
+- [本轮截图、参考对照、完整命令与限制](evidence/tabby-cutover/README.md)，[资产/master/来源](../design/tabby/README.md)。不是历史测试结果，也不是独立 Demo。
+
+| 本轮检查 | 结果 |
+| --- | --- |
+| `npm ci` | PASS，真实锁文件安装；未变更依赖 |
+| `npm test` | PASS 36/36，0 skipped |
+| `npm run typecheck` / `npm run typecheck:domain` | PASS |
+| `npm run build` | PASS；JS 282.32 kB / gzip 91.53 kB，CSS 27.46 kB / gzip 7.01 kB |
+| `npm run check:resources` | PASS；原生 master 另验字节/尺寸/哈希 |
+| `npm run test:browser` | PASS 10/10，44.6 秒；正常 HTTP 入口、完整主线/野餐三活动、两处铺路及旧存档恢复、资源/音频/存储失败与触控/键盘 |
+| 子路径生产 HTTP `/wordspell/` | PASS；桌面完整通关、12 张实际图片请求/解码，无旧 SVG、4xx 或 pageerror |
+| 实际截图对照 / Anti-AI-Generic Review | PASS，本轮工程自检；桌面/平板/手机，非用户最终视觉验收 |
+| `npm run check:release` | BLOCKED，退出 1：`发布资源缺失或未审核 bag`；没有降低发布校验 |
+| 真机、Safari、正式录音听审、教研、儿童试玩 | NOT_RUN |
+| 远端 Actions / 在线 Provider | NOT_RUN；未启用或修改 CI 权限、未使用玩法 Provider |
+
+本地启动：在上述工作区执行 `npm ci`、`npm run dev -- --host 127.0.0.1 --port 5176`，打开 http://127.0.0.1:5176/ 。正式入口为 `/`，不是 `/#design`；无公网部署。图像是已接入的生产运行资产，但来源/权利/教学/录音审核保持 PENDING。用户原欢呼图的高清 master 本机不可得，如实使用已有 512px 图且限结局小尺寸；另有三个原生 1254px 角色姿态。下一包为真实设备与素材/录音/教研验收，不重写正常工作的业务逻辑。
+
+以下为历史记录，不与本轮结果混用。
 
 ## 2026-09-19 · 免测试合并与全分支发布
 

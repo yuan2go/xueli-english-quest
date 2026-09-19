@@ -68,7 +68,7 @@ main { max-width:1440px; min-height:calc(100dvh - 32px); margin:16px auto; paddi
 .object:hover { border-color:transparent; background:#fffaf033; }
 .object > img,.object > .paper-puppet > img { width:100%; aspect-ratio:1; max-height:150px; object-fit:contain; }
 .object.companion-object > img { max-height:none; }
-.object > span:not(.paper-puppet):not(.on-mat):not(.try-hat-prop),.object > small { display:table; margin:auto; padding:2px 7px; color:var(--ink); background:#fffaf0eb; font-size:12px; line-height:1.5; border-radius:3px; }
+.object > .object-label,.object > small { display:table; margin:auto; padding:2px 7px; color:var(--ink); background:#fffaf0eb; font-size:12px; line-height:1.5; border-radius:3px; }
 .object > small:not(.region-label) { position:absolute; top:4px; right:2px; }
 .object.selected { outline:2px dashed var(--ink); outline-offset:2px; background:#f5efdf55; }
 .object:disabled { opacity:1; }
@@ -84,6 +84,7 @@ main { max-width:1440px; min-height:calc(100dvh - 32px); margin:16px auto; paddi
 .object .on-mat > span { width:35%; }
 .object .on-mat > span:has(.character-art) { width:58%; }
 .object .on-mat img { width:100%; height:auto; }
+.object .on-mat .character-art { max-width:220px; }
 .ink-road { position:absolute; z-index:1; top:38%; left:36%; width:29%; min-height:64px; height:14%; border-radius:38% 16% 28% 24%; border:2px dashed #d3c395; color:var(--paper-light); background:#34453b; margin:0; font-size:12px; box-shadow:0 6px 0 #34453b33; }
 .ink-road:disabled { opacity:1; }
 .crossed .ink-road { color:var(--paper-light); }
@@ -143,6 +144,11 @@ dialog button { margin:5px 8px 5px 0; }
 .tutorial-intro span { display:block; font-size:12px; color:var(--muted); }
 .ending { display:grid; grid-template-columns:1.4fr 1fr; gap:28px; margin:24px 0; }
 .ending-copy { align-self:center; padding:0 10px; }
+.ending .object-picnic-mat { width:70%; left:28%; bottom:5%; }
+.ending .object-picnic-mat .object > img { max-height:none; height:auto; margin-bottom:-17%; }
+.ending .object .on-mat { bottom:32%; }
+.ending .object-bag-main { left:0; bottom:42%; width:26%; }
+.ending .object-route-sheet { left:0; bottom:0; width:26%; }
 .ending h1 { font-size:42px; margin:14px 0; }
 .ending-copy > button { margin:5px 5px 5px 0; }
 .word-cards { display:flex; flex-wrap:wrap; gap:8px; margin:20px 0; }
@@ -174,8 +180,13 @@ dialog button { margin:5px 8px 5px 0; }
  .cover { display:flex; flex-direction:column; align-items:stretch; gap:8px; padding-top:8px; } .cover-picture { order:-1; min-height:0; height:245px; max-height:none; } .cover-cat { width:58%; max-width:230px; bottom:4%; left:10%; } .cover-map { width:30%; right:4%; bottom:2%; } .cover-caption { font-size:11px; bottom:5px; left:10px; }
  .cover-copy { padding:4px 6px; } .cover-copy .eyebrow { margin:8px 0; } .cover h1 { font-size:36px; margin:10px 0; } .cover h1 br { display:none; } .cover-intro { margin:8px 0 18px; font-size:16px; } .cover-intro br { display:none; } .cover-copy .primary { width:100%; } .cover-footer { margin-top:8px; flex-wrap:wrap; gap:0; } .cover-footer > span { width:100%; padding-left:16px; }
  .progress-notebook > summary { font-size:11px; } .chapter { gap:8px; } .chapter p { font-size:16px; } .chapter > span { font-size:12px; } .progress { width:100%; } .progress i { flex:1; height:4px; }
- .scene { min-height:300px; } .scene-caption { top:10px; left:10px; right:10px; max-width:calc(100% - 20px); font-size:12px; padding:4px 8px; } .scene-caption .map-direction { font-size:10px; }
- .scene-objects { inset:23% 2% 40px; } .object > span:not(.paper-puppet):not(.on-mat):not(.try-hat-prop),.object > small { font-size:10px; padding:1px 3px; } .object { min-height:60px; padding:1px; } .object-cat-companion { width:36%; } .object-bag-main { width:25%; } .object-route-sheet { width:28%; } .object-hat-main { width:25%; } .object-cat-card { width:23%; } .object-picnic-mat { width:48%; }
+ .scene { min-height:300px; } .scene.act-3 { min-height:350px; } .scene-caption { top:10px; left:10px; right:10px; max-width:calc(100% - 20px); font-size:12px; padding:4px 8px; } .scene-caption .map-direction { font-size:10px; }
+ .scene-objects { inset:23% 2% 40px; } .object > .object-label,.object > small { font-size:10px; padding:1px 3px; } .object { min-height:60px; padding:1px; } .object-cat-companion { width:36%; } .object-bag-main { width:25%; } .object-route-sheet { width:28%; } .object-hat-main { width:25%; } .object-cat-card { width:23%; } .object-picnic-mat { width:48%; }
+ .object:not(.companion-object) > img,.object > .paper-puppet > img { height:76px; aspect-ratio:auto; }
+ .object-picnic-mat .object > img { height:106px; }
+ .act-3 .object-cat-companion { top:0; bottom:auto; width:30%; }
+ .act-3 .object-bag-main { top:0; bottom:auto; }
+ .act-3 .object-cat-card { top:0; bottom:auto; }
  .region-label,.placement-caption,.bank-state { font-size:9px; } .placed img { width:26px; height:26px; } .placed small { font-size:9px; } .placed { padding:2px; }
  .placement-lesson { font-size:10px; padding:5px 8px; } .ink-road { top:40%; font-size:10px; min-height:48px; padding:4px; }
  .empty-cat { left:28%; width:46%; bottom:15%; } .empty-cat > span { font-size:10px; }

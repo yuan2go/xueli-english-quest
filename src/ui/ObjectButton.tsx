@@ -37,7 +37,7 @@ export function ObjectButton({
       onPointerDown={onPointerDown}
     >
       {entity.kind === "actor" ? <CharacterArt /> : <Art word={word} paper={entity.id === "cat-card" && word === "cat"} />}
-      <span>{name}</span>
+      <span className="object-label">{name}</span>
       {children}
     </button>
   );

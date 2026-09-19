@@ -165,6 +165,9 @@ test("phone: normal entrance, true letter interaction, ink boundaries, all thirt
   await expect(p.locator(".scene-projection")).toHaveCount(0);
   await screenshot(p, "phone-transform");
   await transform(p, "p", "t");
+  // Reduced motion shows the committed object immediately, without a hidden-result phase.
+  await expect(p.locator('[data-feedback="s04a"]')).toHaveAttribute("data-phase", "2");
+  await expect(p.locator('[data-entity="route-sheet"]')).toHaveAttribute("data-word", "mat");
   await screenshot(p, "phone-correct");
   await at(p, "s04b");
   await reload(p, "s04b");

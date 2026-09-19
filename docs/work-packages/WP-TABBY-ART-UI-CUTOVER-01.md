@@ -1,13 +1,13 @@
 # WP-TABBY-ART-UI-CUTOVER-01
 
-Baseline: `fbd322b1efd0ce13786af1d70ce0cccffc21d313`; reuse PR #5 identity commit `b1d64dafe085eeb379321fecd4d3d0bc5789273a`. Implement in `codex/tabby-art-ui-cutover-01`, isolated worktree; preserve domain/session/audio/save contracts.
+Initial baseline: `fbd322b1efd0ce13786af1d70ce0cccffc21d313`; latest `origin/main` merged at user request: `60c30f06d006a2a3b18818fc0f9beb1ab9fc87d8` via `451ef210348e91806e9222b8aaf28ee0301c143b`; reuse PR #5 identity commit `b1d64dafe085eeb379321fecd4d3d0bc5789273a`. Implement in `codex/tabby-art-ui-cutover-01`, isolated worktree; preserve domain/session/audio/save contracts.
 
 ## PAGE → STATE → ASSET
 
 | Page | State | Assets |
 | --- | --- | --- |
 | Game | waiting / transform / placing | act 1/2/3 background; idle/action tabby; map, mat, bag, hat, cap |
-| Game | correct / wrong / hint | same scene; happy or thinking tabby; real changed entity / transient projection; DOM feedback |
+| Game | correct / wrong / hint | same scene; action or thinking tabby; real changed entity / transient projection; DOM feedback |
 | Start | new / saved | act 1, idle tabby; DOM book title and resume/restart |
 | Tutorial | introduction / inline demonstration | idle/action tabby; actual letter controls and DOM instructions |
 | Result / Picnic | completed / free play / activities | act 3, happy/idle tabby, actual entity arrangement |

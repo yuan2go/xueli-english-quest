@@ -270,13 +270,14 @@ export default function App() {
   useEffect(() => {
     if (!cue) return;
     const critical = cue.step.type === "transform" || cue.step.id === "s04b";
-    setPhase(critical ? 0 : 2);
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setPhase(critical && !reduced ? 0 : 2);
     let live = true;
     const started = Date.now();
     let release: ReturnType<typeof setTimeout> | undefined;
     const voice = setTimeout(
       () => {
-        if (critical) setPhase(1);
+        if (critical && !reduced) setPhase(1);
         const owner = current.current.id;
         audio.play(
           cue.step.word,
@@ -301,7 +302,7 @@ export default function App() {
       },
       critical ? 400 : 0,
     );
-    const response = setTimeout(() => setPhase(2), critical ? 1200 : 0);
+    const response = setTimeout(() => setPhase(2), critical && !reduced ? 1200 : 0);
     const finish = setTimeout(() => setCue(null), critical ? 3100 : 1600);
     return () => {
       live = false;
@@ -745,6 +746,7 @@ export default function App() {
         {screen === "end" && (
           <section className="ending">
             <Scene
+              disabled
               session={session}
               submit={() => {}}
               onMiss={() => {}}

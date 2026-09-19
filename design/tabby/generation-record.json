@@ -1,0 +1,64 @@
+{
+  "date": "2026-09-19",
+  "tool": "Built-in imagegen",
+  "modelVersion": "Not exposed by tool",
+  "seed": "Not exposed by tool",
+  "identitySource": "PR #5 public/assets/game/tabby/companion.webp; original user PNG not locally available",
+  "styleReference": "references/core-game.png",
+  "nativeOutput": "11 separate native asset masters and 4 independent page references; tutorial corrected once to 0 / 12. No crops from page references.",
+  "additionalBriefs": {
+    "core": "Single complete book game screen, 2/3 woodland scene and 1/3 lowercase letter workshop; approved tabby identity; map to mat crossing.",
+    "thinking": "Edit idle master, thoughtful head tilt and paw below tracker; preserve all identity invariants.",
+    "action": "Edit idle master to three-quarter-front stepping pose; no mirror; tracker viewer-right.",
+    "scenes": "Three individual empty environments: cottage / forest crossing / picnic clearing. No characters, maps, mats, bags or UI baked into backgrounds."
+  },
+  "processing": "Native PNG masters untouched. Alpha bounding-box trim and downsample onto normalized transparent runtime canvas; characters 768 square with baseline 94%, props 512 square; scenes 1440x960; Pillow WebP quality=88 method=6. No upscaling or mirroring. Light/dark alpha checked. Original celebration runtime retained byte-identical at 512; no HD master claimed.",
+  "review": {
+    "visual": "Implementation review; not owner signoff",
+    "rights": "PENDING",
+    "teaching": "PENDING",
+    "release": "PENDING"
+  },
+  "prompts": [
+    {
+      "id": "idle",
+      "prompt": "Use case: identity-preserve. ONE CHARACTER, ONE STATE, ONE FILE. Create a native high resolution 1024x1024 or larger transparent PNG of the EXACT attached approved explorer tabby cat. Image 1 is identity reference; image 2 shows the established paper-storybook rendering style. Full body neutral attentive seated pose, both front paws down, slightly looking toward viewer right. Brown-grey base, deep dark tabby stripes, golden yellow eyes, pale muzzle, grey collar and WHITE round locator on VIEWER-RIGHT neck, green scarf below locator and olive exploration backpack on viewer-left shoulder. Same facial proportions, ears, stripe shapes, soft warm lighting, fine dark outlines and painterly fur. Locator must remain fully visible, do not mirror. No ground, scenery, letters, props, shadows extending far, collage, character sheet, multiple states, frames or borders. Real alpha background. Leave consistent 8 percent margin, paws at 90 percent canvas height, ears at 8 percent; body 80 percent canvas height. This is the default gameplay pose, calm and curious, no cheering. Render newly at native resolution, do not upscale input."
+    },
+    {
+      "id": "map",
+      "prompt": "ONE OBJECT, ONE FILE. Native high-resolution transparent alpha PNG, at least 1024 square. A single unfolded accordion-fold paper MAP for children's English storybook game. Warm ivory paper, clearly folded three panels, simple forest green tree symbols, dotted winding route and small ochre compass symbol. No letters, no labels, no words. Three-quarter overhead view with clear silhouette, object centered with 10% transparent margins, same hand-painted watercolor and dark fine ink style as reference. Subtle paper texture, warm gentle light. Exclude cat, character, hands, background, other props, collage, contact sheet, storyboard, presentation board, UI, text. One complete independent map, not cropped out of a page."
+    },
+    {
+      "id": "mat",
+      "prompt": "ONE OBJECT, ONE FILE. Native high-resolution transparent alpha PNG, 1280 square. A single EMPTY rectangular woven picnic MAT lying flat, three-quarter overhead perspective. Warm straw ochre woven surface with a simple forest-green double stripe border and small neat fringes. Flat low silhouette, visibly textile and not paper: NO printed map, compass, trees or route. Matches reference warm paper storybook watercolor fine dark ink illustration, gentle warm light. Entire mat centered, 12% transparent margins, enough broad surface to later place cat/hat sprites on it. NO objects on mat, no cat, no landscape, no text, no scene, no contact sheet, collage, storyboard, presentation board. Real transparent alpha, one mat only."
+    },
+    {
+      "id": "bag",
+      "prompt": "ONE OBJECT, ONE FILE. Native high-resolution 1280 square transparent alpha PNG. A single upright olive green canvas exploration BACKPACK with rounded flap, ochre leather straps, brass buckle, small paw-print patch, one rolled green bedroll attached at top; matches backpack worn by exact reference tabby but is a separate independent game prop. Three-quarter front view, fully visible comfortable 15% margins, bottom at 85%, obvious bag opening/flap. Same watercolor paper-storybook material and fine ink outlines, gentle warm light. No cat, character, hands, scenery, other objects, text, labels, UI, collage, contact sheet, storyboard, presentation board. ONE backpack only, centered on real transparent background."
+    },
+    {
+      "id": "hat",
+      "prompt": "ONE OBJECT, ONE FILE. Native high-resolution 1280 square transparent alpha PNG of ONE wide-brim sun HAT, warm ochre straw, clearly broad brim all around, dark forest green ribbon around crown. Three-quarter front view slightly above, easily recognizable wide-brim silhouette on a child's small game screen. Match reference painterly watercolor paper-storybook, fine brown ink, gentle warm light, restrained texture. Entire object centered with 15% transparent margin. No animal, head, hands, background, props, lettering, logo, UI, contact sheet, collage, storyboard, presentation board. Not a baseball cap. True transparency."
+    },
+    {
+      "id": "cap",
+      "prompt": "ONE OBJECT, ONE FILE. Native high-resolution 1280 square transparent alpha PNG of ONE baseball CAP. Soft ochre tan fabric crown with stitched panel seams, small top button and a clearly projecting curved forest-green visor at front only. Three-quarter front side angle so cap shape is immediately distinguishable from a wide-brim hat. Painterly watercolor fine brown ink storybook style exactly reference, warm gentle light, subtle cloth texture. Entire independent object centered with generous 15% transparent margins. No logo, text, animal, head, hands, landscape, props, UI, collage, contact sheet, storyboard or presentation board. Real transparent alpha."
+    },
+    {
+      "id": "start",
+      "prompt": "ONE SINGLE COMPLETE GAME SCREEN. Native high resolution landscape Start screen visual reference for WordSpell. Image 1 locks existing core game book-spread composition and palette. Image 2 is EXACT tabby character identity; use it fully visible, no mirroring, white neck locator on viewer-right, green scarf and backpack. Open parchment storybook on quiet deep green binding. Left page contains refined editorial title 'WordSpell', big title 'A picnic adventure', short subtitle 'Small words. Wonderful things.', one forest green 'Start adventure' button, understated 'Continue story' and 'Practice record' text controls. Right page is a woodland cottage clearing with the tabby large but fully in frame standing on earth; a small folded map near bottom. Warm #f5efdf paper, #254b3d forest ink, ochre #c89845, restrained watercolor and paper texture. Precise feasible React layout, no SaaS cards, no glow, particles, confetti or repeated cards. English text only and accurate. Exclude collage, contact sheet, storyboard, presentation board, mockup device or multiple screens. ONE complete finished entry screen."
+    },
+    {
+      "id": "tutorial",
+      "prompt": "ONE SINGLE COMPLETE GAME SCREEN. Create native high-resolution landscape TUTORIAL screen reference using exact core game's paper-book design and attached tabby. A compact central cream paper instruction overlay over the quiet book game page, overlay occupies about 55% width with a small idle tabby on left, white round tracker visible on VIEWER RIGHT neck, green scarf below and backpack unchanged. Title exactly 'Wake up the story'. Three short real steps with clear lowercase DOM-like letter tiles and simple icons: '1. Tap a letter', '2. Fill the spaces', '3. Cast your spell'. Example tiles c a t in a single row. One green button 'Let me try' and modest text 'Choose an object, then choose its place.' The game scene is visible around overlay but unobtrusive. Forest green #254b3d, warm paper #f5efdf, ochre. Restrained fine ink/watercolor, no thick panel stack, no glow or confetti. Accurate English text, no pseudo lettering. Exclude collage/contact sheet/storyboard/presentation board/device frame/multiple screens. This is one feasible short tutorial modal reference, not gameplay completion."
+    },
+    {
+      "id": "result",
+      "prompt": "ONE SINGLE COMPLETE GAME SCREEN. Native high-resolution landscape RESULT screen visual reference for the established WordSpell paper-storybook game. Use reference 1 for open book composition and exact quiet palette and reference 2 for exact tabby identity, white round locator on VIEWER-RIGHT neck unobscured, green scarf and backpack unchanged, never mirror. Main image on left 60 percent: a completed picnic clearing with ONE happy seated tabby on ONE straw mat with green edging, ONE wide brim straw hat beside cat on mat, an olive backpack standing next to mat, folded route map on ground. The small cap is inside backpack and not separately duplicated. Right page: exact English title 'The picnic begins.', smaller '12 challenges completed', three thin lines each with checkmark and 'Page 1', 'Page 2', 'Page 3'. Six small lowercase word controls 'cat bag map mat hat cap'. Main green button 'Keep playing', secondary 'Read again', understated 'Practice record'. All controls arranged as a book margin, no dashboard card grid. Warm paper #f5efdf, forest ink #254b3d, ochre, watercolor fine ink, calm joyful light. No medals, percentages, scores, glitter, glow, confetti. Accurate English text. No collage/contact sheet/storyboard/presentation board/device frame or multiple screens."
+    },
+    {
+      "id": "tutorialCorrection",
+      "prompt": "Edit this SINGLE COMPLETE GAME SCREEN reference. Change ONLY top HUD number '4 / 12' to '0 / 12', because tutorial begins before any challenge is complete. Preserve everything else: same full screen book composition, same character and white locator on viewer-right neck, same clear English words, same complete tutorial overlay, same resolution. No new elements, no collage, no alternative screens."
+    }
+  ]
+}

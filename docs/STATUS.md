@@ -1,4 +1,35 @@
-# 项目状态 · 场景驱动三幕已接通 / WP-GAMEPLAY-CORE-04
+# 项目状态 · 整屏绘本冒险 / WP-IMMERSIVE-GAME-UI-05
+
+## 2026-09-20 · 当前整屏游戏界面交付
+
+用户确认“整屏绘本冒险”后完成正式 `/` 改造。基线 `main` 与本轮 fetch 后的 `origin/main` 均为 `52fac621e6e81f6f645f6574096b937cd050b872`。独立分支 `codex/immersive-game-ui-05`，工作树 `/Volumes/DevSSD/Development/Workspace/projects/xueli-english-quest-game-ui-05`；唯一实现负责人 Codex。设计提交 `291800f`，已验证实现提交 `18ca6d20ef60f6edf310e82874778d8bd968c8af`；其后仅补本状态与完成清单，最终完整 SHA 见交付回复及当前分支 HEAD。主工作区未修改。本轮留下 3 个本地提交，不推送、不开 PR、不合并、不部署。
+
+已实现：林间全幅标题画面；覆盖视口的正式场景；木牌幕标与声音/暂停；物品附近行动浮层；按需纸张拼词/组句工具盘；工具展开时调整可操作区域和背景取景；手记集中目标、活动与制作；真实布置结局和暂停/记录。手机竖屏保持整屏，低高度横屏临时使用侧工具，关闭恢复探索。复用狸花猫/三幕图像和全部原玩法命令，未改变 domain/game、schema 4、教学分类或地图纸真实过路链。
+
+本轮实际浏览器失败均已修复：动作浮层挡下一物品；角色透明区域挡收回的地图纸；短横屏背包挡住已铺纸张；按压缩放覆盖居中 transform 导致触屏点空。动作结束后收起浮层，候选位置优先避让其他对象，物品尺寸受场景安全区限制；地图纸与猫/背包位置分离；按压保留原定位。没有强制点击、跳过测试或减少领域约束。最后视觉复核补齐工具取景与短横屏结局的遮挡处理，再执行完整浏览器套件。
+
+| 本轮命令/证据 | 实际结果 |
+| --- | --- |
+| `git fetch origin`、`git status --short`、分支/工作树核对 | PASS；基线 clean，main 与 origin/main 一致 |
+| `npm ci` | PASS；安装 26 包，0 vulnerabilities；fsevents 待批准安装脚本警告保留，没有放开策略 |
+| `npm test` | PASS 43/43，0 skipped；领域、应用、存档、语音及资源回归 |
+| `npm run typecheck` / `npm run typecheck:domain` | PASS；最终 build 再检查完整类型 |
+| `npm run build` | PASS；最终 JS 284.53 kB / gzip 93.20 kB，CSS 23.96 kB / gzip 6.50 kB，HTML 0.57 kB |
+| `npm run check:resources` | PASS；未修改美术/音频资源、manifest、package.json 或 lockfile |
+| `npm run test:browser` | PASS 11/11，53.8 秒；原 5 个完整业务/故障回归与新增 6 个界面/短横屏业务回归 |
+| `npx --yes prettier@3.6.2 --write ...` | PASS；仅本次改动文件的格式化，不加入项目依赖 |
+| `git diff --check` / `git diff --cached --check` | PASS |
+| `npm run check:release` | BLOCKED，实际退出 1：发布资源缺失或未审核 bag；原门槛保持 |
+| 真实设备、Safari、儿童试玩、录音听审/教研/权利审核 | NOT_RUN / PENDING，不能由模拟视口或自动化推定 |
+| Provider、生图、远端 CI、公网部署 | NOT_RUN；没有凭据、付费模型调用或 CI 设置变化 |
+
+正常首页 → 三幕 → 真实变纸/拖动过路/恢复地图 → 组句/观察 → 两种帽子与收纳选择 → 结局/刷新/回顾，在手机/桌面实际完成；640×360 短横屏也跑通整条主线。平板通过页面解锁并完成六活动变体、刷新/退出/重玩。360×640 与平板验证 CDP touch 拖动/取消、落空、键盘、后台暂停、焦点及旋转；故障回归保留图片重试、TTS 失败辅助、损坏档保护与临时存储。手机完整路径无 pageerror、console error 或 HTTP 4xx+。
+
+[本轮截图、路径与证据边界](evidence/immersive-game-ui-05/README.md) · [已批准工作包](work-packages/WP-IMMERSIVE-GAME-UI-05.md) · [当前交互合同](03-ux-art-audio.md)。图片为实际 HTTP 截图，不是设计稿或预置通关。
+
+本地体验：在本工作树执行 `npm run dev -- --host 127.0.0.1 --port 5181 --strictPort`，访问 `http://127.0.0.1:5181/`。后续需要负责人视觉体验、iOS/Android 真机、正式素材/录音/教研和真实儿童试玩；本轮不宣称学习提升、趣味性验收或发布就绪。
+
+以下是历史状态，不与本轮结果混用。
 
 ## 2026-09-20 · 本轮免测试发布
 

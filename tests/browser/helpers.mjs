@@ -137,7 +137,7 @@ export async function shot(p, name) {
     Promise.all([...document.images].map((i) => i.decode().catch(() => {}))),
   );
   await p.screenshot({
-    path: `docs/evidence/gameplay-core-04/${name}.png`,
+    path: `docs/evidence/web-game-shell-05/${name}.png`,
     fullPage: true,
     animations: "disabled",
   });
@@ -149,4 +149,12 @@ export async function viewportOK(p) {
   const b = await p.locator(".quest-scene").boundingBox();
   expect(b.height).toBeGreaterThan(200);
   expect(b.y + b.height).toBeLessThan((await p.viewportSize()).height);
+}
+
+export async function explore(p, name) {
+  await button(p, "探索小路").click();
+  await p
+    .getByRole("dialog")
+    .getByRole("button", { name, exact: true })
+    .click();
 }

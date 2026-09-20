@@ -1,5 +1,7 @@
 # WP-GAMEPLAY-CORE-04 · 场景驱动冒险与英语应用闭环
 
+> **Historical delivery / 历史交付**：本包保留原版本范围和证据，不再授权新开发。固定挑战/步骤、旧页面与旧 UI 接入点均非当前产品规范。现行规则见 01–05、11/12，当前包为 [WP-WEB-GAME-SHELL-05](WP-WEB-GAME-SHELL-05.md)。
+
 唯一实现负责人：Codex。本包按 2026-09-19 用户完整任务实施，优先于旧包的固定步骤限制。
 基线/default branch：main，`6e2cdf70b6f98a85808b51d83176f4160fd3f9a0`。
 分支：`codex/gameplay-core-04`；独立工作树 `xueli-english-quest-gameplay-core-04`。

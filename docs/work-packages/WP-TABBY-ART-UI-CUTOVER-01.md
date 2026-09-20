@@ -1,5 +1,7 @@
 # WP-TABBY-ART-UI-CUTOVER-01
 
+> **Historical delivery / 历史交付**：本包保留原版本范围和证据，不再授权新开发。固定挑战/步骤、旧页面与旧 UI 接入点均非当前产品规范。现行规则见 01–05、11/12，当前包为 [WP-WEB-GAME-SHELL-05](WP-WEB-GAME-SHELL-05.md)。
+
 Initial baseline: `fbd322b1efd0ce13786af1d70ce0cccffc21d313`; latest `origin/main` merged at user request: `60c30f06d006a2a3b18818fc0f9beb1ab9fc87d8` via `451ef210348e91806e9222b8aaf28ee0301c143b`; reuse PR #5 identity commit `b1d64dafe085eeb379321fecd4d3d0bc5789273a`. Implement in `codex/tabby-art-ui-cutover-01`, isolated worktree; preserve domain/session/audio/save contracts.
 
 ## PAGE → STATE → ASSET

@@ -9,4 +9,10 @@
 
 后续每行填写：工具及可确认版本、任务与关键输入摘要、产物路径/提交、人工修改、素材来源/权利、测试或审核结果、已报告 usage 与成本（未知留 unknown）。
 
-真实工坊证据另存最小脱敏记录：request hash、模板/模型/内容版本、生成时间、校验问题、审核人、预览结果。Fixture 标为 fixture，不填 provider success。演示视频经过剪辑要标注。
+上述 2026-09-16/17 行为 historical，历史检查见 [历史状态](../archive/status-through-core-04.md)，不代替本轮结果。
+
+| 日期 | 工具 | 实际任务 | 产物 | 人工/工程检查 | 范围限制 |
+| --- | --- | --- | --- | --- | --- |
+| 2026-09-20 | Codex / GPT-6 | 执行 WP-WEB-GAME-SHELL-05，治理旧设计、正式入口 Game Shell、输入/反馈/资源、正常入口试玩后修复 | 当前代码、权威文档、tests、evidence/web-game-shell-05 | 46 核心测试、8 浏览器测试及实际检查见 STATUS；agent 工程自检 | 未调用生图或运行时 Provider；未接受人工教研/儿童验收；费用/token unknown |
+
+当前没有运行时 AI 工坊。Fixture 不填 provider success；演示视频经过剪辑要标注。

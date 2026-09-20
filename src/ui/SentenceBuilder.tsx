@@ -1,14 +1,32 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { SentenceTask } from "../content/sentences.ts";
+import { usePointerDrop } from "./pointer.ts";
 export function SentenceBuilder({
   task,
   submit,
+  disabled = false,
 }: {
   task: SentenceTask;
   submit: (ids: string[]) => void;
+  disabled?: boolean;
 }) {
   const [ids, setIds] = useState<string[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
+  const surface = useRef<HTMLDivElement>(null);
+  const move = (token: string, destination: string | null) => {
+    if (!destination) return;
+    setIds((old) => {
+      const next = old.filter((id) => id !== token);
+      if (destination === "words") return next;
+      const index =
+        destination === "sentence" ? next.length : next.indexOf(destination);
+      if (index < 0) return old;
+      next.splice(index, 0, token);
+      return next;
+    });
+    setSelected(null);
+  };
+  const pointer = usePointerDrop(move, disabled, surface);
   const shift = (offset: number) => {
     if (!selected) return;
     setIds((old) => {
@@ -21,49 +39,64 @@ export function SentenceBuilder({
     });
   };
   return (
-    <div className="sentence-builder" aria-label="选词组句">
-      <div className="sentence-line" aria-label="我的句子">
+    <div ref={surface} className="sentence-builder" aria-label="选词组句">
+      <div
+        className={`sentence-line ${pointer.ghost?.target === "sentence" ? "drop-hover" : ""}`}
+        data-drop="sentence"
+        aria-label="我的句子"
+      >
         {ids.length === 0 ? (
-          <span>点词块，把意思说出来…</span>
+          <span>拖到这里，或点词块，把意思说出来…</span>
         ) : (
           ids.map((id, i) => (
             <button
               key={id}
+              data-drop={id}
+              disabled={disabled}
+              lang="en"
+              className={pointer.ghost?.target === id ? "drop-hover" : ""}
               aria-label={`句子第${i + 1}块 ${task.tokens.find((t) => t.id === id)!.text}`}
               aria-pressed={selected === id}
-              onClick={() => setSelected(selected === id ? null : id)}
+              onPointerDown={(e) => pointer.start(e, id)}
+              onClick={() =>
+                pointer.click(() => setSelected(selected === id ? null : id))
+              }
             >
               {task.tokens.find((t) => t.id === id)!.text}
             </button>
           ))
         )}
+        <span
+          className="sentence-tail"
+          data-drop="sentence"
+          aria-label="句尾放词"
+        />
       </div>
       <div className="sentence-edit">
         <button
-          disabled={!selected}
+          disabled={disabled || !selected || ids.indexOf(selected) === 0}
           onClick={() => shift(-1)}
           aria-label="词块左移"
         >
           ←
         </button>
         <button
-          disabled={!selected}
+          disabled={
+            disabled || !selected || ids.indexOf(selected) === ids.length - 1
+          }
           onClick={() => shift(1)}
           aria-label="词块右移"
         >
           →
         </button>
         <button
-          disabled={!selected}
-          onClick={() => {
-            setIds(ids.filter((id) => id !== selected));
-            setSelected(null);
-          }}
+          disabled={disabled || !selected}
+          onClick={() => selected && move(selected, "words")}
         >
           撤回词块
         </button>
         <button
-          disabled={!ids.length}
+          disabled={disabled || !ids.length}
           onClick={() => {
             setIds([]);
             setSelected(null);
@@ -72,22 +105,36 @@ export function SentenceBuilder({
           重新组句
         </button>
       </div>
-      <div className="word-blocks" aria-label="可用词块">
+      <div className="word-blocks" data-drop="words" aria-label="可用词块">
         {task.tokens.map((t) => (
           <button
             key={t.id}
             lang="en"
             data-token={t.id}
-            disabled={ids.includes(t.id)}
-            onClick={() => setIds([...ids, t.id])}
+            disabled={disabled || ids.includes(t.id)}
+            onPointerDown={(e) => pointer.start(e, t.id)}
+            onClick={() => pointer.click(() => move(t.id, "sentence"))}
           >
             {t.text}
           </button>
         ))}
       </div>
-      <button className="primary" onClick={() => submit(ids)}>
+      <button
+        className="primary"
+        disabled={disabled || !ids.length}
+        onClick={() => submit(ids)}
+      >
         说出这句话
       </button>
+      {pointer.ghost && (
+        <div
+          className="drag-ghost"
+          aria-hidden="true"
+          style={{ left: pointer.ghost.x, top: pointer.ghost.y }}
+        >
+          {task.tokens.find((t) => t.id === pointer.ghost?.label)?.text}
+        </div>
+      )}
     </div>
   );
 }

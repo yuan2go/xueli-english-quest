@@ -11,6 +11,7 @@ import {
   snapshot,
   shot,
   object,
+  explore,
 } from "./helpers.mjs";
 async function solve(p, mode) {
   const state = await snapshot(p),
@@ -67,7 +68,7 @@ test("normal story unlocks activities; each of six authored variants played thro
     ["find", "背包找物"],
     ["helper", "野餐小帮手"],
   ]) {
-    await button(p, name).click();
+    await explore(p, name);
     const variant = await solve(p, mode);
     await shot(p, `activity-${mode}`);
     await p.reload();
@@ -76,7 +77,7 @@ test("normal story unlocks activities; each of six authored variants played thro
     await expect(p.locator(".activity-success")).toBeVisible();
     await button(p, "返回故事").click();
     expect((await snapshot(p)).projection.story).toEqual(original);
-    await button(p, name).click();
+    await explore(p, name);
     await expect(p.locator(".activity-success")).toBeVisible();
     await button(p, "换个情境重玩").click();
     expect((await snapshot(p)).projection.activities[mode].variant).not.toBe(

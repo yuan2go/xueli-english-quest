@@ -1,0 +1,16 @@
+{
+  "surface": "normal production HTTP /",
+  "url": "http://127.0.0.1:4185/",
+  "viewport": "360x640 Chromium touch emulation",
+  "events": [
+    "Agency/Continuity: scene returned after waking; chose map before bag",
+    "Recovery: wrong word revised in-place, no new object for wrong attempt",
+    "Causality/Manipulation/Juice: same paper transformed, reverse guarded, dragged onto ink, committed crossing cue",
+    "Recovery/Pacing FIXED: open the real bag within blocked tool, same token draft retained, submit again; no repeated sentence assembly",
+    "Replayability: cap worn, hat packed, activity round-trip and refresh preserve personal story; six variants covered separately by browser suite"
+  ],
+  "errors": [],
+  "injectedGameState": false,
+  "externalChildStudy": false,
+  "ceiling": "Agent engineering walkthrough from child-player perspective; no child, teaching or physical-device approval"
+}

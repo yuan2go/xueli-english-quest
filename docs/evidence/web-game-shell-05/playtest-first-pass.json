@@ -1,0 +1,13 @@
+{
+  "surface": "normal production HTTP entrance",
+  "viewport": "360x640 Chromium touch emulation",
+  "events": [
+    "wake: world returns, no automatic next tool",
+    "wrong known word: no spawn; replace one letter and recover",
+    "map to mat; early reverse rejected; actual drag crosses ink",
+    "correct sentence blocked by closed bag: draft retained, but opening bag currently needs closing tool and rebuilding",
+    "personal ending, activity round-trip and refresh preserve layout"
+  ],
+  "errors": [],
+  "externalChildStudy": false
+}

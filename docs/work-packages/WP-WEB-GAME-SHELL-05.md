@@ -30,3 +30,44 @@
 
 ## 交付
 更新权威文档、STATUS 和本工作包实际结果；记录 baseline/final SHA、关键设计变化、删除的过期设计、实际测试、未运行项、已知限制。提交并推送分支，创建 PR；除非执行时得到明确授权，不自动合并 main。
+
+## 代码事实与实施清单（本包唯一执行计划）
+
+基线 `9b20d629dd4a4472f33afff3b935597a47741771`；沿用已授权 11/12，未新增平行规格。
+
+| 事实 | 权威设计 | 本包落点 |
+| --- | --- | --- |
+| App 982 行，常驻 action 列表和 JSX 流程分支 | 11 持续世界 / 12 Context Tool | GameShell、HUD、ContextTool；encounter/action 纯投影模块 |
+| Scene 已按世界递归物品；pointer 缺 scope、lost capture、显式释放 | 03/12 输入 | 共用 scoped pointer adapter；词块加入拖入/重排/退回 |
+| 手机始终一半场景一半表单 | 11 场景主体 | 无工具满世界，工具按需底部/侧边展开，局部滚动 |
+| checkAssets 只用于失败重试，首次没有分级生命周期 | 05/12 资源 | critical/scene/lazy 调度，取消、失败/重试和低网 fallback |
+| world/adventure/save 原子/重放链已存在 | 04/05 | 保持业务与 schema，不重写核心；新增表现仅消费提交前后 |
+
+- [x] 文档治理先于实现：历史状态隔离；旧 WP/evidence 明示 historical；重写过期 03/06/08/09/10/prompts/submission/content 导航；清除未使用 Experience/Picnic/ObjectButton 和三份旧样式，保留旧档链和测试。
+- [x] Game Shell 纵向接入：内容映射、情境入口、工具焦点、连续场景；App 只接平台/会话和外层表面。
+- [x] 输入/表现：统一 pointer 命中边界，取消/释放/旋转；词块直接操控；提交前后 cue、有限演出、跳过/reduced-motion。
+- [x] 资源/生命周期：manifest 分组调度，错误/重试保留输入；音频/后台/旋转清理。
+- [x] 必要验证：npm ci/test/typecheck/typecheck:domain/build/check:resources/check:release；正式入口完整主线及六活动变体，拖放/组句/刷新/故障/多视口；复查儿童视角并修复。
+- [x] 同步实际结果与证据，检查无新冲突；提交记录见下文，发布状态由关联 PR 和远端分支标识，不合并。
+
+
+## 实际交付 · 2026-09-20
+
+实现提交 `efc52f30542bd3c0df48721e551368e4a8fd6a12`；此前治理提交 `83756cb`。完整能力、验证命令和剩余阻塞见 [STATUS](../STATUS.md)，真实主线/活动/故障路径、截图及最后一轮体验修复见 [本包证据](../evidence/web-game-shell-05/README.md)。这些记录描述实际交付，不是新增设计。
+
+- 正式 App 从 982 行降为 339 行，GameShell 持续呈现 Scene/HUD/按需工具/短暂表现；内容与 shell 纯投影管理 encounter/tool/feedback。
+- 输入覆盖真实鼠标/触控/键盘操作、取消/旋转/后台、词块拖入重排退回；桌面/平板/手机场景保持主体，失败可原位恢复。
+- 三态分离，资源分级重试、音频生命周期和 reduced-motion；核心、save schema/journal、历史兼容及依赖锁均未修改。
+- 46/46 核心测试、8/8 生产 HTTP 浏览器测试、类型/构建/开发资源检查 PASS。完整主线、六活动变体、刷新与资源/存储故障均从正常入口实际操作；不注入通关状态。
+- 最后代入儿童视角复查发现“正确句子遇关闭背包后重组”的摩擦，已实现原工具开包、保留词块、显式重试，并重新完整通关。桌面/小屏/平板遮挡和焦点等本轮发现也已修复。
+- `check:release` 仍实际 exit 1（bag 未审核）；远端 Actions 关闭，CI NOT_RUN。实体设备、Safari、教研/正式听审、儿童试玩、公网部署 NOT_RUN。工程完成不等于公开发布或教学验收。
+
+## 追加：贴图动作与运行流畅度 · 用户 2026-09-20 请求
+
+沿用本包已批准的表现/性能设计；优化基线 `d251e05878537b6e13c8bc92b4a686551a4f30a2`，PR #9 尚未合并。采用现有 WebP + CSS/Web Animations 的小幅待机、姿态衔接、变形和实际实体移动；逐帧角色素材需要另行美术制作，引擎仍无必要性。实际基线为手机 Chromium / CPU 4x：120 次拖动更新产生 122 次 layout（3 次一致），此机器并未观察明显丢帧，不预先声称 FPS 改善。
+
+- [ ] `ui/pointer.ts`：坐标留在 ref，requestAnimationFrame 合并事件，仅开始/命中目标改变/结束更新 React；拖影只写 transform，取消时清理待执行帧。三个消费者保持点击/拖放/键盘语义。
+- [ ] `ui/Scene.tsx`、`ui/shell/GameShell.tsx`、局部 motion hook 和 CSS：真实实体提交前后测量，分批读几何后 transform/opacity 补间，消除 left/top 动画及移动副本；移动携带子物品，姿态/变形有连续视觉，世界提交不等待动画。
+- [ ] `ui/Art.tsx` 与 CSS：异步图片解码、已存在姿态的短过渡、小幅待机；后台/暂停/旋转和 reduced-motion 清理或稳定投影，避免持续 JS 帧循环。
+- [ ] 必要验证：同条件三轮 drag profile 前后对照；真实入口新增动作/取消/reduced-motion 回归；原完整 8 项浏览器路径、46 核心测试、typecheck/build/resources；最终看图/动作采样，不虚报真机 FPS。
+- [ ] 将实际设计与结果回写 03/12、STATUS 和本包证据；在同一已授权 PR 分支提交推送，不合并。

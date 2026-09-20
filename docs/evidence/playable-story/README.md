@@ -1,3 +1,5 @@
+> **Historical evidence**：仅证明本目录对应的历史版本；不是当前 UI/流程规范，也不是 SHELL-05 的验证结果。
+
 # WP-PLAYABLE-STORY-01 · 本次工程证据
 
 日期：2026-09-17。基线 `080d70d95790ed3c37c188214a4a6b8ffeefc93a`；验证实现 `b037005d8cb50bf18bbc4b94da10172cccdc0131`。测试源码 `tests/browser/story.spec.mjs` 与 `tests/session.test.mjs`，没有内部强制通关接口。

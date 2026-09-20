@@ -1,3 +1,5 @@
+> **Historical evidence**：仅证明本目录对应的历史版本；不是当前 UI/流程规范，也不是 SHELL-05 的验证结果。
+
 # WP-PLAYFUL-GAME-03 实际浏览器证据
 
 2026-09-17，macOS Chromium / Playwright，生产 HTTP `127.0.0.1:4174`。实现 `20775514e6b1dd347e0e639c93640f10349aac72`；34 Node + 8 浏览器通过，最后全浏览器运行 38.2 秒。截图由真实页面操作生成，不是设计稿，也不是真机。

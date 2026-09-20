@@ -1,5 +1,5 @@
-import { useState } from "react";
-import type { Step } from "../content/story.ts";
+import { useRef, useState } from "react";
+import type { LetterTask } from "../game/interaction.ts";
 import { usePointerDrop } from "./pointer.ts";
 import { letterLayout } from "../game/interaction.ts";
 
@@ -8,10 +8,11 @@ export function Letters({
   submit,
   disabled = false,
 }: {
-  step: Step;
+  step: LetterTask;
   disabled?: boolean;
   submit: (word: string) => void;
 }) {
+  const surface = useRef<HTMLDivElement>(null);
   const { tokens, fixed } = letterLayout(step);
   const initial =
     step.type === "transform"
@@ -41,10 +42,14 @@ export function Letters({
     });
     setSelected(null);
   }
-  const pointer = usePointerDrop((source, target) => {
-    if (target?.startsWith("slot-")) move(source, Number(target.slice(5)));
-    else if (target === "bank") move(source, null);
-  }, disabled);
+  const pointer = usePointerDrop(
+    (source, target) => {
+      if (target?.startsWith("slot-")) move(source, Number(target.slice(5)));
+      else if (target === "bank") move(source, null);
+    },
+    disabled,
+    surface,
+  );
   function choose(token: string) {
     const empty = selected ?? slots.findIndex((v, i) => !v && !fixed(i));
     if (empty >= 0) move(token, empty);
@@ -57,7 +62,7 @@ export function Letters({
     )
     .join("");
   return (
-    <div className="letter-workshop" aria-label="字母操作区">
+    <div ref={surface} className="letter-workshop" aria-label="字母操作区">
       <div className="slots">
         {slots.map((id, i) => {
           const letter = fixed(i)
@@ -69,7 +74,7 @@ export function Letters({
               className={`letter slot ${fixed(i) ? "fixed" : ""} ${selected === i ? "selected" : ""}`}
               aria-label={`第${i + 1}格${letter ? ` ${letter}` : " 空"}`}
               aria-pressed={selected === i}
-              disabled={fixed(i)}
+              disabled={disabled || fixed(i)}
               data-drop={`slot-${i}`}
               onPointerDown={(e) => {
                 if (id && !fixed(i)) pointer.start(e, id);
@@ -92,7 +97,7 @@ export function Letters({
           <button
             key={t.id}
             className="letter stamp"
-            disabled={slots.includes(t.id)}
+            disabled={disabled || slots.includes(t.id)}
             aria-label={`字母 ${t.letter}`}
             onPointerDown={(e) => pointer.start(e, t.id)}
             onClick={() => pointer.click(() => choose(t.id))}
@@ -117,7 +122,7 @@ export function Letters({
       )}
       <button
         className="primary spell"
-        disabled={word.length !== step.word.length}
+        disabled={disabled || word.length !== step.word.length}
         onClick={() => submit(word)}
       >
         施法 <span aria-hidden="true">✧</span>

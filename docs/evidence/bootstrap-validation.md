@@ -1,3 +1,5 @@
+> **Historical evidence**：仅证明本目录对应的历史版本；不是当前 UI/流程规范，也不是 SHELL-05 的验证结果。
+
 # 初始化验证记录
 
 日期：2026-09-16。执行环境：Linux 容器，Node.js v22.16.0、npm 10.9.2、预装 TypeScript 5.8.3。应用 manifest 声明 TypeScript 6.0.2；本地领域检查版本不同，结果不能当成完整依赖构建证据。

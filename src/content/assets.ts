@@ -13,7 +13,10 @@ export function assetPathById(id: string): string {
 
 export const assetPath = (word: WordId) => assetPathById(word);
 
-function dimensions(data: ArrayBuffer, type: string): Promise<{ width: number; height: number }> {
+function dimensions(
+  data: ArrayBuffer,
+  type: string,
+): Promise<{ width: number; height: number }> {
   return new Promise((resolve, reject) => {
     const image = new Image();
     const url = URL.createObjectURL(new Blob([data], { type }));
@@ -22,7 +25,8 @@ function dimensions(data: ArrayBuffer, type: string): Promise<{ width: number; h
       URL.revokeObjectURL(url);
       image.onload = null;
       image.onerror = null;
-      if (ok) resolve({ width: image.naturalWidth, height: image.naturalHeight });
+      if (ok)
+        resolve({ width: image.naturalWidth, height: image.naturalHeight });
       else reject(new Error("decode"));
     };
     const timer = setTimeout(() => finish(false), 3000);
@@ -32,19 +36,35 @@ function dimensions(data: ArrayBuffer, type: string): Promise<{ width: number; h
   });
 }
 
-export async function checkAssets(): Promise<string[]> {
+export async function checkAssets(
+  ids = IMAGES.map((a) => a.id),
+  signal?: AbortSignal,
+  reload = false,
+): Promise<string[]> {
   validateResources(IMAGES, AUDIO);
   const results = await Promise.all(
-    IMAGES.map(async (asset) => {
+    IMAGES.filter((a) => ids.includes(a.id)).map(async (asset) => {
       try {
-        const response = await fetch(withBase(asset.path), { signal: AbortSignal.timeout(8000), cache: "reload" });
+        const response = await fetch(withBase(asset.path), {
+          signal: signal
+            ? AbortSignal.any([signal, AbortSignal.timeout(8000)])
+            : AbortSignal.timeout(8000),
+          cache: reload ? "reload" : "default",
+        });
         if (!response.ok) return asset.id;
         const data = await response.arrayBuffer();
-        if (data.byteLength !== asset.bytes || !matchesFormat(new Uint8Array(data), asset.type)) return asset.id;
+        if (
+          data.byteLength !== asset.bytes ||
+          !matchesFormat(new Uint8Array(data), asset.type)
+        )
+          return asset.id;
         const size = await dimensions(data, asset.type);
-        if (size.width !== asset.width || size.height !== asset.height) return asset.id;
+        if (size.width !== asset.width || size.height !== asset.height)
+          return asset.id;
         if (!crypto.subtle) return "";
-        const hash = [...new Uint8Array(await crypto.subtle.digest("SHA-256", data))]
+        const hash = [
+          ...new Uint8Array(await crypto.subtle.digest("SHA-256", data)),
+        ]
           .map((b) => b.toString(16).padStart(2, "0"))
           .join("");
         if (hash !== asset.sha256) return asset.id;

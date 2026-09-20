@@ -1,5 +1,7 @@
 # WP-STORY-EXPERIENCE-02 · 原方案主线体验闭环
 
+> **Historical delivery / 历史交付**：本包保留原版本范围和证据，不再授权新开发。固定挑战/步骤、旧页面与旧 UI 接入点均非当前产品规范。现行规则见 01–05、11/12，当前包为 [WP-WEB-GAME-SHELL-05](WP-WEB-GAME-SHELL-05.md)。
+
 > 集成状态补注（2026-09-17，WP-PLAYFUL-GAME-03 核验）：下述为本包原交付证据；提交 `28231ec765c4f8d5026d8b63bfe26aafd2c996b0` 及实现现已在 origin/main `0ff79584a96da53e512a6702c7987d4ab65e1d20` 的祖先链。原“本地未合并”仅描述当时状态；本次验证见 STATUS，不改写历史 PASS 的适用版本。
 
 2026-09-17，本地实施与自动化验证完成；正式资源、教研、真机和发布分别待验收。基线 `6b06c9efa149ea3643b3957d98a349b845b9c7fb`，独立分支 `feat/wp-story-experience-02`。接续 WP-PLAYABLE-STORY-01，未扩展词表、关卡、平台或 AI 工坊。

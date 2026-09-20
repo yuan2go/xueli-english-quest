@@ -1,6 +1,6 @@
 # 05 · 内容、运行与存档合同
 
-当前内容版本 `4.0.0-dev.1`、存档 schema 4。WP-GAMEPLAY-CORE-04 的以下规则是正式页面合同；旧 schema 2/pack3.x 只用于识别、验证与保留历史日志。
+当前内容版本 `4.0.0-dev.1`、存档 schema 4。WP-WEB-GAME-SHELL-05 的以下规则是正式页面合同；旧 schema 2/pack3.x 只用于识别、验证与保留历史日志。
 
 ## 内容与身份
 
@@ -26,6 +26,6 @@ key 为 `xueli.adventure.v4`。envelope `{schema,content,id,seed,journal,project
 
 ## 资源与发布
 
-继续使用唯一图片 manifest 与 Vite BASE_URL。原图/音频哈希、字节、格式与审核策略未放宽；新增有限句子的开发语音目录同样登记为 PENDING/path=null，经现有 StoryAudio 播放，不伪造录音。`check:resources` 包含新增语音目录；`check:release` 仍拒绝未审核素材。视觉资源不改变旧内容哈希；新内容行为修改应更新新版本，不能原地复用已发布版本。
+继续使用唯一图片 manifest 与 Vite BASE_URL。SHELL-05 只改变 UI/表现/加载调度，保留内容版本、schema 和旧哈希。`sceneModel/resolveTool` 读取既有 availability/goals，presentation 只消费提交结果；选中、草稿、DOM 坐标和 cue 均不进入日志。原图/音频哈希、字节、格式与审核策略未放宽；新增有限句子的开发语音目录同样登记为 PENDING/path=null，经现有 StoryAudio 播放，不伪造录音。`check:resources` 包含新增语音目录；`check:release` 仍拒绝未审核素材。视觉资源不改变旧内容哈希；新内容行为修改应更新新版本，不能原地复用已发布版本。
 
 旧 pack 的精确哈希和 journal decoder 保留在 `content/story.ts`、`platform/save.ts` 和旧回归测试里，仅用于历史验证；没有把旧十二挑战的定义重新加为新产品约束。

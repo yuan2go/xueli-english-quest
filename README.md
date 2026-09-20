@@ -2,9 +2,11 @@
 
 **发现问题，用单词改变物品，用句子帮助朋友。**
 
-首个故事《小猫的野餐冒险》是一款触屏绘本游戏。正式入口 `/` 已接入场景目标驱动的三幕：家门口准备 → 湿墨小径 → 野餐草地。没有账号、后端或运行时 AI 依赖。
+首个故事《小猫的野餐冒险》是一款触屏绘本游戏。正式入口 `/` 是整屏绘本冒险，已接入场景目标驱动的三幕：家门口准备 → 湿墨小径 → 野餐草地。没有账号、后端或运行时 AI 依赖。
 
 唤醒伙伴后就可探索已出现物品。背包和地图可按不同顺序恢复；纸偶能变帽子；开包、取出、戴帽、换帽、摘帽与摆放都产生真实世界结果。同一张路线纸必须亲自变成垫子、铺过湿墨、让猫到达对岸后才能恢复地图。草地上用词块组成指令和描述，安排野餐，并保留自己的帽子和收纳选择。
+
+场景铺满画面，点物品展开行动；拼词/组句时才打开工具盘。角落保留声音和暂停，探险手记收纳目标、活动与制作。竖屏可玩，低高度横屏为工具留出侧边空间。
 
 三个短活动按能力提前开放，各有两种手工编排情境：帽子搭配、背包找物、野餐小帮手。退出回到原故事布置，刷新不改活动变体；重玩切换另一种情境。自由制作的备用 mat / hat 各一件，稳定 ID，不复制主角或关键物品。
 
@@ -14,8 +16,8 @@ Node.js 22.12+，已有真实且精确锁定的 npm lockfile。
 
 ```sh
 npm ci
-npm run dev -- --host 127.0.0.1 --port 5178
-# http://127.0.0.1:5178/ —— 正式 React 入口
+npm run dev -- --host 127.0.0.1 --port 5181
+# http://127.0.0.1:5181/ —— 正式 React 入口
 npm test
 npm run typecheck
 npm run typecheck:domain
@@ -29,7 +31,7 @@ npm run test:browser
 ## 当前权威与限制
 
 - [项目状态与本次真实检查](docs/STATUS.md)
-- [本工作包](docs/work-packages/WP-GAMEPLAY-CORE-04.md)
+- [当前界面工作包](docs/work-packages/WP-IMMERSIVE-GAME-UI-05.md)、[玩法合同](docs/work-packages/WP-GAMEPLAY-CORE-04.md)
 - [产品与范围](docs/01-product-and-scope.md)、[场景玩法](docs/02-gameplay-and-levels.md)
 - [架构](docs/04-architecture.md)、[运行和存档合同](docs/05-content-and-runtime-contracts.md)
 - [全部文档导航](docs/README.md)、[有效决策](docs/10-decisions-risks-and-sources.md)

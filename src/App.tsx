@@ -27,17 +27,11 @@ import {
 import { localId } from "./platform/id.ts";
 import { StoryAudio } from "./platform/audio.ts";
 import { checkAssets } from "./content/assets.ts";
-import {
-  Art,
-  AssetContext,
-  AssetNotice,
-  CharacterArt,
-  NAMES,
-  Visual,
-} from "./ui/Art.tsx";
+import { Art, AssetContext, AssetNotice, NAMES } from "./ui/Art.tsx";
 import { Scene } from "./ui/Scene.tsx";
 import { Letters } from "./ui/Letters.tsx";
 import { SentenceBuilder } from "./ui/SentenceBuilder.tsx";
+import { GameHud, GameIcon, TitleScreen } from "./ui/GameChrome.tsx";
 import { Modal } from "./ui/Modal.tsx";
 import type { Location, WordId } from "./domain/world.ts";
 import "./adventure.css";
@@ -105,7 +99,9 @@ export default function App() {
   const current = useRef(session),
     canSave = useRef(!loaded.blocked);
   const [screen, setScreen] = useState<"home" | "game" | "records">("home");
-  const [modal, setModal] = useState<"pause" | "restart" | "help" | null>(null);
+  const [modal, setModal] = useState<
+    "pause" | "restart" | "help" | "journal" | null
+  >(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [tool, setTool] = useState<Tool>(null);
   const [message, setMessage] = useState("");
@@ -367,7 +363,7 @@ export default function App() {
     if (r.kind === "valid" || r.kind === "done") {
       audio.stop();
       setTool(null);
-      setSelected(r.focus ?? morph?.id ?? null);
+      setSelected(null);
     }
   }
   function submitSentence(ids: string[]) {
@@ -521,93 +517,104 @@ export default function App() {
   );
   return (
     <AssetContext.Provider value={assetContext}>
-      <main className={`quest-app ${screen === "game" ? "playing" : ""}`}>
-        <header className="quest-header">
-          <a
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              audio.stop();
-              setScreen("home");
-            }}
-            className="quest-brand"
-          >
-            雪梨英语奇旅<small>XUELI ENGLISH QUEST</small>
-          </a>
-          <span className="chapter-name">
-            {screen === "game"
-              ? (activity?.title ?? SCENES[b.scene].title)
-              : "小猫的野餐冒险"}
-          </span>
-          {screen === "game" && (
-            <>
-              <button onClick={() => setModal("help")}>帮助</button>
-              <button
-                onClick={() => {
-                  audio.stop();
-                  setModal("pause");
-                }}
-              >
-                暂停
-              </button>
-            </>
+      <main
+        className={`quest-app screen-${screen} ${screen === "game" ? "playing" : ""}`}
+      >
+        <div className="game-notices">
+          <AssetNotice />
+          {warning && (
+            <div className="notice save-warning" role="alert">
+              {warning}
+            </div>
           )}
-        </header>
-        <AssetNotice />
-        {warning && (
-          <div className="notice save-warning" role="alert">
-            {warning}
-          </div>
-        )}
+        </div>
         {screen === "home" && (
-          <section className="quest-cover">
-            <div>
-              <p className="eyebrow">一张纸，一次旅行，许多自己的办法。</p>
-              <h1>
-                小猫想去野餐。
-                <br />
-                你会怎么帮它？
-              </h1>
-              <p>寻找身边的东西，用单词改变用途，用一句话安排世界。</p>
-              <button className="primary" onClick={start}>
-                {session.revision > 0 ? "继续冒险" : "开始冒险"}
-              </button>
-              <button className="quiet" onClick={() => setScreen("records")}>
-                本地记录
-              </button>
-              <p className="micro">
-                无需账号 · 触屏、鼠标和键盘均可
-                <br />
-                图像与开发语音待审核；无声音时可选文字辅助。
-              </p>
-            </div>
-            <div className="quest-cover-art">
-              <Visual id="scene-act-1" label="家门口" />
-              <CharacterArt />
-              <Art word="map" />
-            </div>
-          </section>
+          <TitleScreen
+            continuing={session.revision > 0}
+            start={start}
+            settings={() => setModal("pause")}
+          />
         )}
         {screen === "game" && (
           <>
-            <div className="world-problem">
-              <h1>
-                {ended && session.mode === "story"
+            <GameHud
+              act={SCENES[b.scene].act}
+              activity={activity?.title}
+              title={
+                ended && session.mode === "story"
                   ? "野餐开始啦！"
                   : activity
                     ? activity.variants[b.variant].title
-                    : SCENES[b.scene].title}
-              </h1>
-              <p>
-                {activity
-                  ? activity.variants[b.variant].problem
-                  : ended
-                    ? "看看你选择的帽子、座位和物品。还可以继续调整。"
-                    : SCENES[b.scene].problem}
-              </p>
-            </div>
-            <div className={`quest-layout ${tool ? "with-tool" : ""}`}>
+                    : SCENES[b.scene].title
+              }
+              muted={muted}
+              mute={() => {
+                audio.stop();
+                setMuted((v) => !v);
+                setAudioNote(
+                  muted ? "声音已开启，可以重听。" : "已静音，可选择文字辅助。",
+                );
+              }}
+              pause={() => {
+                audio.stop();
+                setModal("pause");
+              }}
+            />
+            <div
+              className={`quest-layout ${tool ? "with-tool" : ""}`}
+              data-tool={tool?.kind}
+            >
               <Scene
+                actions={
+                  selected && entities[selected] ? (
+                    <>
+                      <div className="action-heading">
+                        <h2>
+                          {selected === "cat-card" &&
+                          entities[selected].word === "cat"
+                            ? "小猫纸偶"
+                            : NAMES[entities[selected].word]}
+                        </h2>
+                        <button
+                          className="icon-button"
+                          aria-label="取消选择"
+                          onClick={() => setSelected(null)}
+                        >
+                          <GameIcon name="close" />
+                        </button>
+                      </div>
+                      <div className="context-actions">
+                        {selected === "bag-main" && (
+                          <button
+                            onClick={() => {
+                              send({ action: "bag" });
+                              setSelected(null);
+                            }}
+                          >
+                            {b.bagOpen ? "合上背包" : "打开背包"}
+                          </button>
+                        )}
+                        {["cat-card", "route-sheet"].includes(selected) && (
+                          <button
+                            onClick={() =>
+                              openTool({ kind: "morph", id: selected })
+                            }
+                          >
+                            试试换字
+                          </button>
+                        )}
+                        {availableTargets(session, selected).map((t) => (
+                          <button
+                            key={t.key}
+                            onClick={() => performMove(selected, t.target)}
+                          >
+                            {t.label}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  ) : null
+                }
                 session={session}
                 selected={selected}
                 onSelect={choose}
@@ -634,238 +641,182 @@ export default function App() {
                 }
                 disabled={!!modal}
               />
-              <aside className="quest-tools" aria-label="行动工具">
-                {tool ? (
-                  <>
-                    <div className="tool-heading">
-                      <span>
-                        {tool.kind === "craft"
-                          ? "自由探索"
-                          : modeLabels[
-                              sentence?.mode ??
-                                task?.mode ??
-                                (teaching
-                                  ? "teaching"
-                                  : tool.kind === "find"
-                                    ? "revisit"
-                                    : "exploration")
-                            ]}
-                      </span>
-                      {taskId && (
-                        <>
-                          <button onClick={() => playTask(true)}>重听</button>
-                          <button onClick={() => toolHelp("text")}>
-                            文字辅助
-                          </button>
-                        </>
+
+              {tool && (
+                <aside className="quest-tools" aria-label="行动工具">
+                  <div className="tool-heading">
+                    <span>
+                      {tool.kind === "craft"
+                        ? "自由探索"
+                        : modeLabels[
+                            sentence?.mode ??
+                              task?.mode ??
+                              (teaching
+                                ? "teaching"
+                                : tool.kind === "find"
+                                  ? "revisit"
+                                  : "exploration")
+                          ]}
+                    </span>
+                    {taskId && (
+                      <>
+                        <button onClick={() => playTask(true)}>重听</button>
+                        <button onClick={() => toolHelp("text")}>
+                          文字辅助
+                        </button>
+                      </>
+                    )}
+                    <button
+                      onClick={() => {
+                        audio.stop();
+                        setTool(null);
+                      }}
+                    >
+                      收起工具
+                    </button>
+                  </div>
+                  <div className="tool-body">
+                    <div className="tool-story">
+                      <h2>
+                        {task?.purpose ??
+                          sentence?.title ??
+                          (morph
+                            ? "给纸张换一个词尾"
+                            : tool.kind === "find"
+                              ? "听声音，点场景中的物品"
+                              : "用拼词制作备用物品")}
+                      </h2>
+                      <p className="tool-context">
+                        {task?.meaning ??
+                          sentence?.context ??
+                          (morph
+                            ? "先取出、摘下或移走上面的东西。换字不会复制物品。"
+                            : tool.kind === "craft"
+                              ? "mat 做一张备用垫，hat 做一顶备用帽；每种一件。"
+                              : "这次先听声音。需要时可开启文字辅助。")}
+                      </p>
+                      {reveal && promptText && (
+                        <p className="answer" lang="en">
+                          {promptText}
+                          {help?.demo && (
+                            <small>
+                              {sentence
+                                ? "示范：按句子顺序逐块选择；两块 the 都要用。"
+                                : "示范：先选择字母填入空格；换字时先取回词尾，再放入新字母。"}
+                            </small>
+                          )}
+                        </p>
                       )}
+                      {morph && teaching && (
+                        <div className="meaning-pair">
+                          <Art word={morph.word} />
+                          <span>
+                            {morph.word} → {targetWord}
+                          </span>
+                          <Art word={targetWord!} />
+                        </div>
+                      )}
+                    </div>
+                    <div className="tool-input">
+                      {toolStep && (
+                        <Letters
+                          key={`${toolStep.id}-${morph?.word ?? ""}`}
+                          step={toolStep}
+                          disabled={!!modal}
+                          submit={submitWord}
+                        />
+                      )}
+                      {sentence && (
+                        <SentenceBuilder
+                          key={sentence.id}
+                          task={sentence as SentenceTask}
+                          submit={submitSentence}
+                        />
+                      )}
+                    </div>
+                  </div>
+                  {taskId && (
+                    <div className="tool-help">
+                      <button onClick={() => toolHelp("hint")}>提示</button>
+                      <button onClick={() => toolHelp("demo")}>看示范</button>
+                    </div>
+                  )}
+                  {taskId && <p className="audio-note">{audioNote}</p>}
+
+                  {message && (
+                    <p className={`quest-feedback ${result}`} role="status">
+                      {message}
+                    </p>
+                  )}
+                </aside>
+              )}
+              {!tool && (
+                <div className="scene-missions">
+                  <div className="world-actions">{actions()}</div>
+                  {session.mode !== "story" && (
+                    <div className="activity-exit">
                       <button
                         onClick={() => {
-                          audio.stop();
-                          setTool(null);
+                          stopTools();
+                          send({ action: "exit" });
                         }}
                       >
-                        收起工具
+                        返回故事
+                      </button>
+                      <button
+                        onClick={() => {
+                          stopTools();
+                          send({ action: "restart-activity" });
+                        }}
+                      >
+                        换个情境重玩
                       </button>
                     </div>
-                    <h2>
-                      {task?.purpose ??
-                        sentence?.title ??
-                        (morph
-                          ? "给纸张换一个词尾"
-                          : tool.kind === "find"
-                            ? "听声音，点场景中的物品"
-                            : "用拼词制作备用物品")}
-                    </h2>
-                    <p className="tool-context">
-                      {task?.meaning ??
-                        sentence?.context ??
-                        (morph
-                          ? "先取出、摘下或移走上面的东西。换字不会复制物品。"
-                          : tool.kind === "craft"
-                            ? "mat 做一张备用垫，hat 做一顶备用帽；每种一件。"
-                            : "这次先听声音。需要时可开启文字辅助。")}
-                    </p>
-                    {reveal && promptText && (
-                      <p className="answer" lang="en">
-                        {promptText}
-                        {help?.demo && (
-                          <small>
-                            {sentence
-                              ? "示范：按句子顺序逐块选择；两块 the 都要用。"
-                              : "示范：先选择字母填入空格；换字时先取回词尾，再放入新字母。"}
-                          </small>
-                        )}
-                      </p>
-                    )}
-                    {morph && teaching && (
-                      <div className="meaning-pair">
-                        <Art word={morph.word} />
-                        <span>
-                          {morph.word} → {targetWord}
-                        </span>
-                        <Art word={targetWord!} />
-                      </div>
-                    )}
-                    {toolStep && (
-                      <Letters
-                        key={`${toolStep.id}-${morph?.word ?? ""}`}
-                        step={toolStep}
-                        disabled={!!modal}
-                        submit={submitWord}
-                      />
-                    )}
-                    {sentence && (
-                      <SentenceBuilder
-                        key={sentence.id}
-                        task={sentence as SentenceTask}
-                        submit={submitSentence}
-                      />
-                    )}
-                    {taskId && (
-                      <div className="tool-help">
-                        <button onClick={() => toolHelp("hint")}>提示</button>
-                        <button onClick={() => toolHelp("demo")}>看示范</button>
-                      </div>
-                    )}
-                    {taskId && <p className="audio-note">{audioNote}</p>}
-                  </>
-                ) : (
-                  <>
-                    {selected && entities[selected] ? (
-                      <>
-                        <h2>
-                          {selected === "cat-card" &&
-                          entities[selected].word === "cat"
-                            ? "小猫纸偶"
-                            : NAMES[entities[selected].word]}
-                        </h2>
-                        <div className="context-actions">
-                          {selected === "bag-main" && (
-                            <button onClick={() => send({ action: "bag" })}>
-                              {b.bagOpen ? "合上背包" : "打开背包"}
-                            </button>
-                          )}
-                          {["cat-card", "route-sheet"].includes(selected) && (
-                            <button
-                              onClick={() =>
-                                openTool({ kind: "morph", id: selected })
-                              }
-                            >
-                              试试换字
-                            </button>
-                          )}
-                          {availableTargets(session, selected).map((t) => (
-                            <button
-                              key={t.key}
-                              onClick={() => performMove(selected, t.target)}
-                            >
-                              {t.label}
-                            </button>
-                          ))}
-                          <button
-                            className="quiet"
-                            onClick={() => setSelected(null)}
-                          >
-                            取消选择
-                          </button>
-                        </div>
-                      </>
-                    ) : selected === "ink-road" ? (
+                  )}
+                  {ended && session.mode === "story" && (
+                    <div className="ending-choice">
                       <p>
-                        小猫的爪子不能碰湿墨。点选路线纸，看看一种字母魔法。
+                        {at(b, "hat-main", "worn")
+                          ? "你选了宽檐帽，小猫有了一把小伞。"
+                          : at(b, "cat-card", "worn")
+                            ? "你选了鸭舌帽，小猫准备好下一次探险。"
+                            : "你摘下了帽子，小猫自在地晒太阳。"}
                       </p>
-                    ) : (
-                      <p className="scene-invitation">
-                        {ended
-                          ? "这就是你的野餐。继续点物品，或去玩一个短活动。"
-                          : "点场景中的伙伴、空缺物品或道具，再选办法。"}
-                      </p>
-                    )}
-                    <div className="world-actions">{actions()}</div>
-                    <details className="quest-goals">
-                      <summary>看看还有什么需要帮忙</summary>
-                      {currentGoals.map((g) => (
-                        <p key={g.id} data-goal={g.id} data-done={g.done}>
-                          {g.done ? "✓" : "○"} {g.label}
-                        </p>
-                      ))}
-                    </details>
-                    {b.scene === "meadow" && (
-                      <button
-                        className="quiet"
-                        onClick={() => openTool({ kind: "craft", id: "craft" })}
-                      >
-                        自由制作 · {CRAFTS.map((c) => c.word).join(" / ")}
+                      <button onClick={() => setScreen("records")}>
+                        回顾这次冒险
                       </button>
-                    )}
-                    <nav className="activity-doors" aria-label="短活动">
-                      {(Object.keys(ACTIVITIES) as ActivityId[])
-                        .filter((id) => unlocked(session, id))
-                        .map((id) => (
-                          <button
-                            key={id}
-                            onClick={() => {
-                              stopTools();
-                              send({ action: "activity", value: id });
-                            }}
-                          >
-                            {ACTIVITIES[id].title}
-                          </button>
-                        ))}
-                    </nav>
-                    {session.mode !== "story" && (
-                      <div className="activity-exit">
-                        <button
-                          onClick={() => {
-                            stopTools();
-                            send({ action: "exit" });
-                          }}
-                        >
-                          返回故事
-                        </button>
-                        <button
-                          onClick={() => {
-                            stopTools();
-                            send({ action: "restart-activity" });
-                          }}
-                        >
-                          换个情境重玩
-                        </button>
-                      </div>
-                    )}
-                    {ended && session.mode === "story" && (
-                      <div className="ending-choice">
-                        <p>
-                          {at(b, "hat-main", "worn")
-                            ? "你选了宽檐帽，小猫有了一把小伞。"
-                            : at(b, "cat-card", "worn")
-                              ? "你选了鸭舌帽，小猫准备好下一次探险。"
-                              : "你摘下了帽子，小猫自在地晒太阳。"}
-                        </p>
-                        <p>
-                          路线纸亲自铺过湿墨。备用制作：
-                          {
-                            Object.keys(entities).filter((id) =>
-                              id.startsWith("craft-"),
-                            ).length
-                          }{" "}
-                          件。探索与练习分开记录。
-                        </p>
-                        <button onClick={() => setScreen("records")}>
-                          回顾这次冒险
-                        </button>
-                      </div>
-                    )}
-                  </>
-                )}
-                {message && (
-                  <p className={`quest-feedback ${result}`} role="status">
-                    {message}
-                  </p>
-                )}
-              </aside>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
+            <nav
+              className={`adventure-controls ${tool ? "tool-open" : ""}`}
+              aria-label="冒险菜单"
+            >
+              <button
+                className="journal-control"
+                aria-label="探险手记"
+                onClick={() => setModal("journal")}
+              >
+                <GameIcon name="book" />
+                <span>探险手记</span>
+              </button>
+              {!tool && (
+                <span className="explore-hint">
+                  {selected
+                    ? "试试一个行动，也可以拖动物品"
+                    : "点点伙伴和道具，发现下一步"}
+                </span>
+              )}
+              <button
+                className="round-control"
+                aria-label="帮助"
+                onClick={() => setModal("help")}
+              >
+                <GameIcon name="help" />
+              </button>
+            </nav>
           </>
         )}
         {screen === "records" && (
@@ -904,13 +855,17 @@ export default function App() {
                 ? "小猫在这里等你"
                 : modal === "restart"
                   ? "保留记录，开始新冒险？"
-                  : "试着观察，再行动"
+                  : modal === "journal"
+                    ? "我的探险手记"
+                    : "试着观察，再行动"
             }
             close={() => setModal(null)}
           >
             {modal === "pause" ? (
               <>
-                <button onClick={() => setModal(null)}>继续冒险</button>
+                <button className="primary" onClick={() => setModal(null)}>
+                  {screen === "home" ? "返回标题" : "继续冒险"}
+                </button>
                 <button onClick={() => setMuted((v) => !v)}>
                   {muted ? "取消静音" : "静音"}
                 </button>
@@ -942,6 +897,57 @@ export default function App() {
                 >
                   返回首页
                 </button>
+              </>
+            ) : modal === "journal" ? (
+              <>
+                <p className="journal-scene">
+                  {activity
+                    ? activity.variants[b.variant].problem
+                    : SCENES[b.scene].problem}
+                </p>
+                <div className="quest-goals">
+                  {currentGoals.map((g) => (
+                    <p key={g.id} data-goal={g.id} data-done={g.done}>
+                      <span aria-hidden="true">{g.done ? "✓" : "○"}</span>{" "}
+                      {g.label}
+                    </p>
+                  ))}
+                </div>
+                <h3>林间小插曲</h3>
+                <nav className="activity-doors" aria-label="短活动">
+                  {(Object.keys(ACTIVITIES) as ActivityId[])
+                    .filter((id) => unlocked(session, id))
+                    .map((id) => (
+                      <button
+                        key={id}
+                        onClick={() => {
+                          setModal(null);
+                          stopTools();
+                          send({ action: "activity", value: id });
+                        }}
+                      >
+                        {ACTIVITIES[id].title}
+                        <span aria-hidden="true"> →</span>
+                      </button>
+                    ))}
+                </nav>
+                {!(Object.keys(ACTIVITIES) as ActivityId[]).some((id) =>
+                  unlocked(session, id),
+                ) && (
+                  <p className="micro">
+                    先和小猫发现身边的物品，新的小故事会在这里出现。
+                  </p>
+                )}
+                {b.scene === "meadow" && (
+                  <button
+                    onClick={() => {
+                      setModal(null);
+                      openTool({ kind: "craft", id: "craft" });
+                    }}
+                  >
+                    自由制作 · {CRAFTS.map((c) => c.word).join(" / ")}
+                  </button>
+                )}
               </>
             ) : modal === "restart" ? (
               <>

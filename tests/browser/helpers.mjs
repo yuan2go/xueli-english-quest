@@ -1,8 +1,10 @@
+import { mkdir } from "node:fs/promises";
 import { expect } from "@playwright/test";
 export const KEY = "xueli.adventure.v4";
 export const button = (p, name) => p.getByRole("button", { name, exact: true });
 export const object = (p, id) => p.locator(`[data-entity="${id}"]`);
 export async function start(p) {
+  p.setDefaultTimeout(10000);
   await p.goto("/");
   await p.waitForLoadState("networkidle");
   await button(p, "开始冒险").click();
@@ -133,11 +135,12 @@ export async function dragTo(p, source, target, cancel = false) {
   await p.mouse.up();
 }
 export async function shot(p, name) {
+  await mkdir("docs/evidence/immersive-game-ui-05", { recursive: true });
   await p.evaluate(async () =>
     Promise.all([...document.images].map((i) => i.decode().catch(() => {}))),
   );
   await p.screenshot({
-    path: `docs/evidence/gameplay-core-04/${name}.png`,
+    path: `docs/evidence/immersive-game-ui-05/${name}.png`,
     fullPage: true,
     animations: "disabled",
   });
@@ -148,5 +151,10 @@ export async function viewportOK(p) {
   ).toBe(true);
   const b = await p.locator(".quest-scene").boundingBox();
   expect(b.height).toBeGreaterThan(200);
-  expect(b.y + b.height).toBeLessThan((await p.viewportSize()).height);
+  expect(b.y + b.height).toBeLessThanOrEqual((await p.viewportSize()).height);
+}
+
+export async function journal(p) {
+  await button(p, "探险手记").click();
+  await expect(p.getByRole("dialog", { name: "我的探险手记" })).toBeVisible();
 }

@@ -11,6 +11,9 @@ import {
 import type { Location, Entity } from "../domain/world.ts";
 import { usePointerDrop } from "./pointer.ts";
 import { SCENES } from "../content/adventure.ts";
+import { useRef, useState } from "react";
+import type { ReactNode } from "react";
+import { SceneActions } from "./SceneActions.tsx";
 export function Scene({
   session,
   selected,
@@ -21,6 +24,7 @@ export function Scene({
   response,
   pose = "idle",
   disabled = false,
+  actions,
 }: {
   session: Adventure;
   selected: string | null;
@@ -31,7 +35,10 @@ export function Scene({
   response: string;
   pose?: "idle" | "thinking" | "action" | "happy";
   disabled?: boolean;
+  actions?: ReactNode;
 }) {
+  const world = useRef<HTMLDivElement>(null);
+  const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const b = board(session),
     e = b.world.entities;
   const place = (source: string, key: string | null) => {
@@ -52,12 +59,17 @@ export function Scene({
   const positions: Record<string, [number, number]> = {
     "cat-companion": [
       b.scene === "trail" && b.world.flags.includes("crossed-ink") ? 80 : 16,
-      45,
+      35,
     ],
-    "bag-main": [45, 32],
-    "route-sheet": b.scene === "meadow" ? [16, 80] : [80, 76],
+    "bag-main": b.scene === "trail" ? [34, 18] : [45, 32],
+    "route-sheet":
+      b.scene === "meadow"
+        ? [16, 80]
+        : b.scene === "trail"
+          ? [70, 83]
+          : [80, 76],
     "hat-main": [30, 78],
-    "cat-card": [77, 24],
+    "cat-card": b.scene === "trail" ? [88, 78] : [77, 24],
     "picnic-mat": [68, 80],
     "craft-mat": [12, 64],
     "craft-hat": [50, 80],
@@ -106,6 +118,7 @@ export function Scene({
         style={style}
       >
         <button
+          ref={selected === item.id ? setAnchor : undefined}
           className={`quest-object ${item.kind === "actor" ? "quest-cat" : ""} ${item.word === "mat" ? "quest-mat" : ""} ${l.kind === "worn" ? "quest-worn" : ""} ${selected === item.id ? "selected" : ""} ${target ? "legal-target" : ""} ${pointer.ghost?.label === item.id ? "drag-origin" : ""}`}
           data-entity={item.id}
           data-word={item.word}
@@ -159,6 +172,14 @@ export function Scene({
       aria-label="故事场景"
       data-scene={b.scene}
       data-crossed={b.world.flags.includes("crossed-ink")}
+      onClick={(event) => {
+        if (
+          selected &&
+          event.target instanceof HTMLElement &&
+          !event.target.closest("button, aside")
+        )
+          onSelect(selected);
+      }}
     >
       <Visual
         id={`scene-act-${SCENES[b.scene].act}`}
@@ -166,78 +187,86 @@ export function Scene({
         className="quest-background"
       />
       <p className="cat-speech" aria-live="polite">
+        <span className="speech-name">小猫</span>
         {response ||
           (b.scene === "trail" && !b.world.flags.includes("crossed-ink")
             ? "喵…爪子会沾上湿墨。有什么能铺过去？"
             : "点点我和身边的东西，看看能做什么。")}
       </p>
-      {b.scene === "trail" && (
-        <button
-          className={`quest-ink ${targets.some((t) => t.key === "ink-road") ? "legal-target" : ""}`}
-          data-drop={
-            targets.some((t) => t.key === "ink-road") ? "ink-road" : undefined
-          }
-          onClick={() =>
-            moving ? place(moving, "ink-road") : onSelect("ink-road")
-          }
-          aria-label="湿墨小径"
-        >
-          {b.world.flags.includes("crossed-ink") ? "已到对岸 ✓" : "湿墨小径"}
-        </button>
-      )}
-      {Object.values(e)
-        .filter(
-          (item) =>
-            item.location.kind === "stage" || item.location.kind === "zone",
-        )
-        .map((item) => renderEntity(item))}
-      {occluded(b, "cat-card") && (
-        <div className="covered-brim" aria-label="背包后露出的小帽檐">
-          <Art word="cap" />
-          <span>露出一点帽檐…</span>
-        </div>
-      )}
-      {availableWords(session).map((t) => (
-        <button
-          key={t.id}
-          className="missing-object"
-          style={{
-            left: `${positions[t.entity][0]}%`,
-            top: `${positions[t.entity][1]}%`,
-          }}
-          onClick={() => onWord(t.id)}
-          aria-label={t.purpose}
-          disabled={disabled}
-        >
-          {t.id === "wake" ? (
-            <CharacterArt pose="thinking" />
-          ) : (
-            <Art word={t.word} />
-          )}
-          <span>{t.purpose}</span>
-        </button>
-      ))}
-      {moving && (
-        <button
-          className="ground-target legal-target"
-          data-drop="ground"
-          onClick={() => place(moving, "ground")}
-        >
-          放回地面
-        </button>
-      )}
-      {pointer.ghost && e[pointer.ghost.label] && (
-        <div
-          className="drag-ghost object-ghost"
-          style={{ left: pointer.ghost.x, top: pointer.ghost.y }}
-        >
-          {e[pointer.ghost.label].kind === "actor" ? (
-            <CharacterArt />
-          ) : (
-            <Art word={e[pointer.ghost.label].word} />
-          )}
-        </div>
-      )}
+      <div className="scene-world" ref={world}>
+        {b.scene === "trail" && (
+          <button
+            className={`quest-ink ${targets.some((t) => t.key === "ink-road") ? "legal-target" : ""}`}
+            data-drop={
+              targets.some((t) => t.key === "ink-road") ? "ink-road" : undefined
+            }
+            onClick={() =>
+              moving ? place(moving, "ink-road") : onSelect("ink-road")
+            }
+            aria-label="湿墨小径"
+          >
+            {b.world.flags.includes("crossed-ink") ? "已到对岸 ✓" : "湿墨小径"}
+          </button>
+        )}
+        {Object.values(e)
+          .filter(
+            (item) =>
+              item.location.kind === "stage" || item.location.kind === "zone",
+          )
+          .map((item) => renderEntity(item))}
+        {occluded(b, "cat-card") && (
+          <div className="covered-brim" aria-label="背包后露出的小帽檐">
+            <Art word="cap" />
+            <span>露出一点帽檐…</span>
+          </div>
+        )}
+        {availableWords(session).map((t) => (
+          <button
+            key={t.id}
+            className={`missing-object ${t.id === "wake" ? "missing-companion" : ""}`}
+            style={{
+              left: `${positions[t.entity][0]}%`,
+              top: `${positions[t.entity][1]}%`,
+            }}
+            onClick={() => onWord(t.id)}
+            aria-label={t.purpose}
+            disabled={disabled}
+          >
+            {t.id === "wake" ? (
+              <CharacterArt pose="thinking" />
+            ) : (
+              <Art word={t.word} />
+            )}
+            <span>{t.purpose}</span>
+          </button>
+        ))}
+        {moving && (
+          <button
+            className="ground-target legal-target"
+            data-drop="ground"
+            onClick={() => place(moving, "ground")}
+          >
+            放回地面
+          </button>
+        )}
+        {pointer.ghost && e[pointer.ghost.label] && (
+          <div
+            className="drag-ghost object-ghost"
+            style={{ left: pointer.ghost.x, top: pointer.ghost.y }}
+          >
+            {e[pointer.ghost.label].kind === "actor" ? (
+              <CharacterArt />
+            ) : (
+              <Art word={e[pointer.ghost.label].word} />
+            )}
+          </div>
+        )}
+        {selected && actions && (
+          <SceneActions anchor={anchor} world={world}>
+            {actions}
+          </SceneActions>
+        )}
+      </div>
     </section>
   );
 }

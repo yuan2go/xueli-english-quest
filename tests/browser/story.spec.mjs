@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
 import {
+  journal,
   start,
   button,
   word,
@@ -20,7 +21,7 @@ import {
 test("phone normal HTTP entrance: early reversible exploration, all acts, real crossing, sentences, choices and restore", async ({
   browser,
 }) => {
-  await mkdir("docs/evidence/gameplay-core-04", { recursive: true });
+  await mkdir("docs/evidence/immersive-game-ui-05", { recursive: true });
   const c = await browser.newContext({
     viewport: { width: 390, height: 844 },
     hasTouch: true,
@@ -97,6 +98,7 @@ test("desktop alternative preparation order, sentence reversal and actual world 
   await finish(p);
   await shot(p, "desktop-ending");
   await viewportOK(p);
+  await journal(p);
   await p.getByRole("button", { name: /^自由制作/ }).click();
   for (const letter of "mat") await button(p, `字母 ${letter}`).click();
   await p.getByRole("button", { name: /^施法/ }).click();

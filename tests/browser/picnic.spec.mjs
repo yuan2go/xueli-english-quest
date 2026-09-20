@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import {
+  journal,
   start,
   button,
   move,
@@ -67,6 +68,7 @@ test("normal story unlocks activities; each of six authored variants played thro
     ["find", "背包找物"],
     ["helper", "野餐小帮手"],
   ]) {
+    await journal(p);
     await button(p, name).click();
     const variant = await solve(p, mode);
     await shot(p, `activity-${mode}`);
@@ -76,6 +78,7 @@ test("normal story unlocks activities; each of six authored variants played thro
     await expect(p.locator(".activity-success")).toBeVisible();
     await button(p, "返回故事").click();
     expect((await snapshot(p)).projection.story).toEqual(original);
+    await journal(p);
     await button(p, name).click();
     await expect(p.locator(".activity-success")).toBeVisible();
     await button(p, "换个情境重玩").click();

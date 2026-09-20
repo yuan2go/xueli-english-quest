@@ -1,6 +1,6 @@
 # 技术文档导航与权威边界
 
-版本：2026-09-20 / gameplay-core-04。01/02/04/05 为当前场景驱动合同；旧工作包保留历史证据，不覆盖当前授权。实际结果只看 STATUS 本轮记录。
+版本：2026-09-20 / immersive-game-ui-05；玩法沿用 gameplay-core-04。01/02/04/05 为当前场景驱动合同；旧工作包保留历史证据，不覆盖当前授权。实际结果只看 STATUS 本轮记录。
 
 | 文档 | 回答的问题 |
 | --- | --- |
@@ -15,6 +15,7 @@
 | [08 测试、发布与运行](08-test-release-and-operations.md) | 必要测试、真机、上线和提交清单 |
 | [09 路线图与 agent 协作](09-roadmap-and-agent-handoff.md) | 工作包顺序、负责人、并行和交接 |
 | [10 决策、风险与来源](10-decisions-risks-and-sources.md) | 对话中的取舍与修正、依据及未确认事项 |
+| [WP-IMMERSIVE-GAME-UI-05](work-packages/WP-IMMERSIVE-GAME-UI-05.md) | 已批准的整屏游戏界面改造范围 |
 | [WP-GAMEPLAY-CORE-04](work-packages/WP-GAMEPLAY-CORE-04.md) | 当前场景驱动主线、组句和活动验收 |
 | [WP-01](work-packages/WP-01.md) | 历史基础工作包 |
 | [WP-PLAYABLE-STORY-01](work-packages/WP-PLAYABLE-STORY-01.md) | 完整主线接续交付、覆盖关系与剩余门槛 |

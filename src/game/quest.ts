@@ -1,7 +1,8 @@
+import { validCommand } from './quest-command.ts';
 import { transition } from '../domain/world.ts';
 import { nodeOf, visible, RuleError } from '../domain/spatial.ts';
 import type { Action, Motion, SpatialWorld } from '../domain/spatial.ts';
-import { puzzle, QUEST_PACK, lexeme } from '../content/quest.ts';
+import { puzzle, QUEST_PACK, lexeme, EXERCISES } from '../content/quest.ts';
 import { parseLanguage, assembleTokens } from './language.ts';
 export type ResultStatus = 'done' | 'valid' | 'blocked' | 'incomplete' | 'structure' | 'outside' | 'ambiguous' | 'mismatch' | 'stale';
 export interface Verdict { status: ResultStatus; message: string; language: 'correct' | 'incorrect' | 'unassessed'; task: 'met' | 'unmet' | 'none'; motions: Motion[] }
@@ -31,6 +32,7 @@ export function initialQuest(id: string, seed = 6): Quest {
 }
 export function goalSatisfied(b: QuestBoard): boolean {
  const w = b.world;
+ if (b.level === 'workshop') return false;
  return puzzle(b.level, b.variant).goals.every(g => {
   const e = w.entities[g.id]; if (!e) return false;
   if (g.type === 'at') return nodeOf(w, g.id) === g.node;
@@ -60,11 +62,13 @@ function record(s: Quest, b: QuestBoard, v: Verdict, dimension: string, word?: s
  s.events.push({ board: s.active, window: b.window, word, dimension, status: v.status, evidence: evidence(b), support: [...b.support], text });
 }
 export function runQuest(s: Quest, command: QuestCommand): { session: Quest; verdict: Verdict } {
- const payload = JSON.stringify(command), previous = s.receipts[command.attemptId];
+ if (!validCommand(command)) return {session:s,verdict:verdict('stale','操作格式无效，请重新操作。')};
+ const payload = JSON.stringify(command), previous = Object.hasOwn(s.receipts,command.attemptId)?s.receipts[command.attemptId]:undefined;
  if (previous) return { session: s, verdict: previous.payload === payload ? previous.verdict : verdict('stale', '这次操作编号已经使用，请重新操作。') };
  if (command.sessionId !== s.id || command.revision !== s.revision || command.board !== s.active)
   return { session: s, verdict: verdict('stale', '场景已改变，请在当前画面重新操作。') };
- const n = structuredClone(s), b = current(n), spec = puzzle(b.level, b.variant), i = command.intent;
+ const n: Quest = {...s, boards:structuredClone(s.boards),journal:[...s.journal],events:[...s.events],receipts:{...s.receipts}};
+ const b = current(n), spec = puzzle(b.level, b.variant), i = command.intent;
  let v = verdict('valid', '可以继续探索。');
  try {
   switch (i.kind) {
@@ -92,7 +96,8 @@ export function runQuest(s: Quest, command: QuestCommand): { session: Quest; ver
     let task: Verdict['task'] = requested ? (m.verb === 'place' && m.source === 'apple' && m.relation === requested && m.target === (requested === 'in' ? 'basket' : 'box') ? 'met' : 'unmet') : 'none';
     if (b.level === 'workshop' && b.practice !== 'exploration') task = m.kind === b.exercise && m.verb === 'place' && m.source === 'apple' && m.relation === 'in' && m.target === 'box' ? 'met' : 'unmet';
     if (m.kind === 'description') {
-     const matches = m.verb === 'property' ? (m.property === 'open' ? e.open : m.property === 'closed' ? !e.open : e.size === m.property) : e.place.kind === m.relation && e.place.id === target;
+     const canOpen=spec.rules.types[e.word].container||spec.rules.handles.some(h=>h.door===e.id);
+     const matches = m.verb === 'property' ? (m.property === 'open' ? canOpen && e.open : m.property === 'closed' ? canOpen && !e.open : e.size === m.property) : e.place.kind === m.relation && e.place.id === target;
      v = verdict(matches ? (task === 'unmet' ? 'mismatch' : 'valid') : 'mismatch', matches ? (task === 'unmet' ? '这句话描述得对，但朋友请求的是另一种摆放。' : '说得对，这正是眼前的布置。描述不会移动物品。') : '句子结构成立，但眼前还不是这样。看看实际位置或大小。', 'correct', task);
     } else {
      const action: Action = m.verb === 'place' ? { type: 'move', source, to: { kind: m.relation, id: target! } } : m.verb === 'resize' ? { type: 'resize', source, size: m.size } : { type: 'open', source, open: m.verb === 'open' };
@@ -112,7 +117,7 @@ export function runQuest(s: Quest, command: QuestCommand): { session: Quest; ver
      try { v = verdict('valid', '拼出来了！把新物品用在场景中吧。', 'correct', 'met', apply(b, { type: 'create', word: i.word })); }
      catch (error) { if (!(error instanceof RuleError)) throw error; v = verdict('blocked', `拼写正确。${error.message}`, 'correct'); }
     }
-    record(n, b, v, 'spelling', i.word); break;
+    record(n, b, v, 'spelling', i.word); if(b.practice!=='independent' && n.events.at(-1)!.evidence==='exploration')n.events.at(-1)!.evidence='assisted'; break;
    }
    case 'teach': {
     if (!lexeme(i.word)) { v = verdict('outside', '这个词还没有收录。'); break; }
@@ -149,6 +154,8 @@ export function runQuest(s: Quest, command: QuestCommand): { session: Quest; ver
    }
    case 'practice': {
     if (b.level !== 'workshop') { v = verdict('blocked','到魔法工坊里试试这项练习。'); break; }
+    const missing=EXERCISES[i.exercise].requires.filter(word=>!b.taught.includes(word));
+    if(missing.length){v=verdict('blocked',`先认识这些词的意义：${missing.join('、')}。点击词义小样来试试。`);break;}
     b.practice = i.mode; b.exercise = i.exercise; b.window++;
     if (i.mode === 'assisted' && !b.support.includes('text')) b.support.push('text');
     v = verdict('valid', '练习已准备好。可以随时请求帮助。'); break;
@@ -156,7 +163,7 @@ export function runQuest(s: Quest, command: QuestCommand): { session: Quest; ver
    case 'next': {
     if (!goalSatisfied(b)) { v = verdict('blocked', '看看场景，目标还没有完成。'); break; }
     const next = b.level === 'R1' ? 'R2' : b.level === 'R2' ? 'R3' : undefined;
-    if (next) { n.boards[next] ??= boardFor(next,n.seed%2); n.active=next; n.story=next; v=verdict('valid',puzzle(next,n.seed%2).invitation); }
+    if (next) { n.boards[next] ??= boardFor(next,n.seed%2); n.boards[next].taught=[...new Set([...n.boards[next].taught,...b.taught])]; n.active=next; n.story=next; v=verdict('valid',puzzle(next,n.seed%2).invitation); }
     else v=verdict('done','朋友收到了你的心意。继续看看布置，或者回花园试试新的条件。');
     break;
    }

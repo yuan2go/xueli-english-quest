@@ -1,35 +1,11 @@
+import { validCommand } from '../game/quest-command.ts';
 import { initialQuest, runQuest, QUEST_PACK } from '../game/quest.ts';
-import type { Quest, QuestCommand, Intent } from '../game/quest.ts';
+import type { Quest, QuestCommand } from '../game/quest.ts';
 export const QUEST_KEY = 'xueli.quest.v6';
 const isRecord = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
 function fail(): never { throw new Error('存档格式或版本不同，原始记录已保留。可导出后明确开始新冒险。'); }
 const fields = (v: Record<string, unknown>, allowed: string[]) => { if (Object.keys(v).some(k => !allowed.includes(k))) fail(); };
 const str = (v: unknown, max = 200): v is string => typeof v === 'string' && v.length <= max;
-const intents: Record<Intent['kind'], string[]> = {
- world:['kind','action'],sentence:['kind','task','ids','text','selected'],spell:['kind','word','answer'],teach:['kind','word'],support:['kind','value'],audio:['kind','value','assetId','source','version'],
- undo:['kind'],next:['kind'],restart:['kind'],enter:['kind','mode'],practice:['kind','mode','exercise'],
-};
-export function validIntent(value: unknown): value is Intent {
- if (!isRecord(value) || typeof value.kind !== 'string' || !Object.hasOwn(intents,value.kind)) return false;
- fields(value,intents[value.kind as Intent['kind']]);
- if (value.kind==='world') {
-  const a=value.action; if(!isRecord(a) || !str(a.type)) return false;
-  if(a.type==='create') {fields(a,['type','word']); return str(a.word,30);}
-  if(!str(a.source,64)) return false;
-  if(a.type==='resize'){fields(a,['type','source','size']);return ['small','normal','big'].includes(String(a.size));}
-  if(a.type==='open'){fields(a,['type','source','open']);return typeof a.open==='boolean';}
-  if(a.type==='move'){fields(a,['type','source','to']);const t=a.to;if(!isRecord(t))return false;fields(t,['kind','id']);return ['node','in','on'].includes(String(t.kind))&&str(t.id,64);}
-  return false;
- }
- if(value.kind==='sentence') return str(value.task,100)&&((str(value.text,240)&&value.ids===undefined)||(Array.isArray(value.ids)&&value.text===undefined&&value.ids.length<=24&&value.ids.every(x=>str(x,100))))&&(value.selected===undefined||str(value.selected,64));
- if(value.kind==='spell')return str(value.word,30)&&str(value.answer,40);
- if(value.kind==='teach')return str(value.word,30);
- if(value.kind==='support')return ['hint','text','demo'].includes(String(value.value));
- if(value.kind==='audio')return ['loading','playing','completed','failed','cancelled','muted'].includes(String(value.value))&&['recording','development-speech','unavailable'].includes(String(value.source))&&str(value.assetId,100)&&str(value.version,100);
- if(value.kind==='enter')return ['story','workshop','revisit'].includes(String(value.mode));
- if(value.kind==='practice')return ['assisted','independent'].includes(String(value.mode))&&['command','description','spelling'].includes(String(value.exercise));
- return true;
-}
 function projection(s: Quest) { return {active:s.active,story:s.story,boards:s.boards,events:s.events,revision:s.revision}; }
 export function encodeQuest(s: Quest): string {return JSON.stringify({schema:6,pack:QUEST_PACK,id:s.id,seed:s.seed,journal:s.journal,projection:projection(s)});}
 export function decodeQuest(raw: string): Quest {
@@ -40,7 +16,7 @@ export function decodeQuest(raw: string): Quest {
  let s=initialQuest(data.id,Number(data.seed));
  for(const c of data.journal){
   if(!isRecord(c))fail();fields(c,['sessionId','revision','board','attemptId','intent']);
-  if(!str(c.sessionId,100)||!str(c.board,40)||!str(c.attemptId,100)||!/^[\w-]+$/.test(c.attemptId)||!Number.isSafeInteger(c.revision)||!validIntent(c.intent))fail();
+  if(!str(c.sessionId,100)||!str(c.board,40)||!str(c.attemptId,100)||!/^[\w-]+$/.test(c.attemptId)||!Number.isSafeInteger(c.revision)||!validCommand(c))fail();
   const r=runQuest(s,c as unknown as QuestCommand);if(r.session===s)fail();s=r.session;
  }
  if(JSON.stringify(projection(s))!==JSON.stringify(data.projection))fail();return s;

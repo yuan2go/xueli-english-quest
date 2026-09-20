@@ -1,0 +1,614 @@
+[
+  {
+    "pack": {
+      "id": "paper-rescue",
+      "version": "6.0.0-dev.1",
+      "rulesVersion": "rescue-1",
+      "review": "PENDING"
+    },
+    "level": "R1",
+    "variant": 0,
+    "strategy": "step",
+    "status": "PASS",
+    "explored": 99,
+    "budget": 25000,
+    "reason": "goal-reached",
+    "witness": [
+      {
+        "type": "create",
+        "word": "box"
+      },
+      {
+        "type": "move",
+        "source": "craft-box",
+        "to": {
+          "kind": "node",
+          "id": "step"
+        }
+      },
+      {
+        "type": "move",
+        "source": "cat-companion",
+        "to": {
+          "kind": "node",
+          "id": "home"
+        }
+      },
+      {
+        "type": "resize",
+        "source": "craft-box",
+        "size": "big"
+      },
+      {
+        "type": "move",
+        "source": "cat-companion",
+        "to": {
+          "kind": "on",
+          "id": "craft-box"
+        }
+      },
+      {
+        "type": "open",
+        "source": "gate",
+        "open": true
+      },
+      {
+        "type": "move",
+        "source": "basket-main",
+        "to": {
+          "kind": "node",
+          "id": "home"
+        }
+      }
+    ],
+    "world": {
+      "rules": "rescue-1",
+      "revision": 7,
+      "entities": {
+        "cat-companion": {
+          "id": "cat-companion",
+          "word": "cat",
+          "size": "normal",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "home"
+          }
+        },
+        "gate": {
+          "id": "gate",
+          "word": "door",
+          "size": "normal",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "step"
+          }
+        },
+        "basket-main": {
+          "id": "basket-main",
+          "word": "basket",
+          "size": "normal",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "home"
+          }
+        },
+        "craft-box": {
+          "id": "craft-box",
+          "word": "box",
+          "size": "big",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "step"
+          }
+        }
+      },
+      "created": [
+        "craft-box"
+      ]
+    }
+  },
+  {
+    "pack": {
+      "id": "paper-rescue",
+      "version": "6.0.0-dev.1",
+      "rulesVersion": "rescue-1",
+      "review": "PENDING"
+    },
+    "level": "R1",
+    "variant": 0,
+    "strategy": "hole",
+    "status": "PASS",
+    "explored": 4,
+    "budget": 25000,
+    "reason": "goal-reached",
+    "witness": [
+      {
+        "type": "resize",
+        "source": "cat-companion",
+        "size": "small"
+      },
+      {
+        "type": "open",
+        "source": "gate",
+        "open": true
+      },
+      {
+        "type": "move",
+        "source": "basket-main",
+        "to": {
+          "kind": "node",
+          "id": "home"
+        }
+      }
+    ],
+    "world": {
+      "rules": "rescue-1",
+      "revision": 3,
+      "entities": {
+        "cat-companion": {
+          "id": "cat-companion",
+          "word": "cat",
+          "size": "small",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "home"
+          }
+        },
+        "gate": {
+          "id": "gate",
+          "word": "door",
+          "size": "normal",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "step"
+          }
+        },
+        "basket-main": {
+          "id": "basket-main",
+          "word": "basket",
+          "size": "normal",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "home"
+          }
+        }
+      },
+      "created": []
+    }
+  },
+  {
+    "pack": {
+      "id": "paper-rescue",
+      "version": "6.0.0-dev.1",
+      "rulesVersion": "rescue-1",
+      "review": "PENDING"
+    },
+    "level": "R2",
+    "variant": 0,
+    "strategy": "any",
+    "status": "PASS",
+    "explored": 21,
+    "budget": 25000,
+    "reason": "goal-reached",
+    "witness": [
+      {
+        "type": "move",
+        "source": "apple-main",
+        "to": {
+          "kind": "node",
+          "id": "clearing"
+        }
+      },
+      {
+        "type": "create",
+        "word": "box"
+      },
+      {
+        "type": "move",
+        "source": "craft-box",
+        "to": {
+          "kind": "node",
+          "id": "clearing"
+        }
+      },
+      {
+        "type": "move",
+        "source": "apple-main",
+        "to": {
+          "kind": "in",
+          "id": "craft-box"
+        }
+      }
+    ],
+    "world": {
+      "rules": "rescue-1",
+      "revision": 4,
+      "entities": {
+        "cat-companion": {
+          "id": "cat-companion",
+          "word": "cat",
+          "size": "normal",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "clearing"
+          }
+        },
+        "bag-main": {
+          "id": "bag-main",
+          "word": "bag",
+          "size": "small",
+          "open": false,
+          "place": {
+            "kind": "node",
+            "id": "home"
+          }
+        },
+        "apple-main": {
+          "id": "apple-main",
+          "word": "apple",
+          "size": "normal",
+          "open": true,
+          "place": {
+            "kind": "in",
+            "id": "craft-box"
+          }
+        },
+        "craft-box": {
+          "id": "craft-box",
+          "word": "box",
+          "size": "normal",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "clearing"
+          }
+        }
+      },
+      "created": [
+        "craft-box"
+      ]
+    }
+  },
+  {
+    "pack": {
+      "id": "paper-rescue",
+      "version": "6.0.0-dev.1",
+      "rulesVersion": "rescue-1",
+      "review": "PENDING"
+    },
+    "level": "R3",
+    "variant": 0,
+    "strategy": "any",
+    "status": "PASS",
+    "explored": 3,
+    "budget": 25000,
+    "reason": "goal-reached",
+    "witness": [
+      {
+        "type": "open",
+        "source": "gate",
+        "open": true
+      },
+      {
+        "type": "move",
+        "source": "apple-main",
+        "to": {
+          "kind": "in",
+          "id": "basket-main"
+        }
+      }
+    ],
+    "world": {
+      "rules": "rescue-1",
+      "revision": 2,
+      "entities": {
+        "cat-companion": {
+          "id": "cat-companion",
+          "word": "cat",
+          "size": "normal",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "garden"
+          }
+        },
+        "apple-main": {
+          "id": "apple-main",
+          "word": "apple",
+          "size": "normal",
+          "open": true,
+          "place": {
+            "kind": "in",
+            "id": "basket-main"
+          }
+        },
+        "bag-main": {
+          "id": "bag-main",
+          "word": "bag",
+          "size": "normal",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "step"
+          }
+        },
+        "gate": {
+          "id": "gate",
+          "word": "door",
+          "size": "normal",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "step"
+          }
+        },
+        "basket-main": {
+          "id": "basket-main",
+          "word": "basket",
+          "size": "normal",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "garden"
+          }
+        },
+        "box-main": {
+          "id": "box-main",
+          "word": "box",
+          "size": "normal",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "inside"
+          }
+        },
+        "picnic-mat": {
+          "id": "picnic-mat",
+          "word": "mat",
+          "size": "big",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "garden"
+          }
+        }
+      },
+      "created": []
+    }
+  },
+  {
+    "pack": {
+      "id": "paper-rescue",
+      "version": "6.0.0-dev.1",
+      "rulesVersion": "rescue-1",
+      "review": "PENDING"
+    },
+    "level": "R3",
+    "variant": 1,
+    "strategy": "any",
+    "status": "PASS",
+    "explored": 4,
+    "budget": 25000,
+    "reason": "goal-reached",
+    "witness": [
+      {
+        "type": "open",
+        "source": "gate",
+        "open": true
+      },
+      {
+        "type": "move",
+        "source": "apple-main",
+        "to": {
+          "kind": "on",
+          "id": "box-main"
+        }
+      },
+      {
+        "type": "move",
+        "source": "cat-companion",
+        "to": {
+          "kind": "node",
+          "id": "garden"
+        }
+      }
+    ],
+    "world": {
+      "rules": "rescue-1",
+      "revision": 3,
+      "entities": {
+        "cat-companion": {
+          "id": "cat-companion",
+          "word": "cat",
+          "size": "normal",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "garden"
+          }
+        },
+        "apple-main": {
+          "id": "apple-main",
+          "word": "apple",
+          "size": "normal",
+          "open": true,
+          "place": {
+            "kind": "on",
+            "id": "box-main"
+          }
+        },
+        "bag-main": {
+          "id": "bag-main",
+          "word": "bag",
+          "size": "normal",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "step"
+          }
+        },
+        "gate": {
+          "id": "gate",
+          "word": "door",
+          "size": "normal",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "step"
+          }
+        },
+        "basket-main": {
+          "id": "basket-main",
+          "word": "basket",
+          "size": "normal",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "garden"
+          }
+        },
+        "box-main": {
+          "id": "box-main",
+          "word": "box",
+          "size": "normal",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "inside"
+          }
+        },
+        "picnic-mat": {
+          "id": "picnic-mat",
+          "word": "mat",
+          "size": "big",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "garden"
+          }
+        }
+      },
+      "created": []
+    }
+  },
+  {
+    "pack": {
+      "id": "paper-rescue",
+      "version": "6.0.0-dev.1",
+      "rulesVersion": "rescue-1",
+      "review": "PENDING"
+    },
+    "level": "R1-R",
+    "variant": 0,
+    "strategy": "step",
+    "status": "PASS",
+    "explored": 99,
+    "budget": 25000,
+    "reason": "goal-reached",
+    "witness": [
+      {
+        "type": "create",
+        "word": "box"
+      },
+      {
+        "type": "move",
+        "source": "craft-box",
+        "to": {
+          "kind": "node",
+          "id": "step"
+        }
+      },
+      {
+        "type": "move",
+        "source": "cat-companion",
+        "to": {
+          "kind": "node",
+          "id": "home"
+        }
+      },
+      {
+        "type": "resize",
+        "source": "craft-box",
+        "size": "big"
+      },
+      {
+        "type": "move",
+        "source": "cat-companion",
+        "to": {
+          "kind": "on",
+          "id": "craft-box"
+        }
+      },
+      {
+        "type": "open",
+        "source": "gate",
+        "open": true
+      },
+      {
+        "type": "move",
+        "source": "basket-main",
+        "to": {
+          "kind": "node",
+          "id": "home"
+        }
+      }
+    ],
+    "world": {
+      "rules": "rescue-1",
+      "revision": 7,
+      "entities": {
+        "cat-companion": {
+          "id": "cat-companion",
+          "word": "cat",
+          "size": "normal",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "home"
+          }
+        },
+        "gate": {
+          "id": "gate",
+          "word": "door",
+          "size": "normal",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "step"
+          }
+        },
+        "basket-main": {
+          "id": "basket-main",
+          "word": "basket",
+          "size": "normal",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "home"
+          }
+        },
+        "craft-box": {
+          "id": "craft-box",
+          "word": "box",
+          "size": "big",
+          "open": true,
+          "place": {
+            "kind": "node",
+            "id": "step"
+          }
+        }
+      },
+      "created": [
+        "craft-box"
+      ]
+    }
+  }
+]

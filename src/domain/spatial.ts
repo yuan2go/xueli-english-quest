@@ -75,7 +75,7 @@ function relation(w: SpatialWorld, r: SpatialRules, e: Thing) {
   if (e.place.kind === 'in') {
     if (!a.container || type(r, e).actor) fail('CONTAINER', '这个对象不能这样装进去。');
     const load = children(w, p.id).filter(c => c.place.kind === 'in').reduce((n, c) => n + extent(c.size), 0);
-    if (load > value(a.capacity, p.size)) fail('CAPACITY', '装不下了：试试改变物品或容器的大小。');
+    if (extent(e.size) > extent(p.size) || load > value(a.capacity, p.size)) fail('CAPACITY', '装不下了：试试改变物品或容器的大小。');
   } else {
     if (!a.support || extent(e.size) > value(a.bearing, p.size)) fail('SUPPORT', '这个支撑太小，托不住。先调整大小。');
   }

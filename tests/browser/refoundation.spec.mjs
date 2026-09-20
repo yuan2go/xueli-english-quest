@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { mkdir } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 const evidence = "docs/evidence/gameplay-refoundation-06";
 const obj = (page, id) => page.locator(`[data-entity="${id}"]`);
 async function select(page, id) {
@@ -27,6 +27,14 @@ export async function solve(page, method) {
     await action(page, "big");
     await select(page, "cat-companion");
     await action(page, "on box · 放上");
+    if (await page.locator('[data-level="R1"]').count()) {
+      const skip = page.getByRole("button", { name: "跳过动作" });
+      if (await skip.isVisible()) await skip.click();
+      await page.screenshot({
+        path: `${evidence}/r1-support.png`,
+        fullPage: true,
+      });
+    }
     await select(page, "gate");
     await action(page, "Open · 打开");
   } else {
@@ -87,6 +95,14 @@ async function sentence(page, text) {
 test("G09 full mobile chapter, workshop/book, request, actual ending and changed revisit", async ({
   page,
 }) => {
+  const http = [];
+  page.on("response", (r) => {
+    if (r.url().includes("/assets/game/"))
+      http.push({
+        path: r.url().split("/assets/game/")[1],
+        status: r.status(),
+      });
+  });
   await page.setViewportSize({ width: 390, height: 844 });
   await start(page);
   await solve(page, "hole");
@@ -160,5 +176,15 @@ test("G09 full mobile chapter, workshop/book, request, actual ending and changed
   await expect(obj(page, "basket-main")).toHaveAttribute(
     "data-place",
     "node:home",
+  );
+  expect(http.every((r) => [200, 304].includes(r.status))).toBe(true);
+  expect(http.some((r) => r.path === "rescue/apple.svg")).toBe(true);
+  await writeFile(
+    `${evidence}/http-chapter.json`,
+    JSON.stringify(
+      { sourceSHA: process.env.MEASURE_SHA ?? "unrecorded", responses: http },
+      null,
+      2,
+    ) + "\n",
   );
 });

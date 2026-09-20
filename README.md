@@ -31,7 +31,7 @@ npm run test:browser
 ## 当前权威与限制
 
 - [项目状态与本次真实检查](docs/STATUS.md)
-- [本工作包](docs/work-packages/WP-WEB-GAME-SHELL-05.md)
+- [本工作包](docs/work-packages/WP-ANIMATED-PLAY-LEARNING-06.md)
 - [产品与范围](docs/01-product-and-scope.md)、[场景玩法](docs/02-gameplay-and-levels.md)
 - [架构](docs/04-architecture.md)、[运行和存档合同](docs/05-content-and-runtime-contracts.md)
 - [全部文档导航](docs/README.md)、[有效决策](docs/10-decisions-risks-and-sources.md)

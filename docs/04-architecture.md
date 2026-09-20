@@ -32,4 +32,4 @@ Pointer/Keyboard → scoped interaction adapter → 显式 Adventure Intent → 
 | UI interaction | GameShell / Letters / SentenceBuilder | 选中、工具、焦点和未提交草稿；暂停保留，收起工具放弃草稿，刷新重新观察 |
 | ephemeral presentation | scoped pointer / FeedbackLayer | 拖影、命中高亮、移动几何、cue；暂停/后台/旋转/超时/跳过清除，不序列化 |
 
-业务先提交，不等待 animationend。普通表现 0.65–1 秒，变形 1.4 秒，抵达/过路/结局 2.4 秒；角色过路约 1.3 秒；reduced-motion 直接显示稳定终态。场景与关系位置来自世界投影，移动副本只补视觉路径。手势与语音回调按当前活动/工具生命周期清理，不成为第二条状态推进路径。
+业务先提交，不等待 animationend。普通表现 0.65–1 秒，变形 1.4 秒，抵达/过路/结局 2.4 秒；角色过路约 1.3 秒；reduced-motion 直接显示稳定终态。场景与关系位置来自世界投影，稳定实体表现只补视觉路径；不得出现飞行副本与终点物体双份可见。手势与语音回调按当前活动/工具生命周期清理，不成为第二条状态推进路径。

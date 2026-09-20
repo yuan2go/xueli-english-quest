@@ -1,6 +1,6 @@
 # 技术文档导航与权威边界
 
-版本：2026-09-20 / web-game-shell-05。01–05 与 11/12 为当前合同；旧工作包保留历史证据，不覆盖当前授权。实际结果只看 STATUS 本轮记录。
+版本：2026-09-20 / animated-play-learning-06。01–05 与 11/12 为当前合同；旧工作包保留历史证据，不覆盖当前授权。实际结果只看 STATUS 本轮记录。
 
 | 文档 | 回答的问题 |
 | --- | --- |
@@ -17,7 +17,7 @@
 | [10 决策、风险与来源](10-decisions-risks-and-sources.md) | 对话中的取舍与修正、依据及未确认事项 |
 | [11 网页游戏产品蓝图](11-web-game-product-blueprint.md) | 页面式学习体验如何推进为可操作世界中的英语冒险 |
 | [12 网页游戏技术设计](12-web-game-technical-design.md) | Game Shell、状态、输入、资源、响应式与引擎升级边界 |
-| [WP-WEB-GAME-SHELL-05](work-packages/WP-WEB-GAME-SHELL-05.md) | 当前 Scene-first Web Game 实施范围与验收 |
+| [WP-ANIMATED-PLAY-LEARNING-06](work-packages/WP-ANIMATED-PLAY-LEARNING-06.md) | 当前动画、玩法与可信学习证据的唯一实施清单 |
 | [WP-GAMEPLAY-CORE-04](work-packages/WP-GAMEPLAY-CORE-04.md) | historical：场景驱动核心交付 |
 | [WP-01](work-packages/WP-01.md) | 历史基础工作包 |
 | [WP-PLAYABLE-STORY-01](work-packages/WP-PLAYABLE-STORY-01.md) | historical：线性主线交付证据 |

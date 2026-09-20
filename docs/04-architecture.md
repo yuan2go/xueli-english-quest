@@ -1,35 +1,50 @@
-# 04 · 技术架构
+# 04 · 架构与重构边界
 
-一个 React/TypeScript/Vite 应用，一个确定性 `domain/world.transition`。正式入口 `main.tsx → App → GameShell`。没有第二套游戏状态或 Demo。输入/资源细节见 12，玩法和证据合同见 02/05。
+版本：Refoundation 06。本文定义目标架构；当前代码差距见 [12](12-web-game-technical-design.md)，详细协议见 [05](05-content-and-runtime-contracts.md)。只有 STATUS 记录已实现/已验证。
+
+## 技术选择
+
+保留一个 React/TypeScript/Vite 单机 Web 应用。基线 package.json 为 React/React DOM 19.2.8、TypeScript 6.0.2、Vite 8.3.0、Playwright 1.63.0，Node >=22.12.0；这是已读取仓库的锁定选型，不是“最新版本”推荐。继续真实 lockfile 与 npm ci，不为更名或文档更新升级依赖。
+
+采用事件驱动、有限离散空间、受控路径与表现动画。不把 Phaser/Pixi、ECS、物理引擎、微服务、后端或状态管理框架设为前置。若实际测量证明 DOM 表现无法满足需求，再独立比较渲染方案；不能凭“像不像游戏”迁移整栈。
 
 ## 唯一执行链
 
-Pointer/Keyboard → scoped interaction adapter → 显式 Adventure Intent → `runAdventure` 核对 session/revision/mode/attempt → 内容语义及世界守卫 → 同一 `domain.transition` → 原子提交 world/facts/events/journal → goals 投影 → presentation cue。
+输入 → scoped interaction adapter → 带会话/版本的意图 → Application 解析与守卫 → 同一 deterministic domain.transition → 原子提交世界/事实/记录 → goal/evidence 投影 → presentation cue → 保存。
 
-`App` 只接会话保存/恢复、外层 Start/Review、暂停/重开/帮助和资源生命周期。`GameShell` 组合持续 `Scene`、`GameHUD`、按需 `ContextTool` 和 `FeedbackLayer`。工具关闭后恢复世界空间，提交后不自动接下一题；成人记录独立，Ending 保留真实布置并提供回顾入口。
+世界目标与语言结果分开。UI 不直接置 completed，动画不写世界，路径规划不能绕过领域判定，教学判题不调用 LLM。纯描述可以提交观察证据，但世界保持不变。合法且有用的非预设解法按世界目标接受。
 
-## 模块边界
+## 责任边界
 
-| 模块 | 责任 |
+| 层 | 当前入口与目标职责 |
 | --- | --- |
-| `domain/world.ts` | 身份、位置、包含/占用、角色保护；独立于 DOM/React/平台 |
-| `content/adventure.ts` / `sentences.ts` | 故事、手工活动变体、有限词块/语义/配额；内容版本未改变 |
-| `content/encounters.ts` | 稳定场景 encounter ID、邀请、句子对应对象和角色反应；不自行判完成 |
-| `game/adventure.ts` / `sentences.ts` | 命令、幂等/revision、守卫、句子语义、目标和证据；沿用既有核心 |
-| `game/shell.ts` | `sceneModel/resolveTool/presentation` 纯投影：现有可用任务映射到对象/工具；提交前后映射到有限反馈，不写世界 |
-| `ui/Scene.tsx` / `ui/pointer.ts` | 递归关系物品、局部布局、可见命中与统一手势；合法目标仍用应用层试算 |
-| `ui/shell/*` | HUD、上下文工具、焦点与表现；字母/词块草稿局部持有 |
-| `platform/useAssets.ts` / `content/assets.ts` | 单一 manifest 的 critical/scene/lazy 调度、校验/失败重试/取消 |
-| `platform/adventure-save.ts` / `audio.ts` | 原 schema 4 重放/投影核验、旧档备份导出；单一可取消语音通道 |
+| App | src/App.tsx：启动、恢复、外层表面、平台生命周期；不管理关卡细步骤 |
+| UI | src/ui/Scene.tsx、src/ui/shell/*、src/ui/pointer.ts：稳定实体、交互草稿、工具、焦点与动画 |
+| Application | src/game/adventure.ts、src/game/sentences.ts、src/game/shell.ts：意图、任务绑定、原子提交、会话隔离、目标/记录派生 |
+| Domain | src/domain/world.ts：身份、空间、属性、关系、动作规则；允许拆模块，但只能有一个写入入口 |
+| Content | src/content/adventure.ts、sentences.ts、encounters.ts：现有内容适配；新增章节/词义/关卡规则声明 |
+| Platform | src/platform/adventure-save.ts、save.ts、audio.ts、useAssets.ts：版本化恢复、音频、资源与浏览器能力 |
 
-`availableTargets` 在克隆世界无副作用试算；点击和拖动使用同一 Intent。旧 `content/story`、`game/session`、旧 save/summary/feedback 和回归仅供历史日志兼容；`initialPicnic` 仍用于既有活动初始构造。旧 Experience/Picnic/ObjectButton 与三份旧 CSS 已删除。
+具体新文件名由实现者决定；以上不是要求构建通用插件框架。优先按空间、动作、语言、恢复等真实变化原因拆分，不把一个巨型文件改成大量一行转发器。
 
-## 三类状态
+## 三类状态与两种内容职责
 
-| 状态 | 所在位置 | 生命周期 |
-| --- | --- | --- |
-| committed | Adventure / Board | 世界、事实、目标投影、学习记录和日志；通过 schema 4 保存/重放 |
-| UI interaction | GameShell / Letters / SentenceBuilder | 选中、工具、焦点和未提交草稿；暂停保留，收起工具放弃草稿，刷新重新观察 |
-| ephemeral presentation | scoped pointer / FeedbackLayer | 拖影、命中高亮、移动几何、cue；暂停/后台/旋转/超时/跳过清除，不序列化 |
+Committed：世界、会话/关卡、seed/variant、行为事实、帮助历史、语言记录和 journal。UI interaction：选择、词块/字母草稿、工具展开、拖动候选。Ephemeral presentation：测量几何、动画相位、声音对象、拖影、短角色反应。后三者中的临时 UI/表现数据不能成为世界事实或写进存档。
 
-业务先提交，不等待 animationend。普通表现 0.65–1 秒，变形 1.4 秒，抵达/过路/结局 2.4 秒；角色过路约 1.3 秒；reduced-motion 直接显示稳定终态。场景与关系位置来自世界投影，移动副本只补视觉路径。手势与语音回调按当前活动/工具生命周期清理，不成为第二条状态推进路径。
+PuzzleSpec 负责局面、规则和胜利谓词；ExerciseSpec 负责明确的语言目标、可接受表达、支持与评估。二者可关联，但不能把一个固定句子字符串当全关胜利条件。教学必须要求的语言行为明确属于教学任务，不偷塞进所有开放谜题的完成条件。
+
+## 世界模型重构
+
+把旧六词枚举、ink-road 单一区域、bag/mat 特判和故事变形名单收束到版本化内容规则中。新规则需要稳定实体、有限属性、可达节点/区域、通道净空、支撑和容器约束、门/把手状态。使用受限数据与纯函数，不引入任意脚本求值。
+
+原故事作为 picnic 规则集适配到同一状态链，保持身份与过路约束。历史 decoder 可只读保留，不作为第二个当前运行时写入者。新规则不得扩大旧存档解释范围。主角可在新章节按许可改变尺寸，但不能被 word transform 变成帽子或另造一个主角。
+
+## 重构顺序
+
+先核对文档/代码冲突和未合并相关工作，更新合同；再用现有入口做 R1 单关闭环，验证两种真实机制解法；然后扩展章节、工坊/词语册、恢复和表现；最后按实际失败补齐必要回归。工程验证后可继续实施，无需等待不存在的实时 AI 凭据；教研/真机/儿童审核独立保持待办。
+
+只维护一套正式应用。保留旧 Git 基线和旧档，不长期并行维护新旧 GameShell。迁移时允许删除已无调用的页面/样式/重复协议，但要先证明无活动入口/存档/测试依赖。不能删除仍有价值的历史 decoder 来让测试变绿。
+
+## 非功能边界
+
+依赖真实锁定；输入/存档/内容边界校验；确定性与幂等；资源/音频/存储失败可解释恢复；移动端可访问操作；无密钥与儿童个人数据；有版本回滚与 exact-SHA 证据。工业级质量体现在这些边界可验证，不体现在框架数量、文档数量或未经测试的“生产就绪”标签。

@@ -1,62 +1,91 @@
-# 12 · 网页游戏技术与交互设计
+# 12 · 技术设计与代码实施映射
 
-版本：2026-09-20。本文是 04/05 的实现指导；领域事实仍以 05 为权威。
+Refoundation 06 目标设计。检查基线：`a9a62e3eb632781595b40171dfb442bf0fbbe55e`，默认分支 main，2026-09-20 读取。本文不是已实施报告；必要契约见 04/05，验收见 08。路径指向本次已知结构，开工须核对最新代码而不是机械按旧行号修改。
 
-## 架构决策
-当前采用 **React + TypeScript + Vite 的事件驱动单机网页游戏架构**。保留唯一确定性领域转换，不引入第二套游戏状态、不默认引入 Phaser/Pixi/Cocos、不增加后端。当前玩法是点击/拖放、拼写、组句、物品关系、有限演出和场景条件推进，尚无持续物理、自由角色控制或大规模逐帧实体模拟。
+## 1. 当前代码差距
 
-## 当前分层
-Browser/App Shell 下分 Start/Pause/Ending/Review 与 Game Shell；Game Shell 由 Scene View、HUD、Context Tool、Feedback Layer、Accessibility 组成。Application 保持 Adventure Session；Domain 保持 world.transition；Content 保存 scenes/encounters/tasks/manifest；Platform 保存 save/replay/audio/assets/browser lifecycle。依赖方向 UI → Application → Domain；Domain 不依赖 React、DOM、Storage、Audio。
+| 位置/函数 | 已读取事实 | 新包需要改变什么 |
+| --- | --- | --- |
+| src/domain/world.ts / WORDS | 六词枚举；Entity 只有 id/word/kind/location；Effect 为 spawn/transform/place | 内容词表/原型引用、有限属性、开合与空间动作；旧六词只约束旧包 |
+| world.ts / validLocation | zone 只认 ink-road；in 只认 bag；on 只认 mat | 用内容声明的容器、支撑、通道和交互条件取代全局词形特判 |
+| world.ts / assertWorld | flags 只接受 crossed-ink；actor 只能为 cat；变形有实例与词对限制 | 通用实体完整性与规则集特定校验分开，保留旧包限制而非全删 |
+| src/game/adventure.ts | availableWords/sentenceTasks/goals 和活动构造围绕三幕、教学事实、两种活动 variant | 关卡初态/世界目标与 ExerciseSpec 分离；新内容不继续复制分支树 |
+| src/game/sentences.ts / parseSentence | 少于六词直接 incomplete；词表与正则限 Put/The…is…和 in/on | 各结构完整性独立；支持 Open/Close、属性描述、按审核开放的 Make；不误判短句 |
+| sentences.ts / assemble/sameMeaning | 词块 ID 唯一检查和有限语义比较已存在 | 复用思想；增加任务归属、实体绑定/消歧和新语义，而非换唯一答案字符串 |
+| src/platform/adventure-save.ts | schema 4/content 精确匹配；重放 runAdventure；字段/target 白名单；6000 条与 4,000,000 字符限制 | 新动作/位置需版本化 codec、白名单和 fixture；不能只改类型/版本号 |
+| adventure-save.ts / exportRecords | 导出覆盖 wordspell.* 与 xueli.adventure.* 前缀 | 新 key 必须进入导出/清理/备份范围，旧档保留，不造成数据遗漏 |
+| App/GameShell/Scene/pointer | 当前架构已有一个正式 Shell、三态分离和 scoped 输入 | 替换主玩法投影；真实实体路径/属性变化，不新建并行产品入口 |
+| package.json | 包名仍为 xueli-wordspell；Node test runner 与现有脚本 | 包名仅是历史工程名，不代表仓库没改名；必要时单独一致性清理，不触发整栈重建 |
 
-## Game Shell
-**Scene View**：世界是第一视觉层并跨任务持续。实体位置由 committed world 投影；拖影、粒子、选中光晕不是领域事实。点击与拖放共用 intent/availableTargets；失败/取消恢复 committed world。
+上表来自基线代码和对应合同读取，不代表本轮运行测试、完整安全审计或已验证所有未合并分支。精确基线代码可在 [Git 树](https://github.com/yuan2go/xueli-english-quest/tree/a9a62e3eb632781595b40171dfb442bf0fbbe55e) 查看。
 
-**HUD**：只显示当前情境必要信息、暂停、音量/重听和少量状态；不引入无价值的 XP、货币、任务列表。
+## 2. 内容和世界的最小充分模型
 
-**Context Tool**：由选中对象、encounter 和目标按需展开。拼写/组句/听音不是独立页面；关闭工具不改变已提交世界。手机采用底部 sheet/有界区域，桌面/Pad 可侧栏。
+保留 World/Entity/Command 等语义，可重命名或拆分实现。推荐结构能力为：
 
-**Feedback Layer**：即时反馈约 100–250ms，关键动作约 300–900ms，少数故事演出更长。业务先提交，表现随后消费结果；禁止依赖 animationend 才保存。reduced-motion 直接投影终态。
+- 实体：稳定 id、lexeme/archetype、kind、有限 attrs、单一 location、实例状态和资源引用；属性/能力定义来自 ruleset。
+- 空间：稳定节点/区域、连接、净空、支撑/高度、交互点和容器关系；场景百分比坐标只用于呈现，不直接判玩法。
+- 关卡：pack/rulesVersion、initialWorld、goal predicates、tool permissions、creation quotas、exercise references、variant/seed。
+- 运行会话：id/revision、active level/mode、各隔离会话、journal、帮助与语言事件、派生完成状态。
 
-## 状态模型
-1. Committed game state：world、facts、scene、goals、journal、practice evidence，可重放/保存。
-2. UI interaction state：selected entity、opened tool、focus、未提交字母/词块。
-3. Ephemeral presentation state：drag ghost、animation phase、particle、hover、pressed，不进入存档。
+不把通用 ECS、物理系统、DSL 编译器或插件注册中心作为前置。只实现本包规则需要的数据类型和纯函数。内容定义可以用 TypeScript 或受校验 JSON，作者能力不等于要做可视化编辑器。
 
-React state 只承担需要 React 渲染的状态。未来若出现高频逐帧对象，不把每帧坐标灌入全局 React state。
+## 3. 单一规则核与搬运
 
-## 命令与结果
-所有改变世界或学习证据的输入转换为显式 intent，通过现有 adventure command 进入唯一执行链：Pointer/Keyboard → Interaction Adapter → Intent → runAdventure → guards/content semantics → world.transition → atomic commit → goals/evidence → presentation cue。世界阻挡不得被记录成英语错误。
+将 canReach/canTraverse/canContain/canSupport/canResize/canInteract 一类查询实现为无副作用函数，供应用守卫、UI 候选与离线关卡校验共同使用。名称可变，但语义只能有一个权威实现。
 
-## 内容驱动
-Scene/Encounter/Task 使用稳定 ID。内容声明 prerequisites、completion conditions、relevant entities、available tools、language objective、semantic effect/observation、feedback cue、assets/audio、practice classification。不要把通关逻辑散落在 JSX。新增关卡原则上通过内容 + 可复用规则完成；只有新机制才扩展 Domain/Application。
+点击/拖动对象到目标是一个 transport/place 意图：验证当前可见/可接触、操作者起点、路径、携带物净空、目标容量/支撑，再形成完整事务。不能让 DOM 坐标直接替换实体位置。门开启要求当前角色能到达正确把手；魔法属性工具可以按内容允许远程作用可见对象，但不因此授予远程搬运/开门权限。
 
-## 资源与生命周期
-唯一 manifest 继续作为资源入口。加载分 critical / scene / lazy；失败有 fallback/retry，retry 不重置世界。首次用户手势后激活音频；切后台停止瞬时演出和音频，恢复后以 committed state 重绘。首阶段不要求 Service Worker/PWA。
+尺寸改变应在同一事务检查实体所在空间、父容器和子树占用。可能造成悬空、内容丢失或穿透时拒绝，不自动消失、不静默挪动玩家物品。若需要新复合行为，明确 effects 顺序并验证完整后态，不在多个 React setState 间分散提交。
 
-## 输入
-统一 Pointer Events + Keyboard adapter：单 active pointer、pointer capture/cancel、click/drag 阈值、交互区 touch-action、旋转/visibility change 取消未提交拖动、键盘与点击产生同一 intent、语义名称和 focus ring。不使用桌面 HTML5 drag-and-drop 作为核心触控方案。
+旧规则作为版本化 picnic ruleset 适配；同一 transition 选择已绑定规则。历史只读 decoder 不可成为第二条新玩法写入链。新 rescue ruleset 可以允许 cat-companion.resize，但不能允许 spawn/word-transform 主角。
 
-## 响应式
-Desktop：Scene 主区 + Context Tool 侧区。Tablet：Scene 优先，工具按方向切换。Phone portrait：固定比例场景 + 底部工具，工具滚动不推动场景完全离屏。Phone landscape：限制 HUD 高度，优先可操作场景。360×640、390×844、768×1024、1024×768、1440×1000 为工程回归基准，不等于真机验收。
+## 4. 目标、语言与支持
 
-## 性能
-不因架构升级引入重量级引擎；避免无关全树 rerender；world projection 使用稳定派生；图片按显示尺寸优化；动画优先 transform/opacity；listener/timer/audio/pointer capture 在切场景时清理。只有出现持续 60fps 模拟需求才建立帧循环专项预算。
+PuzzleSpec 的 goal 读取世界和明确的游戏事实，不要求参考 witness 的逐步完成 flags。ExerciseSpec 的语言检查可以有情境目标；目标是否满足、表达是否成立、世界是否能执行是三个结果。
 
-## 存档
-继续 command journal + projection verification。Game Shell 重构不得改变 journal 重放得到权威状态的原则。表现状态不进入 journal；内容/schema 改动显式版本化；未知/损坏存档保留原文。
+解析器按内容开放的结构匹配，不再先用全局词数阈值否定短句。输入规范化和 token 校验先行；两块 the 独立，重复 id/外来 task token 拒绝。有限语义至少包含 open/close/place/resize/observe；描述不能产生 effect。
 
-## 测试策略
-只保留高价值测试：Domain 不变量；Application 关键 encounter、幂等/revision、目标投影、活动隔离、保存重放；Browser 正常入口完整冒险、关键拖放/组句、刷新恢复、移动端和桌面/平板、资源/存储失败；关键 Game Shell 状态截图和无横向溢出。真机/儿童试玩独立记录。不要为 CSS 细节或私有函数堆单测，不删除失败断言换 PASS。
+先确定指代再执行：同词多实例要用预先选择、限定词或明确的内容绑定消歧；模糊时不择优猜测。outside 不等于错误英语；世界 blocked 保留正确语言与草稿。只有明确提交才生成语言尝试，撤销/重听/拖空不新增错词。
 
-## 引擎升级门槛
-只有出现连续自由移动/物理碰撞、大量精灵粒子、复杂镜头动画，或 DOM 场景经测量无法满足目标设备性能，才提 ADR 比较继续 DOM、PixiJS、Phaser/Cocos。若迁移，采用 renderer adapter 渐进切换；Domain/Application/Content/Save 不随渲染器重写。
+帮助维持评估窗口内单调支持；世界 undo 与证据不可互相覆盖。当前独立条件不足时，允许游戏继续但标记 assisted/unassessed。内容审核状态也不能由程序测试自动升级。
 
-## 实际模块与边界
+## 5. 撤销与恢复设计
 
-落点见 04 的模块表。GameShell 不用旧 Step 伪装工具；Letters 接受有限 `LetterTask`，SentenceBuilder 保留唯一 token ID、拖入/排序/退回和键盘按钮。`sceneModel` 将 Adventure 的真实可用任务映射为对象相关邀请与出口，结束条件仍由 `complete/goals` 提供。
+使用现有 command journal 演进实现可重放撤销：撤销是新命令，回退完整的世界变更，revision 继续前进，不删除语言事件/支持。允许存储受限的前态/逆向信息作为校验辅助，不能信任任意用户提供的世界补丁。重放必须重新计算并核对。
 
-资源以唯一 manifest ID 分类：critical 为伙伴与当前背景；scene 为当前所需道具；lazy 为延迟姿态/草地欢呼图。未来背景不在首页预取；实际显示可立即按需请求。请求去重、成功缓存、卸载取消；失败显示 fallback，重试仅失败 ID，epoch 只重建图片，不重置工具/世界。没有 Service Worker 或第二份资源登记。
+明确本关 undo 边界、重开新会话和跨表面切换。重开/撤销不能重复造主角、恢复已消耗的一次性奖励或把旧帮助洗成独立。世界当前 goalSatisfied 与已完成历史分开；只保留有意义、幂等的章节结果。
 
-每个拖动表面限定命中 scope，捕获后仍以视口坐标命中当前可见元素；关系对象用父对象百分比局部定位。失去 capture、多指、旋转、后台和 Escape 都清理；释放 capture 不触发第二次提交。键盘 Enter/Space 不被上一拖动的合成 click 抑制。句尾有明确落点，已有词块是插入点。
+旧 schema 4 decoder 精确行为需保护。采用新 envelope/key 或明确版本分支；不原地重新解释旧 journal。备份→回读→才允许替换，存储失败不覆盖原文。迁移不可靠时让用户导出后明确开始新章节，不编造转换成绩。新命令/target/属性白名单及大小限制须和 codec/export/清理一起更新。
 
-Phone 未开工具时世界占满剩余视口；打开工具后世界至少保留主体区域，底部 sheet 最大约 45%，内部滚动，句子行保持可见便于拖入。窄横屏改侧栏。命中尺寸与遮挡通过实际回归检查，真机范围仍见 STATUS。
+## 6. Shell 与表现
+
+沿用 main.tsx → App → GameShell 的正式入口，App 管会话恢复/平台与表面，Scene 投影世界，工具发意图。工坊与词语册是同一应用表面，不创建另一应用或复制一份领域状态；各场景会话数据隔离。
+
+保持 committed/UI/ephemeral 三类状态。低频权威结果驱动 React；高频 pointer 坐标保存在 ref 并合并到 requestAnimationFrame，只有选中/落点语义变化需要视图更新。清理 cancel、lostcapture、多指、关闭、旋转和后台，防止合成 click 再提交。
+
+表现从前后状态和已计算路径生成 cue。真实实体保留 key，读取前后几何后用 transform/opacity 做路径/属性补间；关系子物品一同运动。连续命令打断时从当前视觉采样平滑到最新终态，旧 cue 通过 session/revision token 作废。提交不等待动画；刷新直接恢复 committed state。reduced-motion 与跳过使用相同终态，不分叉业务。
+
+角色有限姿态：待机/观察/行走/使用/受阻/庆祝；复用已有合适资源，新姿态或道具必须独立登记并实际引用。不能把一张合成图拆几个低清片段冒充全套动画素材。页面正式文字保持 DOM 可访问。
+
+## 7. 资源、平台和错误处理
+
+单一 manifest 与 BASE_URL；critical/scene/lazy 分级、去重、取消、失败重试。重试不清世界或词块。正式音频、开发 TTS、不可用三态可观察；首次手势激活和后台/切换取消沿用 StoryAudio。
+
+内存可用但存储失败时继续并告知；未知/坏存档保留原文；内容失败不加载半套规则。视图命中与规则失败反馈分别标识，避免把网络错误归为英语错误。每次边界失败有短用户文案和不含个人信息的可诊断原因，不新增线上遥测默认采集。
+
+输入反馈目标为及时且不中断连续操作；性能先对同条件做基线/变更后比较，不承诺未经测量的帧率。优先消除每次 pointermove 的 layout、全树重渲染、资源重复加载和未清监听；不在主线程同时做大规模关卡搜索。搜索属于开发期检查，运行时只执行已发布规则。
+
+## 8. 可解性与必要测试
+
+关卡检查复用 transition/goal 与可用行动枚举；固定内容/seed，使用有限状态键、预算和确定性 tie-break。为每关输出 witness 或明确 UNKNOWN；R1 的两 witness 在关键机制条件上不同。不要仅换动作顺序、填两条固定成功标志或用 LLM 宣布可解。
+
+保存参考 witness 作为内容测试，不是孩子唯一正确路径。用正常 HTTP 首页重现核心解法和完整章节，检验 UI 可达性。规则/语言/恢复单测与浏览器测试互补；故障注入有明确目的，不注入通关状态。
+
+当前命令和验收矩阵在 08。仅新增必要检查；新 check:levels 脚本若被采用，必须真实实现后加入 package，而不是文档先声称可运行。保留既有核心和旧档测试，必要时迁移失效 UI 测试并说明等价覆盖。
+
+## 9. 切换与回滚
+
+在独立实现分支先完成 R1，验证机制后继续完整章节/工坊/回访与 C 阶段。正式入口切换与内容/规则/schema 版本同批交付；旧档不被覆盖，旧代码可通过 Git 基线回退。不要常驻双 Shell、双判题、双 manifest。
+
+只迁移本包需要的规则，删除的旧模块须确认不再被当前入口、历史 decoder 或测试依赖。更新文档表述与实际实现、生成证据并提交 PR；未经另行授权不合并 main。部署与 Git 提交分开，不把新文档或新 PR 当作线上站点更新。

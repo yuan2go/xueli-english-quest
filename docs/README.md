@@ -1,32 +1,30 @@
-# 技术文档导航与权威边界
+# 项目与技术文档导航
 
-版本：2026-09-20 / web-game-shell-05。01–05 与 11/12 为当前合同；旧工作包保留历史证据，不覆盖当前授权。实际结果只看 STATUS 本轮记录。
+版本：2026-09-20 / Gameplay Refoundation 06。当前文档描述目标设计；**已实现/已验证只看 STATUS**。旧 SHELL-05 的核心不改约束和后续只做设备验收路线被新工作包取代；历史证据不删除，也不沿用为本轮 PASS。
 
-| 文档 | 回答的问题 |
+| 文档 | 唯一职责 |
 | --- | --- |
-| [STATUS](STATUS.md) | 仓库现在真正有什么、验证了什么、缺什么 |
-| [01 产品与范围](01-product-and-scope.md) | 为谁做、为什么做、当前范围 |
-| [02 场景目标与玩法](02-gameplay-and-levels.md) | 每关目标、操作、错误、状态与学习证据 |
-| [03 交互、美术与音频](03-ux-art-audio.md) | 手机界面、触屏规则、资源和无障碍 |
-| [04 技术架构](04-architecture.md) | 模块边界、状态推进、恢复与部署形态 |
-| [05 内容与运行协议](05-content-and-runtime-contracts.md) | 词、物品、关卡、指令、存档与校验 |
-| [06 AI 与安全边界](06-ai-workshop-and-security.md) | 暂停的运行时 AI 范围、开发辅助与数据安全 |
-| [07 教学质量与内容安全](07-learning-quality-and-safety.md) | 记录口径、教研审核、隐私与授权 |
-| [08 测试、发布与运行](08-test-release-and-operations.md) | 必要测试、真机、上线和提交清单 |
-| [09 路线图与 agent 协作](09-roadmap-and-agent-handoff.md) | 工作包顺序、负责人、并行和交接 |
-| [10 决策、风险与来源](10-decisions-risks-and-sources.md) | 对话中的取舍与修正、依据及未确认事项 |
-| [11 网页游戏产品蓝图](11-web-game-product-blueprint.md) | 页面式学习体验如何推进为可操作世界中的英语冒险 |
-| [12 网页游戏技术设计](12-web-game-technical-design.md) | Game Shell、状态、输入、资源、响应式与引擎升级边界 |
-| [WP-WEB-GAME-SHELL-05](work-packages/WP-WEB-GAME-SHELL-05.md) | 当前 Scene-first Web Game 实施范围与验收 |
-| [WP-GAMEPLAY-CORE-04](work-packages/WP-GAMEPLAY-CORE-04.md) | historical：场景驱动核心交付 |
-| [WP-01](work-packages/WP-01.md) | 历史基础工作包 |
-| [WP-PLAYABLE-STORY-01](work-packages/WP-PLAYABLE-STORY-01.md) | historical：线性主线交付证据 |
-| [WP-PLAYFUL-GAME-03](work-packages/WP-PLAYFUL-GAME-03.md) | historical：旧野餐与短玩法交付 |
-| [设计说明模板](submission/design-description.md) | 产品说明；必须按实际交付更新 |
-| [AI 使用记录](submission/ai-usage-log.md) | 实际 AI 制作证据，不是营销陈述 |
+| [STATUS](STATUS.md) | 当前代码基线、交付状态、实际检查和限制 |
+| [01 产品与范围](01-product-and-scope.md) | 名称、对象、应用边界、本包范围与非目标 |
+| [02 玩法与章节](02-gameplay-and-levels.md) | 核心规则、R1/R2/R3/回访、不同解法与旧包不变量 |
+| [03 交互/美术/音频](03-ux-art-audio.md) | 触屏、场景、焦点、角色、素材、音频与降级 |
+| [04 架构](04-architecture.md) | 分层、技术栈、唯一状态链与重构边界 |
+| [05 内容/运行/恢复](05-content-and-runtime-contracts.md) | 内容、空间、指令、判定、证据、撤销与版本化 |
+| [06 AI/安全](06-ai-workshop-and-security.md) | 开发期 AI、无运行时依赖、隐私和凭据 |
+| [07 教学与审核](07-learning-quality-and-safety.md) | 学习序列、能力矩阵、支持口径、教研与儿童观察 |
+| [08 验证与发布](08-test-release-and-operations.md) | G01–G12、必要测试、设备、内容/发布门槛 |
+| [09 路线与协作](09-roadmap-and-agent-handoff.md) | 阶段、负责人、Git 权限与交付格式 |
+| [10 决策/来源](10-decisions-risks-and-sources.md) | 有效取舍、风险、参考作品及事实边界 |
+| [11 项目蓝图](11-web-game-product-blueprint.md) | 完整玩家体验与产品定型，不另立规则 |
+| [12 技术设计](12-web-game-technical-design.md) | 最新基线代码差距、规则核、语言/恢复/表现实施映射 |
+| [WP-GAMEPLAY-REFOUNDATION-06](work-packages/WP-GAMEPLAY-REFOUNDATION-06.md) | 当前完整实施范围、里程碑和验收 |
+| [Codex 提示词](prompts/codex-gameplay-refoundation-06.md) | 精简执行入口；细节引用权威合同 |
+| [历史 SHELL-05](work-packages/WP-WEB-GAME-SHELL-05.md) | 历史交付入口，不是当前待实施规格 |
+| [设计说明](submission/design-description.md) | 提交材料，发布前按实际实现更新，不当作当前能力证明 |
+| [AI 使用记录](submission/ai-usage-log.md) | 真实制作记录，不按计划编造 |
 
-阅读顺序：README → STATUS → 01 → 02 → 04/05 → 11/12 → 当前工作包；UI 开发必读 03，AI 范围边界见 06。无需每次把所有文件复制进 Prompt。
+阅读顺序：README → STATUS → AGENTS/CLAUDE → 01/02/11 → 04/05/12 → 当前工作包；UI 必读 03，教学必读 07，验收必读 08。工程实施前再核对相关旧 Prompt/内容导航与实际入口，修正冲突后编码。
 
-需求权威在 01/02，交互权威在 03，领域协议在 05，交付状态只在 STATUS。代码与文档冲突时，先报告差异，判断是缺陷还是批准后的设计改变；禁止把当前代码的偶然行为默认为新需求。修改设计时同步对应测试与工作包，不追加平行蓝图。
+新设计与基线代码暂不一致是已声明的待实现差距，不通过把文档写成“已完成”消除。长期决定改 01/10；关卡改 02；协议改 05；工作状态改 STATUS/WP。不要复制一个“最终版蓝图2”与此索引并存。
 
-历史状态移至 [archive/status-through-core-04](archive/status-through-core-04.md)。历史工作包、evidence、旧内容 fixture 和 design/tabby/references 只供版本/来源追溯，不作为当前蓝图。
+旧 STATUS 与 SHELL-05 的完整原文分别保存在 [状态原文快照](archive/status-at-a9a62e3.md.txt) 和 [工作包原文快照](archive/wp-shell-05-at-a9a62e3.md.txt)。以 .txt 保留原始字节与原路径上下文，不把原文相对链接当新目录中的活动导航；可在 [基线 Git 树](https://github.com/yuan2go/xueli-english-quest/tree/a9a62e3eb632781595b40171dfb442bf0fbbe55e) 按原路径读取。其他历史工作包、evidence 与美术参考只供追溯。

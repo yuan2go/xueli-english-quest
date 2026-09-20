@@ -1,48 +1,59 @@
-# 10 · 设计决策、风险、来源和假设
+# 10 · 有效决策、风险与来源
 
-## 当前有效决策 · 2026-09-20 / WP-WEB-GAME-SHELL-05
+2026-09-20 / Refoundation 06。来源说明事实，取舍说明本项目设计判断；参考作品的口碑、宣传和示例均不是本游戏趣味或教学证据。
 
-| 决策 | 当前结论 |
+## 决策记录
+
+| 决策 | 结论与后果 |
 | --- | --- |
-| 产品与主线 | 雪梨英语奇旅 / Xueli English Quest；按世界目标与行为事实推进，旧 step++ 不驱动正式页面 |
-| 范围数量 | 三幕六词是首个故事的编排，不把三字母、十二挑战、十三步骤固化成产品限制 |
-| 早期探索 | 恢复同伴后，按实际出现物品开放可逆玩法；主线自由布置不借用通关初始状态 |
-| 英语应用 | 有限语法/语义判定；命令执行，描述核对。目标不符与世界受阻不等于错误英语 |
-| 制作与身份 | restore/make/transform/find 明确区分；craft-mat/craft-hat 各一件，关键物品不复制 |
-| 目标与结局 | 准备/布置允许合理换序；帽子与收纳选择保留到结局，当前布置来自真实世界 |
-| 活动与随机 | 复用三活动，每个两个实质变体；能力解锁，隔离世界，固定 seed/variant 恢复 |
-| 状态和存档 | 同一 domain.transition，schema 4 重放并核对投影；旧 step 无法可靠迁移新目标，备份/导出后明确重开 |
-| 证据 | 教学、辅助、独立、探索、回访分开；TTS 明示未审核，自动化不证明好玩、教研合格或学习提升 |
+| D06-01 应用边界 | 保留名称/仓库/一个 Web 应用；重做主玩法而非新建平行 Demo |
+| D06-02 主要乐趣 | 创造性场景解谜；选择、组合、后果与再尝试，不是英语小游戏合集 |
+| D06-03 语言作用 | 有限造物、属性词义、可执行指令、观察描述；不把描述句当魔法命令 |
+| D06-04 真实规则 | 尺寸、可达性、开合、支撑、容纳必须改变合法行为，不能用动画 flags 冒充 |
+| D06-05 核心重构 | 允许改 Domain/Application/Save；旧 SHELL-05 的核心不改约束不再适用于新包 |
+| D06-06 技术栈 | 继续 React/TS/Vite、一个确定性写入链；无测量/实际需求不换引擎 |
+| D06-07 内容范围 | 3 主关 + 1 回访 + 工坊/词语册仅为本包范围；旧六词/三幕不是全局限制 |
+| D06-08 旧身份 | 原故事 map→mat→铺路→map 和主角/纸偶分离保持；新尺寸属性不改变角色身份 |
+| D06-09 记录与恢复 | 撤销不洗掉帮助；旧档不映射新通关；新规则显式版本化 |
+| D06-10 AI/安全 | AI 用于实际开发制作；运行时本地判定，不新建 AI 平台，不收集儿童个人数据 |
+| D06-11 授权 | 本次直接 main 仅限文档；后续实现默认独立分支/PR，部署与外部服务核对授权 |
+| D06-12 质量状态 | 工程、视觉、真机、教研、趣味与发布分开；本次设计不等于已完成游戏 |
 
-## 2. 风险与应对
+旧设计与交付保存在 Git 基线及 archive 原文快照。历史来源/证据不能覆盖以上有效决定；变化时维护本表和对应合同，不另加冲突的总蓝图。
 
-| 风险 | 触发/识别 | 应对 |
+## 参考作品与采用范围
+
+- [Scribblenauts Unlimited 官方 Steam](https://store.steampowered.com/app/218680/Scribblenauts_Unlimited/)：创造物体、赋予属性并解决问题。采用“先给问题、再选工具”；不复制开放世界、角色或素材。
+- [Baba Is You 官方 Steam](https://store.steampowered.com/app/736260/Baba_Is_You/)：通过可操作词块改变规则。采用有限规则的组合；其规则语言不是自然英语教材。
+- [Noun Town 官方 Steam](https://store.steampowered.com/app/2313720/Noun_Town_Language_Learning/)：语言学习、探索与小游戏结合。采用“语言用于行动”的组织，不复制小镇/经营/语音识别系统。
+- [Letter Quest 官方 Steam](https://store.steampowered.com/app/373970/Letter_Quest_Grimms_Journey_Remastered/)：前序调研的拼词回合挑战参考；本轮不引入战斗装备。未在此次文档提交中重新试玩。
+- [English K1 Run](https://github.com/TeacherEvan/English-K1Run)：前序读取的触控优先 React/TS/Vite 游戏参考；借鉴输入/音频组织，不整库搬迁。其 README/许可/版本须在实际代码复用时重新核对。
+- [Words of Wonders 原型](https://github.com/mertmcd/Words-of-Wonders)：前序检查到字母连线与 pointer 交互，采用手感思路，不把固定词表原型当完整课程或直接生产底座。
+- [JavaScript Baba 民间复刻](https://github.com/slwulf/baba-is-you)：仅机制研究，非官方授权素材来源，不默认允许代码/素材复用。
+
+Scribblenauts、Baba、Noun Town 官方页面在 2026-09-20 文档整理时重新读取；未做购买、安装、手机实测或教学效果验证。上述采用与舍弃是设计决策，不是已证实的效果排序。GitHub 可见不等于所有附带资源均可复用；代码许可、图像、音乐、商标各自核对。
+
+## 工程依据
+
+基线为 [a9a62e3eb632781595b40171dfb442bf0fbbe55e](https://github.com/yuan2go/xueli-english-quest/tree/a9a62e3eb632781595b40171dfb442bf0fbbe55e)。包版本以该提交 package.json/lock 为准，代码差距详见 12；不声称已验证该基线的运行状态。
+
+[Vite 静态部署](https://vite.dev/guide/static-deploy.html)说明 dist/base 与 preview 边界；[Codex AGENTS.md 指南](https://developers.openai.com/codex/guides/agents-md/)作为项目指令入口参考，执行权限以实际工具/用户授权为准。原有 [MDN Pointer Events](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events) 和 [媒体自动播放](https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Autoplay) 参考在涉及兼容性实现时再核对，不把初始化说明当本轮真机证据。
+
+用户在会话中给出的比赛信息作为产品范围背景，未独立验证赛事，也不意味着可以公开公司课件或声线。仅记录工作需要的截止时间，不复制内部公告原文、奖项金额或个人信息。
+
+## 风险与处理
+
+| 风险 | 可观察信号 | 处理 |
 | --- | --- | --- |
-| 核心不好玩 | 只会机械填字，看不懂变形用途 | 从正式入口完整试玩并改进世界操控与因果 |
-| 教学混淆 | 字母名当音素、帽子排他、泄露答案 | 教研审查、模式标记、独立测试 |
-| 状态死局 | 变走正在用的垫子、缺地图、主角变帽子 | 实例/情境守卫、恢复测试、同内核可达性检查 |
-| 范围膨胀 | 平台功能替代实际游戏体验 | 沿当前工作包交付，缺口必须来自真实观察 |
-| 网络或音频 | 移动端无法访问、播放被阻止 | 本地资源、首次交互解锁、真实网络验收 |
-| 权利与隐私 | 直接取公司课件/真人声线/儿童数据 | 原创占位、授权后替换、无个人数据默认 |
-| 双 agent 覆盖 | 同工作区修改核心协议与 lock | 一包一负责人、独立 worktree、先合约后并行 |
-| 验证缺口 | 只有逻辑/视口测试，没有目标设备或儿童观察 | 如实标 NOT_RUN；不能据此声称真机或教学验收 |
+| 换皮答题 | 只有预设句子触发预设演出，没有可用替代办法 | R1 先证明两种机制解法，失败先改核心循环 |
+| 属性是装饰 | big 后通道/支撑判定完全不变 | 同规则正反例与跨对象检查 |
+| 逻辑瞬移 | 拖物越墙、远处把手可直接开 | 单一可达性与搬运守卫，视图不写坐标事实 |
+| 模型复杂失控 | ECS/物理/AI 后台先于可玩关卡 | 限制规则、离散空间，按实际需求拆模块 |
+| 学习被绕开 | 固定颜色/槽位可作答；提示后标独立 | 独立条件变体和单调帮助记录 |
+| 语言误教 | 描述当指令、短句误判、指代不清 | 有限句法规则、语义/世界分层及教研 |
+| 新旧档损坏 | 改枚举后旧日志无法重放且被覆盖 | 版本化、原文备份/导出、精确 fixture，不猜进度 |
+| 未审核资源发布 | check:release 被移除或审核者虚构 | 保持发布阻断；工程与内容验收分开 |
+| 多 agent 冲突 | 同时改 core/lock 或强推 main | 单负责人、独立 worktree/PR、读取最新 SHA |
+| 只做文档/核心 | 没有正式入口和完整章节 | A/B/C 明确交付，不能以类图/求解器替代 UI 游戏 |
 
-## 3. 公开资料与用途
-
-以下是初始化时（2026-09-16）的 historical 调研来源，仅保留出处追溯；不是本轮重新核验的技术合同或产品需求。实际依赖以锁文件、工程行为以当前代码与验证为准。
-
-- [单词拼读王 App Store](https://apps.apple.com/cn/app/id6749286225)：用于核对自然拼读产品定位；不据宣传推定实际学习效果。
-- [悦读小达人 App Store](https://apps.apple.com/cn/app/id6760697207)：用于核对绘本、听读、场景词汇方向；不推定内部 SDK、授权或法人与公司的关系。
-- [Vite Getting Started](https://vite.dev/guide/)：Node 版本要求及工程入口。初始化选用的直接依赖版本参考当日官方模板，完整依赖仍须真实安装锁定。
-- [Vite 官方 React TypeScript 模板](https://github.com/vitejs/vite/blob/main/packages/create-vite/template-react-ts/package.json)：初始化依赖基线参考，不承诺永远使用最新版本。
-- [Vite Static Deploy](https://vite.dev/guide/static-deploy)：dist、base 和静态部署；preview 不是生产服务器。
-- [MDN Pointer Events](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events)：统一输入及取消语义。
-- [MDN Autoplay](https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Autoplay)：浏览器媒体自动播放限制。
-- [OpenAI AGENTS.md](https://developers.openai.com/codex/guides/agents-md)：Codex 项目指令入口。
-- [Claude Code Memory](https://code.claude.com/docs/en/memory)：CLAUDE.md 与文件引用入口。
-
-旧比赛日程与调用预算蓝图已退役。目标年龄、体验时长与教学效果仍需外部验证，不是已测结论。
-
-## 4. 待负责人确认，但不阻断全部开发
-
-素材权利与正式审核、录音和听审、教研负责人、真机与适当儿童试玩条件，以及另行授权的托管部署。资源发布检查继续拦截未审核素材；模型凭据不在当前范围，不作为当前工程阻塞。
+正式素材、录音、教研人员、真实设备/儿童观察条件和托管权限尚须真实核验。只阻断对应验收，不阻断其余独立工程工作。

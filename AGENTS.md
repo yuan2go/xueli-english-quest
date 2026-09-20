@@ -2,29 +2,44 @@
 
 ## Goal and authority
 
-Build a touch-first English storybook game, not a learning-platform shell. Read README.md, docs/STATUS.md, docs/README.md and the assigned work package before modifying code. Product and gameplay: docs/01 and docs/02. Runtime contracts: docs/04 and docs/05. Report conflicts; update the authoritative document with the implementation instead of copying a competing specification.
+Build one touch-first children's English adventure puzzle game, not a learning-platform shell or a collection of disconnected minigames. Current target: **WP-GAMEPLAY-REFOUNDATION-06**. Read README.md, docs/STATUS.md, docs/README.md, the assigned package, and the relevant authoritative documents before coding. Product/scope: 01; levels/gameplay: 02; UX/assets: 03; architecture/contracts: 04/05; teaching: 07; acceptance: 08; synthesis and implementation mapping: 11/12.
 
-Current target: WP-WEB-GAME-SHELL-05 Scene-first Web Game; read docs/11 and docs/12. This story uses three acts and six words, not global product limits; the legacy twelve challenges/thirteen steps no longer drive the formal page. Preserve the actual map → mat → place across ink → map chain. Full-game readiness requires actual interaction, reviewed content and device evidence, not type declarations or mock tests.
+Refoundation changes the primary gameplay, not merely the animations. Keep the repository and one application; replace unsuitable pages and domain/application/save structures where required. The old SHELL-05 restriction against core changes is historical, not an active constraint. Do not create a second demo, game state writer, sentence judge or resource manifest.
+
+This documentation revision defines requirements, not completed capabilities. Current facts and exact-SHA checks belong in STATUS; old PASS reports are not current evidence. Do only the change-scope verification needed, then implement rather than repeating a whole-repository audit.
+
+## Gameplay and teaching invariants
+
+- Finite word creation, semantic properties, commands and observation must affect or describe the actual world. Size must affect traversal/support/containment; dragging proposes an action and cannot teleport through obstacles.
+- Puzzle completion is derived from world goals, not a prescribed action sequence. The first core level requires two mechanically distinct solutions, not reordered scripts. Exercise language goals are separate from open puzzle goals.
+- Commands may change the world; descriptions never do. Use finite authored grammar, token ownership and stable repeated-token IDs; handle short sentences, case/punctuation, reasonable declared variants and ambiguous references. Never judge correctness with an LLM.
+- Preserve entity identity. cat-companion is not cat-card. The companion cannot be created again or transformed into an object; explicitly allowed size changes in the new pack keep the same actor identity.
+- Preserve the original story's route-sheet map → mat → placed across ink/actual crossing → map chain and independent picnic-mat. Old six words/three acts are pack-specific, not global product limits.
+- Teach new meaning before assessment. Guided, assisted, demonstrated, independent, exploration and revisit evidence remain distinct. Replays, incomplete input, failed drops, resource errors and world-blocked correct language are not language mistakes.
+- Undo may restore world state but never erase historical help or attempts to claim independence. Goals, historical completion and learning evidence are distinct.
 
 ## Engineering constraints
 
-- One React / TypeScript / Vite application; one deterministic domain transition path. Do not add microservices, a generic workflow platform, ECS, physics engine, ORM or a global event bus without a concrete requirement.
-- Keep domain code independent of React, DOM, storage, audio and providers. UI emits commands; domain state drives rendering. Never decide correctness with an LLM.
-- Preserve entity identity on transformation. Protect the companion cat from transformation; cat-card is a separate token. Reject stale commands, duplicate creation, cyclic containment and transformation of an occupied support/container.
-- Touch and click must both work. Invalid drops, audio replay and incomplete input are not wrong-language attempts. An explicit submission is required for spelling.
-- Do not expose complete answers during unassisted listening checks. Guided, text-assisted and demonstration completions are separate evidence classes.
-- No API key or private information in client code, VITE_* variables, logs or commits. No arbitrary HTML/JS, remote URLs or tool execution from model output.
-- Real provider work requires explicitly approved credentials and budget. Lack of credentials blocks only live provider verification: continue the deterministic game, local fixtures and validation. Label fixtures clearly; never claim a simulated call was real.
-- Use existing project commands. Install and commit a real npm lockfile when network access is available; do not invent lockfile hashes. Pin resolved dependencies and review changes; do not run forceful dependency upgrades blindly.
+- One React/TypeScript/Vite application and one deterministic transition path. Domain is independent of React, DOM, storage, audio and providers. UI emits commands; domain state drives rendering.
+- Use finite spatial and content rules before considering a physics engine, ECS, new rendering engine, state framework or generic editor. Add dependencies only for a concrete need with actual lockfile installation/review.
+- Reject stale commands, duplicate IDs, invalid references, cyclic containment, occupancy violations and partial effects. Commit compound actions atomically with replayable journal/evidence.
+- Version content/rules/save changes. Preserve raw old/unknown/corrupt saves, verify backups, offer export, never infer new completion from old steps. Update decoder allowlists and export coverage together.
+- Touch, click and keyboard equivalents must work. Handle pointer cancellation, rotation, backgrounding, focus, reduced motion and resource/storage failure. Animations never advance business state or gate saving.
+- No keys in client code, VITE_* secrets, logs, files or screenshots. No child personal data, unauthorized company materials, arbitrary model HTML/JS/URLs or dynamic code execution.
+- Runtime AI/provider work is out of scope. Lack of credentials blocks only separately authorized live work, not the local game. Label development TTS and fixtures honestly.
 
 ## Workflow
 
-Inspect git status, current branch and origin/main before work. Preserve unrelated edits. One implementation owner per work package; another agent may review. Use separate branches/worktrees for concurrent work. Coordinate shared domain/content contracts before parallel changes; do not edit the same files simultaneously.
+Inspect git status, branch, latest origin/main and related unmerged changes before work. Preserve unrelated edits. One implementation owner per package; another agent may review or perform non-overlapping work in a separate worktree. Coordinate shared content/domain/save contracts.
 
-Implement an end-to-end slice, then the smallest meaningful regression coverage. Run npm test and, after dependency installation, npm run typecheck and npm run build. Add browser tests only where they validate a real interaction or a regression. Do not manufacture coverage by asserting constants or taking large snapshots. Fix failures caused by the change; disclose unrelated or environmental failures.
+Read and retire conflicting active designs/prompts before coding. Retain historical evidence and needed decoders/fixtures. Update the existing authoritative documents, not parallel blueprints. Comments explain rationale and invariants, not narrated code.
 
-Never silently force-push, reset unrelated changes, disable security controls or mark unrun checks PASS. Follow the user's instructions for committing/pushing/PRs; otherwise leave reviewable local commits and report their status.
+Implement R1 end-to-end through the real entry first, then the complete assigned chapter/workshop/revisit scope. If the core still has no real choices, fix it before expanding content. Do not stop at a prototype or engine skeleton and mark the whole package complete.
+
+Run relevant necessary behavior checks and the existing project commands. Build includes typecheck; avoid redundant runs where there is no change. Run domain/application/save regressions and real HTTP browser paths for affected behavior. Do not manufacture coverage with constants, massive snapshots, skipped failures or reduced release gates. Device, child, teaching and rights reviews are independent evidence.
+
+This user's direct-main authorization applies to this documentation delivery only. Future implementation defaults to a separate branch, commits, push and PR; no auto-merge or force-push without fresh explicit authorization. Never overwrite concurrent changes or disable security/workflow controls.
 
 ## Handoff
 
-Keep comments about rationale and invariants, not narrated code. Update docs/STATUS.md with: implemented capability, exact commands/results, unrun checks, blockers and next package. Delivery reports include baseline/final SHA, changed behavior, necessary tests, actual browser/provider evidence, and remaining limitations. No claims of production quality or learning improvement without corresponding evidence.
+Report baseline/final full SHA, branch/PR, actual changed behavior, command results and exit codes, exact-SHA browser evidence, remaining work and limitations. Unrun checks are NOT_RUN; unavailable conditions are BLOCKED. Engineering, visual completion, devices, fun, teaching and public release have separate readiness states. Never claim learning improvement, permanent mastery or production quality from code/tests alone.

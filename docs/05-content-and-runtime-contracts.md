@@ -1,31 +1,69 @@
-# 05 · 内容、运行与存档合同
+# 05 · 内容、领域、语言与恢复合同
 
-当前内容版本 `4.0.0-dev.1`、存档 schema 4。WP-WEB-GAME-SHELL-05 的以下规则是正式页面合同；旧 schema 2/pack3.x 只用于识别、验证与保留历史日志。
+Refoundation 06 目标协议。基线仍是内容 4.0.0-dev.1 / schema 4；本次仅更新文档，未改变运行时格式。新格式由实现提交显式分配版本，禁止继续沿用旧版本号解释新行为。
 
-## 内容与身份
+## 内容登记
 
-词汇来自现有资源词表，当前六词不限制未来产品词数。Letters 按目标长度生成槽位。每个 WordTask 声明意义、用途、模式、字母、多次提交目标和 restore/make 身份；不是从拼写随意生成物品。
+ContentPack 必须包含稳定 packId/version/rulesVersion、lexemes、entities/archetypes、levels、exercises、资源依赖及审核状态。词条声明词形、意义/词性、语音、例句与视觉/动作意义支持。词条 ID、词块实例 ID、世界实体 ID、素材 ID 各自独立，不能把显示英文当唯一主键。
 
-cat-companion 永远为 actor，cat-card 为 token。route-sheet 的 map/mat 保留 ID；在本次主线提交 crossed-ink 前不能从 mat 恢复 map。picnic-mat、craft-mat 是不同实例；craft-mat/craft-hat 的内容配额各 1，刷新和重复操作不可复制。每个实例仅有一个 stage/zone/in/on/worn location，包含无环；占用支撑物不能静默变形或收纳；换帽原子移动旧帽。
+LevelSpec 声明初态、空间/节点与通道、允许的规则和造物配额、目标谓词、可用语言工具、引用的学习任务、手工变体、帮助、资源、参考解法与校验预算。仅支持白名单谓词/规则；不从 JSON 执行 JS、HTML、任意 URL、eval 或动态插件。
 
-SentenceTask 声明有限词块及独立 tokenId、语义 kind/source/relation/target、实例映射、place/observe、练习模式、情境与可接受模板。判定先检查 token 所有权/唯一性，再规范大小写/标点，通过有限语法解析语义，再比较目标、当前词形/位置和世界许可。范围外表达不泛称错误英语。描述句永远不执行 place。
+ExerciseSpec 声明语言目标、情境、输入方式、答案可见性、可接受结构/语义、词块独立 ID、实体绑定与消歧、提示/示范及评估边界。少词判断由具体结构决定，不采用全局“少于六词即未完成”。Open the box. 与 Put the apple in the bag. 均须独立定义结构。
 
-## 命令与记录
+## 实体与空间
 
-`AdventureCommand` 包含 sessionId/revision/mode/attemptId 和有限 Intent；同 ID 同内容返回原回执，同 ID 不同内容或旧 revision/mode 拒绝。有效提交顺序为 clone → 校验 → effects → facts/events/journal → commit。世界错误不留下半个换帽动作。
+每个实体保持稳定 ID、词条/原型引用、角色类别、允许属性、位置、资源引用。属性采用可解释的有限值；small/normal/big 等具体集合由内容定义，显示大小必须与规则尺寸一致。不是所有物体都允许所有变化，限制必须可理解并有反馈。
 
-结果 `valid/done/incomplete/structure/outside/mismatch/blocked/stale` 分开；证据另记 language correct/adjust/unassessed，不把语句成立但动作失败计为语言错误。当前目标经 `goals` 从 committed world/facts 推导，不能由 UI 提交“完成”。
+位置只有一个权威来源，可为区域/节点、承载/包含/佩戴关系；渲染坐标由场景布局投影。空间合同至少能表达通道开闭与净空、支撑高度/承载、容器开口/容量、交互点与操作者可达性。采用离散规则，不承诺连续刚体物理。
 
-事件区分 spelling、substitution、sentence-command、sentence-description、listening、operation、exploration；practice 区分 teaching/assisted/independent/exploration/revisit。帮助 text/hint/demo 持续保留；evidence 明确 guided/assisted/demonstrated/independent/audio-unverified/exploration。无播放开始的听音拼写/找物不获独立听力口径，开发 TTS 的来源与版本保存在 Support；播放开始不证明孩子听懂。重听、未填满、落空、资源失败不计语言错误。
+移动/取放须验证源可接触、操作者路径、携带物的净空、目标许可及最终位置。容器移动携带其子树；不能把包里的对象留在原地或复制一份。缩小容器、支撑或载人对象后若会造成重叠、悬空或容量不合法，原子拒绝并给出调整方法；本包不实现自动抛出/摔落模拟。
 
-## schema 4 存档
+魔法印块可按内容作用于可见对象，开门/搬运等角色行动仍须可达。字母更换词形、resize 改属性、spawn 创造新实例是不同 effect。禁止主角物种变形；新章节允许的主角尺寸变化仍为同一 actor。
 
-key 为 `xueli.adventure.v4`。envelope `{schema,content,id,seed,journal,projection}`，projection 包含故事/活动世界、场景/目标、已选 variant/seed、帮助和必要学习事件。恢复不信任该投影：验证 schema/content/结构/字段长度，从初始状态重放每条真实命令，再逐字比较导出的投影。上限 6000 条/4MB，超限提示导出。临时拖影、输入草稿和音频对象不持久化。
+## 动作、原子性与确定性
 
-旧 `wordspell.story.v1` 用旧 decoder 判断是否已知；先把原文备份至内容指纹后缀 key，回读一致且不覆盖碰撞。新目标无法可靠由旧 step 推导，因此保留旧档、提供导出、要求明确开始新冒险；不伪造迁移完成度。其他旧活动 key 原样保留，也包含在导出中。新档损坏/未来版本同样保留，确认重开前备份；备份失败不覆盖。存储完全不可用时临时运行并告知。
+所有世界修改、帮助、语言评估、撤销和重开均通过显式应用命令。保留 sessionId、revision、mode/level、attemptId 及严格载荷校验；涉及词块时校验所属 task 和唯一 ID；内容/rulesVersion 必须绑定会话。
 
-## 资源与发布
+同 attemptId 同载荷返回同回执；同 ID 不同载荷拒绝；过期会话/revision/关卡拒绝。顺序：校验边界 → 克隆/事务草案 → 解析和守卫 → 计算完整 effects/路径 → 验证后态 → 一次提交世界、事实、journal、证据 → 派生目标/表现。拒绝不留下半个开门、半个换帽或道具配额消耗。
 
-继续使用唯一图片 manifest 与 Vite BASE_URL。SHELL-05 只改变 UI/表现/加载调度，保留内容版本、schema 和旧哈希。`sceneModel/resolveTool` 读取既有 availability/goals，presentation 只消费提交结果；选中、草稿、DOM 坐标和 cue 均不进入日志。原图/音频哈希、字节、格式与审核策略未放宽；新增有限句子的开发语音目录同样登记为 PENDING/path=null，经现有 StoryAudio 播放，不伪造录音。`check:resources` 包含新增语音目录；`check:release` 仍拒绝未审核素材。视觉资源不改变旧内容哈希；新内容行为修改应更新新版本，不能原地复用已发布版本。
+随机只来自持久化 seed 和显式抽取状态；恢复不重新抽关卡。墙钟、DOM 尺寸、动画回调、网络或模型响应不能参与领域判定。路径相同时的选择有稳定 tie-break。复杂动作可在一个事务提交逻辑终态和有序路径；动画期间新命令必须按新 revision 校验，不能利用旧视觉瞬移或消费旧回调。
 
-旧 pack 的精确哈希和 journal decoder 保留在 `content/story.ts`、`platform/save.ts` 和旧回归测试里，仅用于历史验证；没有把旧十二挑战的定义重新加为新产品约束。
+## 语言结果与任务结果
+
+评估流水：词块所有权/重复 ID → 结构完整性 → 规范大小写/标点 → 有限语法解析 → 实体消歧 → 语言与情境 → 世界许可 → 目标投影。不得只比较唯一字符串。
+
+至少区分 incomplete、structure、outside、ambiguous、mismatch、blocked、valid/done、stale；可映射到现有类型，但语义不能丢失。outside 表示当前内容未覆盖，不断言所有英语表达均错误；ambiguous 要求明确指代；blocked 不抹掉已成立的语言。
+
+指令可以执行 Open/Close、Put…in/on…、经审核的 Make…small/big…等动作。描述如 The box is small.、The apple is in the bag. 仅核对当前可观察事实，不调用 resize/place。命令和描述的顺序变体仅在内容允许时接受；不因例句唯一而拒绝已声明等价表达。
+
+开放谜题只要求最终状态和必要世界约束，不能将非参考解法全标 mismatch。独立语言任务的语义目标可以更窄，但必须明确向玩家呈现，不能误称自由探索。两个同名实体由预先选择/指代限定解决，不默认绑定到能过关的那个。
+
+## 证据与帮助
+
+记录 vocabulary/meaning、listening、spelling、phonics/substitution、grammar/sentence、world-semantics/operation 等维度；证据不因一次谜题通关全部置为通过。沿用教学/辅助/独立/探索/回访及 guided/assisted/demonstrated/audio-unverified 分类，保留真实支持详情。
+
+text/hint/demo 在当前评估窗口单调累计；撤销、关闭工具或重试不能洗掉已看答案。进入新回访实例可产生新的独立观察，但不删除旧支持历史。重听不计错误；显示完整答案、锁定关键词或演示后复现须降低证据口径。资源失败、拖动落空、未填满和语法正确但世界受阻不是语言错误。
+
+音频记录 source/version/assetId 和开始/失败/重听事件；成功播放不等于听懂。开发 TTS 不能自动升级为正式独立听力证据。手指将带图形的 small 印块放到对象上是词义使用观察，不自动是拼写或语法能力。
+
+## 撤销、重开与完成
+
+撤销是新的版本化命令，不删除 journal；回退完整世界动作，重新投影当前目标，但历史语言尝试、帮助和已发生观察保留。对撤销后的再操作采用明确分支语义，旧未来不偷偷重放。实例配额、唯一主角、已领取章节结果均防重复。
+
+当前 goalSatisfied 与曾经完成/解锁历史分开，UI 不能把回退后的不满足状态继续显示为当前完成。跨关撤销边界明确，默认只在本关可撤销，不跨历史已结束会话。重开用新 session/attempt namespace；不能靠重开立即消除帮助后宣称延迟复测。
+
+工坊、主章节、回访和保留故事的会话彼此隔离，全部仍使用同一应用/领域链。工坊生成的物品不带入关卡绕过配额；返回章节恢复先前世界。
+
+## 存档与旧版本
+
+基线 key 为 xueli.adventure.v4，envelope 为 schema/content/id/seed/journal/projection，decoder 按真实 journal 重放并核对投影，限制为 6000 条/4,000,000 字符。这里按当前代码描述，不把字符数误写为精确字节数。
+
+新结构显式版本化并包含内容/规则版本、关卡会话、variant/seed、journal、必要证据和校验投影。外部 JSON 严格校验字段/长度/枚举/引用；拒绝未知命令与任意对象键注入。以重放结果为准，不信任客户端提供的 completed 或 world。内容更新不得改变旧 rulesVersion 下命令含义。
+
+旧 v4 与更早 wordspell 档先原文保留/备份、回读一致，失败不覆盖。可以继续支持精确旧版本只读恢复，或导出后明确开始新章节；不得将旧 step/完成次数映射为新目标。迁移必须有真实 fixture 与前后等价证据，不做假兼容。内容不兼容、未来格式、损坏、超限、存储禁止/满额都有明确提示与可用导出；内存模式可继续但告知不会保存。
+
+旧路线纸/主角/纸偶/野餐垫规则的历史验证保留。新增命令必须同步 decoder 白名单、exportRecords 覆盖的新 key、重放与异常测试；不能只换保存的 schema 数字。
+
+## 内容与资源发布
+
+新关卡/词句/物理规则改变行为时更新内容与规则版本；视觉资产变更有独立 manifest 版本/哈希，不伪造旧内容哈希。所有实际引用资源由唯一 manifest 与 BASE_URL 解析，审核状态独立保存。发布检查不得对未审核资源静默回退为 PASS。

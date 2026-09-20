@@ -1,0 +1,52 @@
+{
+  "label": "before",
+  "sha": "d251e05878537b6e13c8bc92b4a686551a4f30a2",
+  "environment": "Chromium headless, 390x844, CDP CPU 4x; actual normal entry wake+bag then 120 pointer moves and Escape; engineering measurement, not physical-device FPS",
+  "runs": [
+    {
+      "run": 0,
+      "LayoutCount": 122,
+      "RecalcStyleCount": 135,
+      "LayoutDuration": 0.005056,
+      "RecalcStyleDuration": 0.004122,
+      "ScriptDuration": 0.066118,
+      "TaskDuration": 0.174975,
+      "pointerMoves": 121,
+      "styleMutations": 238,
+      "frames": 123,
+      "frameMedian": 16.699999999999818,
+      "frameP95": 16.800000000000182,
+      "framesOver33ms": 0
+    },
+    {
+      "run": 1,
+      "LayoutCount": 122,
+      "RecalcStyleCount": 135,
+      "LayoutDuration": 0.001987,
+      "RecalcStyleDuration": 0.003982,
+      "ScriptDuration": 0.07061999999999999,
+      "TaskDuration": 0.16660599999999998,
+      "pointerMoves": 121,
+      "styleMutations": 238,
+      "frames": 122,
+      "frameMedian": 16.699999999999818,
+      "frameP95": 16.800000000000182,
+      "framesOver33ms": 0
+    },
+    {
+      "run": 2,
+      "LayoutCount": 122,
+      "RecalcStyleCount": 135,
+      "LayoutDuration": 0.005409,
+      "RecalcStyleDuration": 0.010736,
+      "ScriptDuration": 0.112247,
+      "TaskDuration": 0.260919,
+      "pointerMoves": 121,
+      "styleMutations": 238,
+      "frames": 122,
+      "frameMedian": 16.699999999999818,
+      "frameP95": 16.800000000000182,
+      "framesOver33ms": 0
+    }
+  ]
+}

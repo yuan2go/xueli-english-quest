@@ -199,8 +199,8 @@ export type Cue = {
     | "blocked";
   message: string;
   entity?: string;
-  from?: string;
-  to?: string;
+  from?: WordId;
+  to?: WordId;
   duration: number;
 };
 export function presentation(
@@ -240,8 +240,8 @@ export function presentation(
     kind,
     entity,
     message: result.message,
-    from: entity && board(before).world.entities[entity]?.word,
-    to: entity && board(result.session).world.entities[entity]?.word,
+    from: entity ? board(before).world.entities[entity]?.word : undefined,
+    to: entity ? board(result.session).world.entities[entity]?.word : undefined,
     duration: ["arrive", "celebrate", "cross"].includes(kind)
       ? 2400
       : kind === "transform"

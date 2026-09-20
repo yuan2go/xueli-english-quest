@@ -85,6 +85,7 @@ test("persistent world, scoped touch/keyboard, sheet scrolling, focus and portra
     await expect(p.locator(".answer")).toHaveCount(0);
     const saved = (await snapshot(p)).projection;
     await button(p, "字母 m").click();
+    await expect(button(p, "第1格 m")).toBeFocused();
     const surfaceBefore = await scene.boundingBox();
     await p
       .locator(".quest-tools")

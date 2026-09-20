@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ACTIVITIES } from "../../content/adventure.ts";
 import type { ActivityId } from "../../content/adventure.ts";
 import { ENTITY_REACTIONS } from "../../content/encounters.ts";
@@ -16,7 +16,7 @@ import { NAMES } from "../Art.tsx";
 import { Modal } from "../Modal.tsx";
 import { ContextTool } from "./ContextTool.tsx";
 import { GameHUD } from "./GameHUD.tsx";
-import type { Flight } from "./FeedbackLayer.tsx";
+import { useSceneMotion } from "./useSceneMotion.ts";
 import { FeedbackLayer } from "./FeedbackLayer.tsx";
 export function GameShell({
   session,
@@ -43,8 +43,6 @@ export function GameShell({
   const [tool, setTool] = useState<Tool | null>(null);
   const [explore, setExplore] = useState(false);
   const [feedback, setFeedback] = useState("");
-  const [flight, setFlight] = useState<Flight | null>(null);
-  const origin = useRef<{ rect: DOMRect; word: Flight["word"] } | null>(null);
   const [cue, setCue] = useState<Cue | null>(null);
   const current = useRef(session);
   current.current = session;
@@ -55,7 +53,9 @@ export function GameShell({
   const b = board(session),
     model = sceneModel(session),
     entities = b.world.entities;
-  const inactive = paused || explore;
+  const [hidden, setHidden] = useState(document.hidden);
+  const inactive = paused || explore || hidden;
+  const captureMotion = useSceneMotion(shell, cue, inactive);
   useEffect(() => {
     audio.muted = muted;
     audio.volume = volume;
@@ -72,9 +72,15 @@ export function GameShell({
       setCue(null);
       audio.stop();
     };
+    const visibility = () => {
+      setHidden(document.hidden);
+      if (document.hidden) cancel();
+    };
     window.addEventListener("resize", cancel);
+    document.addEventListener("visibilitychange", visibility);
     return () => {
       window.removeEventListener("resize", cancel);
+      document.removeEventListener("visibilitychange", visibility);
       audio.stop();
     };
   }, [audio]);
@@ -88,40 +94,13 @@ export function GameShell({
     const timer = setTimeout(() => setFeedback(""), 6500);
     return () => clearTimeout(timer);
   }, [feedback]);
-  useLayoutEffect(() => {
-    const start = origin.current;
-    const end =
-      cue?.entity &&
-      shell.current
-        ?.querySelector<HTMLElement>(`[data-entity="${cue.entity}"]`)
-        ?.getBoundingClientRect();
-    if (cue?.kind === "move" && start && end)
-      setFlight({
-        x: start.rect.x,
-        y: start.rect.y,
-        width: start.rect.width,
-        height: start.rect.height,
-        dx: end.x - start.rect.x,
-        dy: end.y - start.rect.y,
-        word: start.word,
-      });
-    else setFlight(null);
-  }, [cue]);
   function send(intent: Intent, silent = false) {
-    const before = current.current,
-      r = dispatch(intent);
+    const before = current.current;
+    if (!silent) captureMotion();
+    const r = dispatch(intent);
     current.current = r.session;
     if (!silent) {
       const nextCue = presentation(before, intent, r);
-      const el =
-        nextCue?.entity &&
-        shell.current?.querySelector<HTMLElement>(
-          `[data-entity="${nextCue.entity}"]`,
-        );
-      const word =
-        nextCue?.entity && board(before).world.entities[nextCue.entity]?.word;
-      origin.current =
-        el && word ? { rect: el.getBoundingClientRect(), word } : null;
       setFeedback(r.message);
       setCue(nextCue);
     }
@@ -192,6 +171,7 @@ export function GameShell({
       ref={shell}
       className={`game-shell ${tool ? "tool-open" : selected ? "object-open" : "world-open"}`}
       data-encounter={model.id}
+      data-motion-paused={inactive || undefined}
       onKeyDown={(e) => {
         if (e.key === "Escape" && !inactive) {
           close();
@@ -288,7 +268,7 @@ export function GameShell({
               </div>
             )}
           </nav>
-          <FeedbackLayer cue={cue} flight={flight} />
+          <FeedbackLayer cue={cue} />
         </Scene>
         {(tool || selected) && (
           <aside className="quest-tools" aria-label="行动工具" inert={inactive}>

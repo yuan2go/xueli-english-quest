@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import type { WordId } from "../domain/world.ts";
 import { assetPathById } from "../content/assets.ts";
 import { IMAGES } from "../content/manifest.ts";
@@ -23,7 +23,7 @@ export function Visual({ id, label, className = "", fail = false }: {
     </span>
   );
   return <img key={`${id}-${assets.epoch}`} className={className} data-asset={id}
-    src={assetPathById(id)} width={entry.width} height={entry.height} alt="" draggable={false}
+    src={assetPathById(id)} width={entry.width} height={entry.height} alt="" draggable={false} decoding="async"
     onError={() => { setBroken(true); assets.report(id); }} />;
 }
 export function Art({ word, fail = false, paper = false }: { word: WordId; fail?: boolean; paper?: boolean }) {
@@ -31,7 +31,36 @@ export function Art({ word, fail = false, paper = false }: { word: WordId; fail?
   return paper ? <span className="paper-puppet">{image}<small>纸偶</small></span> : image;
 }
 export function CharacterArt({ pose = "idle" }: { pose?: "idle" | "thinking" | "action" | "happy" }) {
-  return <Visual id={pose === "idle" ? "cat" : `cat-${pose}`} label="狸花猫伙伴" className="character-art" />;
+  const id = pose === "idle" ? "cat" : `cat-${pose}`;
+  const [visible, setVisible] = useState("cat");
+  const [previous, setPrevious] = useState<string | null>(null);
+  const shown = useRef("cat");
+  useEffect(() => {
+    if (shown.current === id) return;
+    let cancelled = false;
+    const image = new Image();
+    image.decoding = "async";
+    image.src = assetPathById(id);
+    // Hold the decoded pose until its replacement is ready, including on a cold cache.
+    void image.decode().catch(() => {}).then(() => {
+      if (cancelled) return;
+      setPrevious(shown.current);
+      shown.current = id;
+      setVisible(id);
+    });
+    return () => { cancelled = true; };
+  }, [id]);
+  useEffect(() => {
+    if (!previous) return;
+    const timer = setTimeout(() => setPrevious(null), 220);
+    return () => clearTimeout(timer);
+  }, [previous, visible]);
+  return <span className="character-sprite" data-pose={pose}>
+    <Visual id={visible} label="狸花猫伙伴" className="character-art" />
+    {previous && <span key={visible} className="character-previous" aria-hidden="true">
+      <Visual id={previous} label="狸花猫伙伴" />
+    </span>}
+  </span>;
 }
 export function AssetNotice() {
   const assets = useContext(AssetContext);

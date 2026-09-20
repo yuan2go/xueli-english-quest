@@ -227,9 +227,6 @@ a {
   max-width: 150px;
   transform: translate(-50%, -50%);
   z-index: 4;
-  transition:
-    left 0.55s ease,
-    top 0.55s ease;
 }
 .entity-anchor.anchor-actor {
   width: 28%;
@@ -251,9 +248,7 @@ a {
   border: 2px solid transparent;
   background: transparent;
   touch-action: none;
-  transition:
-    filter 0.15s ease,
-    background 0.15s ease;
+  transition: background 0.15s ease;
 }
 .quest-object img,
 .missing-object img {
@@ -633,7 +628,9 @@ summary {
 }
 .drag-ghost {
   position: fixed;
-  transform: translate(-50%, -65%);
+  left: 0;
+  top: 0;
+  will-change: transform;
   z-index: 100;
   pointer-events: none;
   background: var(--paper-light);
@@ -745,38 +742,13 @@ summary {
 [data-feedback="blocked"] > button {
   animation: refused 0.25s ease-out;
 }
-[data-feedback="cross"] {
-  animation: cross-ink 1.3s ease-in-out;
-}
-.motion-object {
-  position: fixed;
-  pointer-events: none;
-  animation: item-flight 0.65s ease-in-out both;
-}
-.motion-object img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-@keyframes item-flight {
-  from {
-    opacity: 0.9;
-    transform: translate(0, 0) scale(0.85);
-  }
-  to {
-    opacity: 0;
-    transform: translate(var(--dx), var(--dy)) scale(1);
-  }
-}
 @keyframes materialize {
   from {
     opacity: 0.35;
-    filter: brightness(1.7);
     transform: scale(0.8);
   }
   to {
     opacity: 1;
-    filter: brightness(1);
     transform: scale(1);
   }
 }
@@ -793,22 +765,14 @@ summary {
     transform: translateX(4px);
   }
 }
-@keyframes cross-ink {
-  from {
-    left: 16%;
-  }
-  to {
-    left: 80%;
-  }
-}
 @keyframes ribbon-in {
   from {
     opacity: 0;
-    margin-top: 8px;
+    transform: translate(-50%, 8px);
   }
   to {
     opacity: 1;
-    margin-top: 0;
+    transform: translate(-50%, 0);
   }
 }
 .sr-only {
@@ -843,7 +807,7 @@ summary {
   width: 100%;
   object-fit: cover;
 }
-.quest-cover-art > .character-art {
+.quest-cover-art > .character-sprite {
   position: absolute;
   bottom: 5%;
   left: 7%;
@@ -1113,7 +1077,7 @@ dialog input {
     width: 100%;
     order: -1;
   }
-  .quest-cover-art > .character-art {
+  .quest-cover-art > .character-sprite {
     width: 45%;
     left: 20%;
   }
@@ -1186,4 +1150,47 @@ dialog input {
   .skip-presentation {
     display: none;
   }
+}
+
+/* The hit target remains still while the decoded artwork breathes. */
+.character-sprite, .object-art {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+.character-sprite img { display: block; width: 100%; }
+.quest-cat .character-sprite {
+  transform-origin: 50% 88%;
+  animation: cat-breathe 4.8s ease-in-out infinite;
+}
+.character-previous, .morph-previous {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  animation: pose-out 0.2s ease-out both;
+}
+.character-previous img, .morph-previous img { width: 100%; height: 100%; object-fit: contain; }
+.morph-previous { animation-duration: 0.38s; }
+[data-motion-id][data-moving] { z-index: 12; }
+[data-moving].anchor-actor .character-sprite {
+  animation: cat-step 0.2s ease-in-out infinite;
+}
+.drag-origin .character-sprite { animation-play-state: paused; }
+.quest-scene[data-dragging] .character-sprite { animation-play-state: paused; }
+.game-shell[data-motion-paused] *, .game-shell[data-motion-paused] *::before,
+.game-shell[data-motion-paused] *::after { animation-play-state: paused !important; }
+@keyframes cat-breathe {
+  0%, 100% { transform: scale(1, 1); }
+  50% { transform: scale(1.006, 1.018); }
+}
+@keyframes cat-step {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-3px) rotate(1deg); }
+}
+@keyframes pose-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .character-previous, .morph-previous { display: none; }
 }

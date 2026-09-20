@@ -137,7 +137,7 @@ export async function shot(p, name) {
     Promise.all([...document.images].map((i) => i.decode().catch(() => {}))),
   );
   await p.screenshot({
-    path: `docs/evidence/web-game-shell-05/${name}.png`,
+    path: `${process.env.XUELI_EVIDENCE_DIR ?? "docs/evidence/web-game-shell-05"}/${name}.png`,
     fullPage: true,
     animations: "disabled",
   });

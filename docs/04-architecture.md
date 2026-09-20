@@ -18,7 +18,7 @@ Pointer/Keyboard → scoped interaction adapter → 显式 Adventure Intent → 
 | `game/adventure.ts` / `sentences.ts` | 命令、幂等/revision、守卫、句子语义、目标和证据；沿用既有核心 |
 | `game/shell.ts` | `sceneModel/resolveTool/presentation` 纯投影：现有可用任务映射到对象/工具；提交前后映射到有限反馈，不写世界 |
 | `ui/Scene.tsx` / `ui/pointer.ts` | 递归关系物品、局部布局、可见命中与统一手势；合法目标仍用应用层试算 |
-| `ui/shell/*` | HUD、上下文工具、焦点与表现；字母/词块草稿局部持有 |
+| `ui/shell/*` | HUD、上下文工具、焦点与表现；`useSceneMotion` 只对已提交实体做 FLIP 补间，字母/词块草稿局部持有 |
 | `platform/useAssets.ts` / `content/assets.ts` | 单一 manifest 的 critical/scene/lazy 调度、校验/失败重试/取消 |
 | `platform/adventure-save.ts` / `audio.ts` | 原 schema 4 重放/投影核验、旧档备份导出；单一可取消语音通道 |
 
@@ -30,6 +30,6 @@ Pointer/Keyboard → scoped interaction adapter → 显式 Adventure Intent → 
 | --- | --- | --- |
 | committed | Adventure / Board | 世界、事实、目标投影、学习记录和日志；通过 schema 4 保存/重放 |
 | UI interaction | GameShell / Letters / SentenceBuilder | 选中、工具、焦点和未提交草稿；暂停保留，收起工具放弃草稿，刷新重新观察 |
-| ephemeral presentation | scoped pointer / FeedbackLayer | 拖影、命中高亮、移动几何、cue；暂停/后台/旋转/超时/跳过清除，不序列化 |
+| ephemeral presentation | scoped pointer / useSceneMotion / FeedbackLayer | 拖影、命中高亮、移动几何、cue；暂停/后台/旋转/超时/跳过清除，不序列化 |
 
-业务先提交，不等待 animationend。普通表现 0.65–1 秒，变形 1.4 秒，抵达/过路/结局 2.4 秒；角色过路约 1.3 秒；reduced-motion 直接显示稳定终态。场景与关系位置来自世界投影，移动副本只补视觉路径。手势与语音回调按当前活动/工具生命周期清理，不成为第二条状态推进路径。
+业务先提交，不等待 animationend。普通实体移动约 460ms，铺垫 220ms 后角色过路 850ms，姿态衔接 200ms；反馈 cue 普通 1 秒、变形 1.4 秒、抵达/过路/结局 2.4 秒。reduced-motion 直接显示稳定终态。场景与关系位置来自世界投影，提交前后分批测量实际实体，以 transform 补间，父对象携带子物品，不创建第二个移动实体。手势与语音回调按当前活动/工具生命周期清理，不成为第二条状态推进路径。

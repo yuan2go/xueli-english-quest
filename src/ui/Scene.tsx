@@ -116,6 +116,7 @@ export function Scene({
     return (
       <div
         key={item.id}
+        data-motion-id={item.id}
         data-feedback={
           cue?.entity === item.id
             ? cue.kind
@@ -127,13 +128,13 @@ export function Scene({
         style={style}
       >
         <button
-          className={`quest-object ${item.kind === "actor" ? "quest-cat" : ""} ${item.word === "mat" ? "quest-mat" : ""} ${l.kind === "worn" ? "quest-worn" : ""} ${selected === item.id ? "selected" : ""} ${target ? "legal-target" : ""} ${pointer.ghost?.label === item.id ? "drag-origin" : ""} ${pointer.ghost?.target === item.id ? "drop-hover" : ""}`}
+          className={`quest-object ${item.kind === "actor" ? "quest-cat" : ""} ${item.word === "mat" ? "quest-mat" : ""} ${l.kind === "worn" ? "quest-worn" : ""} ${selected === item.id ? "selected" : ""} ${target ? "legal-target" : ""} ${pointer.ghost?.label === item.id ? "drag-origin" : ""} ${target && pointer.ghost?.target === item.id ? "drop-hover" : ""}`}
           data-entity={item.id}
           data-word={item.word}
           data-location={
             l.kind === "relation" ? `${l.relation}:${l.targetId}` : l.kind
           }
-          data-drop={target?.key}
+          data-drop={item.id}
           aria-label={name(item)}
           aria-pressed={selected === item.id}
           disabled={disabled}
@@ -143,10 +144,14 @@ export function Scene({
           {item.kind === "actor" ? (
             <CharacterArt pose={hats.length ? "idle" : pose} />
           ) : (
-            <Art
-              word={item.word}
-              paper={item.id === "cat-card" && item.word === "cat"}
-            />
+            <span className="object-art">
+              <Art word={item.word} paper={item.id === "cat-card" && item.word === "cat"} />
+              {cue?.kind === "transform" && cue.entity === item.id && cue.from && (
+                <span className="morph-previous" key={cue.id} aria-hidden="true">
+                  <Art word={cue.from} paper={item.id === "cat-card" && cue.from === "cat"} />
+                </span>
+              )}
+            </span>
           )}
           <span className="item-label">
             {name(item)}
@@ -184,6 +189,7 @@ export function Scene({
       data-drop-surface="world"
       data-scene={b.scene}
       data-crossed={b.world.flags.includes("crossed-ink")}
+      data-dragging={!!pointer.ghost || undefined}
     >
       <Visual
         id={`scene-act-${SCENES[b.scene].act}`}
@@ -200,9 +206,7 @@ export function Scene({
         {b.scene === "trail" && (
           <button
             className={`quest-ink ${targets.some((t) => t.key === "ink-road") ? "legal-target" : ""}`}
-            data-drop={
-              targets.some((t) => t.key === "ink-road") ? "ink-road" : undefined
-            }
+            data-drop="ink-road"
             onClick={() =>
               moving ? place(moving, "ink-road") : onSelect("ink-road")
             }
@@ -257,8 +261,9 @@ export function Scene({
       {children}
       {pointer.ghost && e[pointer.ghost.label] && (
         <div
+          ref={pointer.ghostRef}
           className="drag-ghost object-ghost"
-          style={{ left: pointer.ghost.x, top: pointer.ghost.y }}
+          aria-hidden="true"
         >
           {e[pointer.ghost.label].kind === "actor" ? (
             <CharacterArt />

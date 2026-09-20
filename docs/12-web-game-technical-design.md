@@ -22,7 +22,7 @@ Browser/App Shell 下分 Start/Pause/Ending/Review 与 Game Shell；Game Shell �
 2. UI interaction state：selected entity、opened tool、focus、未提交字母/词块。
 3. Ephemeral presentation state：drag ghost、animation phase、particle、hover、pressed，不进入存档。
 
-React state 只承担需要 React 渲染的状态。未来若出现高频逐帧对象，不把每帧坐标灌入全局 React state。
+React state 只承担开始拖动、命中目标变化、结束等语义状态。拖影坐标保留在 ref，由 requestAnimationFrame 合并 pointermove 后直接写 transform；release/cancel 取消未执行帧。没有每帧全局 React 更新。
 
 ## 命令与结果
 所有改变世界或学习证据的输入转换为显式 intent，通过现有 adventure command 进入唯一执行链：Pointer/Keyboard → Interaction Adapter → Intent → runAdventure → guards/content semantics → world.transition → atomic commit → goals/evidence → presentation cue。世界阻挡不得被记录成英语错误。
@@ -57,6 +57,11 @@ Desktop：Scene 主区 + Context Tool 侧区。Tablet：Scene 优先，工具按
 
 资源以唯一 manifest ID 分类：critical 为伙伴与当前背景；scene 为当前所需道具；lazy 为延迟姿态/草地欢呼图。未来背景不在首页预取；实际显示可立即按需请求。请求去重、成功缓存、卸载取消；失败显示 fallback，重试仅失败 ID，epoch 只重建图片，不重置工具/世界。没有 Service Worker 或第二份资源登记。
 
-每个拖动表面限定命中 scope，捕获后仍以视口坐标命中当前可见元素；关系对象用父对象百分比局部定位。失去 capture、多指、旋转、后台和 Escape 都清理；释放 capture 不触发第二次提交。键盘 Enter/Space 不被上一拖动的合成 click 抑制。句尾有明确落点，已有词块是插入点。
+每个拖动表面限定命中 scope，捕获后仍以视口坐标命中当前可见元素；关系对象用父对象百分比局部定位。场景实体与墨迹的落点持续注册，松手立即按最终坐标和 availableTargets 判断，不依赖拖影是否已渲染，避免高频输入在下一帧前释放时丢失合法操作。失去 capture、多指、旋转、后台和 Escape 都清理；释放 capture 不触发第二次提交。键盘 Enter/Space 不被上一拖动的合成 click 抑制。句尾有明确落点，已有词块是插入点。填字/放词会禁用原词库按钮，useLayoutEffect 在同次提交绘制前把焦点移到新位置；撤回和重排也有明确焦点，避免 Escape 因焦点落到 body 而失效。
 
 Phone 未开工具时世界占满剩余视口；打开工具后世界至少保留主体区域，底部 sheet 最大约 45%，内部滚动，句子行保持可见便于拖入。窄横屏改侧栏。命中尺寸与遮挡通过实际回归检查，真机范围仍见 STATUS。
+
+
+`useSceneMotion` 在命令前捕捉当前可见几何，提交后统一读取最终几何/基础 transform，再通过原生 Web Animations 只补间 transform。包内 flex 物品保留自己的基础 transform；移动父节点携带子物品，避免重复位移。中断从可见位置继续，切 encounter 不沿用旧空间。结束、暂停、后台、resize、动态 reduced-motion 和卸载都释放动画；取消立即暴露已提交终态。过路的纸垫先移动 220ms，随后角色移动 850ms，仅表现排序，业务不等动画。FeedbackLayer 只画故事提示，不再叠一个移动副本。
+
+CharacterArt 保留已解码姿态直至新图准备好，使用 200ms opacity 衔接；伙伴图片小幅 CSS 待机，实际点击框稳定。纸张变形使用旧/新图短叠化。浏览器异步解码，资源来源、hash、尺寸和审核门槛不变。性能复测脚本 `node scripts/profile-motion.mjs <preview-url> <report.json> <label>` 从正式首页生成物品后采样拖动；结果仅适用于指定工程环境，不宣称目标真机 FPS。

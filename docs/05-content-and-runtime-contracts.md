@@ -1,6 +1,6 @@
 # 05 · 内容、运行与存档合同
 
-当前内容版本 `4.0.0-dev.1`、存档 schema 4。WP-GAMEPLAY-CORE-04 的以下规则是正式页面合同；旧 schema 2/pack3.x 只用于识别、验证与保留历史日志。
+当前内容版本 `4.0.0-dev.1`、存档 schema 4。WP-WEB-GAME-SHELL-05 的以下规则是正式页面合同；旧 schema 2/pack3.x 只用于识别、验证与保留历史日志。
 
 ## 内容与身份
 

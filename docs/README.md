@@ -1,6 +1,6 @@
 # 技术文档导航与权威边界
 
-版本：2026-09-20 / gameplay-core-04。01/02/04/05 为当前场景驱动合同；旧工作包保留历史证据，不覆盖当前授权。实际结果只看 STATUS 本轮记录。
+版本：2026-09-20 / web-game-shell-05。01–05 与 11/12 为当前合同；旧工作包保留历史证据，不覆盖当前授权。实际结果只看 STATUS 本轮记录。
 
 | 文档 | 回答的问题 |
 | --- | --- |
@@ -17,14 +17,16 @@
 | [10 决策、风险与来源](10-decisions-risks-and-sources.md) | 对话中的取舍与修正、依据及未确认事项 |
 | [11 网页游戏产品蓝图](11-web-game-product-blueprint.md) | 页面式学习体验如何推进为可操作世界中的英语冒险 |
 | [12 网页游戏技术设计](12-web-game-technical-design.md) | Game Shell、状态、输入、资源、响应式与引擎升级边界 |
-| [WP-WEB-GAME-SHELL-05](work-packages/WP-WEB-GAME-SHELL-05.md) | 下一阶段 Scene-first Web Game 实施范围与验收 |
-| [WP-GAMEPLAY-CORE-04](work-packages/WP-GAMEPLAY-CORE-04.md) | 当前场景驱动主线、组句和活动验收 |
+| [WP-WEB-GAME-SHELL-05](work-packages/WP-WEB-GAME-SHELL-05.md) | 当前 Scene-first Web Game 实施范围与验收 |
+| [WP-GAMEPLAY-CORE-04](work-packages/WP-GAMEPLAY-CORE-04.md) | historical：场景驱动核心交付 |
 | [WP-01](work-packages/WP-01.md) | 历史基础工作包 |
-| [WP-PLAYABLE-STORY-01](work-packages/WP-PLAYABLE-STORY-01.md) | 完整主线接续交付、覆盖关系与剩余门槛 |
-| [WP-PLAYFUL-GAME-03](work-packages/WP-PLAYFUL-GAME-03.md) | 主线手感、魔法野餐、三个短玩法和本次交付 |
+| [WP-PLAYABLE-STORY-01](work-packages/WP-PLAYABLE-STORY-01.md) | historical：线性主线交付证据 |
+| [WP-PLAYFUL-GAME-03](work-packages/WP-PLAYFUL-GAME-03.md) | historical：旧野餐与短玩法交付 |
 | [设计说明模板](submission/design-description.md) | 比赛提交材料；必须按实际交付更新 |
 | [AI 使用记录](submission/ai-usage-log.md) | 实际 AI 制作证据，不是营销陈述 |
 
-阅读顺序：README → STATUS → 01 → 02 → 04/05 → 11/12 → 当前工作包；UI 开发再读 03，AI 工坊开发再读 06。无需每次把所有文件复制进 Prompt。
+阅读顺序：README → STATUS → 01 → 02 → 04/05 → 11/12 → 当前工作包；UI 开发必读 03，AI 工坊开发再读 06。无需每次把所有文件复制进 Prompt。
 
 需求权威在 01/02，交互权威在 03，领域协议在 05，交付状态只在 STATUS。代码与文档冲突时，先报告差异，判断是缺陷还是批准后的设计改变；禁止把当前代码的偶然行为默认为新需求。修改设计时同步对应测试与工作包，不追加平行蓝图。
+
+历史状态移至 [archive/status-through-core-04](archive/status-through-core-04.md)。历史工作包、evidence、旧内容 fixture 和 design/tabby/references 只供版本/来源追溯，不作为当前蓝图。

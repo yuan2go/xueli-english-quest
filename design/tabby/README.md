@@ -1,6 +1,6 @@
 # Paper Trail / tabby production assets
 
-`references/`: four native single-screen visual references. Correct/Wrong/Hint use Core Game states; Pause/Recovery use the Tutorial paper overlay treatment. Chinese product text and lowercase Arial letter blocks are real DOM. Reference decorative leaves/signs are intentionally omitted from runtime. References never become whole-page backgrounds.
+`references/`: **historical** page references from the tabby cutover, retained only as generation provenance. Their 12-challenge HUD and page layouts are superseded by docs/03 and docs/11–12. Correct/Wrong/Hint use Core Game states; Pause/Recovery use the Tutorial paper overlay treatment. Chinese product text and lowercase Arial letter blocks are real DOM. Reference decorative leaves/signs are intentionally omitted from runtime. References never become whole-page backgrounds.
 
 `masters/`: native individual PNG outputs, not screenshot crops or upscales. `src/content/visual-assets.ts` is the single authoritative runtime image registry (including native master hash, alpha, bytes, dimensions, display bound and provenance). Runtime files live in `public/assets/game/tabby/`.
 

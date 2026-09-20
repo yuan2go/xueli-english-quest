@@ -1,10 +1,10 @@
-# WordSpell — agent development contract
+# Xueli English Quest — agent development contract
 
 ## Goal and authority
 
 Build a touch-first English storybook game, not a learning-platform shell. Read README.md, docs/STATUS.md, docs/README.md and the assigned work package before modifying code. Product and gameplay: docs/01 and docs/02. Runtime contracts: docs/04 and docs/05. Report conflicts; update the authoritative document with the implementation instead of copying a competing specification.
 
-Current target: WP-GAMEPLAY-CORE-04 scene-driven adventure. This story uses three acts and six words, not global product limits; the legacy twelve challenges/thirteen steps no longer drive the formal page. Preserve the actual map → mat → place across ink → map chain. Full-game readiness requires actual interaction, reviewed content and device evidence, not type declarations or mock tests.
+Current target: WP-WEB-GAME-SHELL-05 Scene-first Web Game; read docs/11 and docs/12. This story uses three acts and six words, not global product limits; the legacy twelve challenges/thirteen steps no longer drive the formal page. Preserve the actual map → mat → place across ink → map chain. Full-game readiness requires actual interaction, reviewed content and device evidence, not type declarations or mock tests.
 
 ## Engineering constraints
 

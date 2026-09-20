@@ -1,6 +1,6 @@
 # 04 · 技术架构
 
-一个 React/TypeScript/Vite 应用，一个确定性 `domain/world.transition`。WP-GAMEPLAY-CORE-04 正式入口为 `main.tsx → App.tsx → Scene/Letters/SentenceBuilder`；没有平行 Demo 或第二套世界引擎。
+一个 React/TypeScript/Vite 应用，一个确定性 `domain/world.transition`。WP-WEB-GAME-SHELL-05 正式入口为 `main.tsx → App.tsx → Scene/Letters/SentenceBuilder`；没有平行 Demo 或第二套世界引擎。
 
 ## 当前执行链
 

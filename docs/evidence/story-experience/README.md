@@ -1,3 +1,5 @@
+> **Historical evidence**：仅证明本目录对应的历史版本；不是当前 UI/流程规范，也不是 SHELL-05 的验证结果。
+
 # WP-STORY-EXPERIENCE-02 · 实际验证证据
 
 日期：2026-09-17；基线 `6b06c9efa149ea3643b3957d98a349b845b9c7fb`。macOS arm64，Node 26.3.1/npm 11.16.0，Playwright 1.63.0/本机 Chromium。页面来自 `npm run build` 后实际 HTTP 预览 `127.0.0.1:4174`。没有真机或儿童参与。

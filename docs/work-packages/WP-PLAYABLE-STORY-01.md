@@ -1,5 +1,7 @@
 # WP-PLAYABLE-STORY-01 · 完整故事主线与纸上小径
 
+> **Historical delivery / 历史交付**：本包保留原版本范围和证据，不再授权新开发。固定挑战/步骤、旧页面与旧 UI 接入点均非当前产品规范。现行规则见 01–05、11/12，当前包为 [WP-WEB-GAME-SHELL-05](WP-WEB-GAME-SHELL-05.md)。
+
 2026-09-17；实施分支 `feat/wp-playable-story-01`。
 基线：`080d70d95790ed3c37c188214a4a6b8ffeefc93a`。开始时本地 main、origin/main 与设计分支均为该 SHA；不存在 design/、docs/design/ 或可读取设计交接资产。复用 docs/01～05 和已有世界内核；保留并提交前次真实安装生成的锁文件。
 

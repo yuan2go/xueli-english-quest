@@ -662,13 +662,13 @@ export function runAdventure(
           return reply("outside", "未知示范内容。");
         const shown = c.phase === "shown" || c.phase === "partial";
         const answer: Exposure["answer"] =
-          c.value === "text" ||
+          (c.value === "text" && c.phase === "shown") ||
           (c.value === "demo" &&
             c.part === "words" &&
             c.step! >= 2 &&
             c.phase === "shown")
             ? "full"
-            : ["partial", "feedback"].includes(c.value!) ||
+            : ["text", "partial", "feedback"].includes(c.value!) ||
                 (c.value === "demo" && c.part === "words" && c.step! >= 1)
               ? "partial"
               : "none";

@@ -76,6 +76,11 @@ export function TeachingDemo({
     function check() {
       if (!alive || document.hidden) return;
       const stage = panel.current;
+      const topDialog = [...document.querySelectorAll("dialog[open]")].at(-1);
+      if (topDialog && stage && !topDialog.contains(stage)) {
+        frameId = requestAnimationFrame(check);
+        return;
+      }
       const images = [...(stage?.querySelectorAll("img") ?? [])];
       for (const image of images) {
         if (image.complete && image.naturalWidth && !decoding.has(image)) {

@@ -381,3 +381,23 @@ test("completed word and transform tasks accept only the original audio request 
     transformed.session,
   );
 });
+
+test("partial text exposure stays assisted and cannot become a complete displayed answer", () => {
+  let s = taught();
+  s = act(s, {
+    action: "help",
+    task: "invite-cat",
+    value: "text",
+    phase: "partial",
+  });
+  const exposure = s.story.help["invite-cat"].exposures.at(-1);
+  assert.equal(exposure.answer, "partial");
+  assert.equal(exposure.status, "partial");
+  s = act(s, {
+    action: "sentence",
+    task: "invite-cat",
+    ids: ids(SENTENCES["invite-cat"]),
+  });
+  assert.equal(s.events.at(-1).evidence, "assisted");
+  assert.deepEqual(decodeAdventure(encodeAdventure(s)), s);
+});

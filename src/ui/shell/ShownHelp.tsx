@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
 import type { AdventureResult, Intent } from "../../game/adventure.ts";
 
-/** Record visible content, including clipped/scrolling help, rather than the request button. */
+/** Content exposure is observed, including clipping and modal occlusion, never inferred from a click. */
 export function ShownHelp({
   task,
   kind,
@@ -18,19 +18,45 @@ export function ShownHelp({
   const current = useRef(send);
   current.current = send;
   useEffect(() => {
+    let ratio = 0,
+      partial = false,
+      shown = false;
+    function record() {
+      const dialog = [...document.querySelectorAll("dialog[open]")].at(-1);
+      if (
+        !element.current ||
+        document.hidden ||
+        ratio <= 0 ||
+        (dialog && !dialog.contains(element.current))
+      )
+        return;
+      const phase = ratio >= 0.95 ? "shown" : "partial";
+      if (shown || (phase === "partial" && partial)) return;
+      current.current({ action: "help", task, value: kind, phase }, true);
+      if (phase === "shown") shown = true;
+      else partial = true;
+    }
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.intersectionRatio < 0.95 || document.hidden) return;
-        current.current(
-          { action: "help", task, value: kind, phase: "shown" },
-          true,
-        );
-        observer.disconnect();
+        ratio = entry.intersectionRatio;
+        record();
       },
-      { threshold: 0.95 },
+      { threshold: [0, 0.01, 0.95, 1] },
     );
+    const modals = new MutationObserver(record);
+    modals.observe(document.body, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ["open"],
+    });
+    document.addEventListener("visibilitychange", record);
     if (element.current) observer.observe(element.current);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      modals.disconnect();
+      document.removeEventListener("visibilitychange", record);
+    };
   }, [task, kind]);
   return <div ref={element}>{children}</div>;
 }

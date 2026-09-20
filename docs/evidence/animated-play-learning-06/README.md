@@ -52,3 +52,7 @@
 实体 iPhone/iPad/Android、Safari/WebKit 真机、目标儿童试玩、正式资源权利/发音/教研、公网部署 NOT_RUN。新增资产和现有素材均没有由开发 agent 填写正式审核通过。四帧步态不是自由物理移动；开包图与原图有轻微比例差，教学效果未证明。
 
 GitHub 交付：[PR #12](https://github.com/yuan2go/xueli-english-quest/pull/12)，未合并。CI NOT_RUN：只读 API 核对仓库 `actions/permissions.enabled=false`，分支 run/check 为空；workflow 定义 active 不等于仓库允许执行。本包未改动开关。
+
+## 手机长按菜单追加修复
+
+用户提供的 iPhone 图片菜单/文字选区失败证据，修复根因与范围见 [手机长按修复](mobile-native-gestures.md)。复测源 `577107e60dd89b241dc95c0d29b0f7f97e55e430`，完整浏览器 **19/19 PASS**（[原始输出](native-gesture-browser.log)）。此前16项的真机证明上限不变；新增桌面 WebKit 与 Chromium touch 包回归不能替代 iPhone 原生浏览器菜单复验。修复后的真机与体验站更新 NOT_RUN。上面的性能数字仍对应原测量 SHA，未把它们改写成本次性能提升。

@@ -29,7 +29,7 @@
 
 ## 验收状态
 
-工程实现与必要验证完成，源 SHA `1ee59d14545f0ec52d02f13ef383b53acb51cf54`，后续证据/文档提交不改变运行代码。完整范围、实际命令、未执行项目与发布阻塞见 [STATUS](../STATUS.md)，正常播放录屏、多时点状态、真实学习记录及性能原始数据见 [证据索引](../evidence/animated-play-learning-06/README.md)。
+首轮工程实现与必要验证源 SHA `1ee59d14545f0ec52d02f13ef383b53acb51cf54`；用户手机长按反馈的追加修复源 SHA 为 `577107e60dd89b241dc95c0d29b0f7f97e55e430`，具体范围见下方。完整范围、实际命令、未执行项目与发布阻塞见 [STATUS](../STATUS.md)，正常播放录屏、多时点状态、真实学习记录及性能原始数据见 [证据索引](../evidence/animated-play-learning-06/README.md)。
 
 - PASS：核心 52/52，浏览器 16/16（正式首页、完整主线、六变体及关键异常）、两项 typecheck、build、resources。生成资产已实际接入：1254×1254 原生四帧走路 atlas 与开包对应图；Alpha/帧/锚点/来源与处理均登记。
 - PASS：过路纸张先行并稳定；小猫/佩戴物独立通过；戴帽/入包首帧连续；嵌套物品拖动随行；连续操作/取消/刷新不改变已提交结果。
@@ -39,3 +39,13 @@
 - NOT_RUN：权利、正式发音/教研、实体设备、儿童研究、公网部署、运行时 Provider。开发者未填写审核通过。
 
 双轴只读审查反馈与工程完整试玩中的真实问题已修复。按用户授权提交、推送独立分支并新建 PR，保留 PR #11 和所有其他工作区，不合并、不强推、不修改 Actions。本包完成后无第二个并行蓝图；下一包待分配。
+
+## 手机长按缺陷追加验收
+
+- [x] 用户截图报告图片保存菜单与文字选区；最小原生菜单事件回归先失败，再修复。
+- [x] GameShell 限定 callout / 选择 / HTML 拖拽保护，插画退出命中，保留工具滚动、Pointer/键盘、成人记录复制；不改变状态链。
+- [x] Chromium 长按后触摸拖动与取消、桌面 WebKit Pointer/键盘、物品/字母/词块、过路刷新和工具滚动；完整浏览器复测19/19，核心52/52，两项typecheck/build/resources PASS。
+- [ ] 修复后 iPhone Chrome/Safari 原生长按菜单复验：NOT_RUN。桌面 WebKit 不支持该 iOS 专用 callout 属性，不冒充真机证明。
+- [ ] 体验站更新：NOT_RUN。PR #12 保持未合并；发布资源审核仍 BLOCKED。
+
+[追加证据与原始浏览器输出](../evidence/animated-play-learning-06/mobile-native-gestures.md)。本条修订原包，不另开平行蓝图。

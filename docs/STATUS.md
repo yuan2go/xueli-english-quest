@@ -2,7 +2,17 @@
 
 2026-09-20：正式入口的工程实现与本轮必要验证完成；正式发布仍 BLOCKED，不能称为已验证教学效果或生产质量。唯一实现负责人 Codex；独立分支 `codex/animated-play-learning-06`，worktree `/Users/yuan/.codex/worktrees/animated-play-learning-06/xueli-english-quest`。
 
-baseline：刷新后默认分支 origin/main `a9a62e3eb632781595b40171dfb442bf0fbbe55e`。最终运行代码/浏览器/性能验证源 SHA：`1ee59d14545f0ec52d02f13ef383b53acb51cf54`；其后仅提交证据与文档，最终交付 HEAD 见 PR 和交付报告。主工作区仍为原 main 且干净；其他工作区没有修改。PR #9/#10 已合并，PR #11 OPEN 且未追加，本包吸收经核对的动作增量，在新分支交付新 PR，不自动合并。
+baseline：刷新后默认分支 origin/main `a9a62e3eb632781595b40171dfb442bf0fbbe55e`。首轮运行代码/浏览器/性能验证源 SHA：`1ee59d14545f0ec52d02f13ef383b53acb51cf54`；手机长按追加修复源 SHA：`577107e60dd89b241dc95c0d29b0f7f97e55e430`，最终交付 HEAD 见 PR 和交付报告。主工作区仍为原 main 且干净；其他工作区没有修改。PR #9/#10 已合并，PR #11 OPEN 且未追加，本包吸收经核对的动作增量，在新分支交付新 PR，不自动合并。
+
+## 手机拖动追加修复 · 2026-09-20
+
+用户 iPhone 截图确认第二幕长按拖动会弹出保存图片菜单并选中文字。旧手机视口/触控模拟 PASS 没有覆盖这一原生浏览器行为，不能据此宣称手机可用性已完成验收。
+
+本次以干净的 `159e0c2514775135b9c75de2a75b34a450ded339` 为修复基线；已确认 PR #12 OPEN，仍在原独立 worktree 完成。GameShell 内禁用 iOS callout、文字选择和原生 HTML 拖拽，插画不参与命中；对象按钮、工具滚动、键盘和成人记录文字选择保持可用。不改领域、存档和学习判定。
+
+修复源 `577107e60dd89b241dc95c0d29b0f7f97e55e430`：`npm test` 52/52、两项 typecheck、build、resources、`git diff --check` PASS；`npm run test:browser` **19/19 PASS**，含 Chromium 750ms 按住后触摸拖动、桌面 WebKit Pointer/键盘、取消/刷新和真实工具滚动。`check:release` 实跑 exit 1，仍被未审核 `bag` 阻断。最小菜单回归实际由红转绿；细节及原始输出见 [长按修复证据](evidence/animated-play-learning-06/mobile-native-gestures.md)。没有重复性能测量或新增 FPS 声称。
+
+**NOT_RUN**：修复后实体 iPhone Chrome/Safari 长按复验、截图中体验站的更新部署。线上只读检查仍是另一组构建资源，未推断其源码 SHA。GitHub CI 仍 NOT_RUN（仓库 Actions 总开关关闭，未修改）。修复推送 PR #12，不自动合并；下一步是更新体验站并进行真实设备复验。
 
 ## 已实现
 

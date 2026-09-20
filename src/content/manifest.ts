@@ -1,3 +1,4 @@
+import { QUEST_AUDIO } from "./quest.ts";
 import type { AudioAsset } from "./resource-contract.ts";
 export { VISUAL_ASSETS as IMAGES } from "./visual-assets.ts";
 
@@ -10,3 +11,5 @@ export const AUDIO: AudioAsset[] = [
   source: "Browser speech development substitute; no phonemes; reviewed recording missing",
   type: "audio/mpeg", durationMs: null,
 }));
+
+export const ALL_QUEST_AUDIO = QUEST_AUDIO;

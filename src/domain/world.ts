@@ -1,3 +1,5 @@
+import { applySpatial } from "./spatial.ts";
+import type { Action, SpatialRules, SpatialWorld, Motion } from "./spatial.ts";
 export const WORDS = ["cat", "bag", "map", "mat", "hat", "cap"] as const;
 export type WordId = (typeof WORDS)[number];
 export type Location =
@@ -118,7 +120,7 @@ export function assertWorld(world: World): void {
   }
 }
 /** Deterministic world effects only. The game layer must also enforce step/answer ownership. */
-export function transition(
+function transitionPicnic(
   world: World,
   command: {
     expectedRevision: number;
@@ -211,4 +213,18 @@ export function transition(
   next.revision += 1;
   assertWorld(next);
   return next;
+}
+
+/** The only domain write entry. Historical picnic commands retain their exact rules. */
+type PicnicCommand = { expectedRevision: number; effect: Effect; mode?: "story" | "picnic" };
+type RescueCommand = { expectedRevision: number; action: Action; rules: SpatialRules };
+export function transition(world: World, command: PicnicCommand): World;
+export function transition(world: SpatialWorld, command: RescueCommand): { world: SpatialWorld; motions: Motion[] };
+export function transition(world: World | SpatialWorld, command: PicnicCommand | RescueCommand) {
+  if ('rules' in world && 'action' in command) {
+    if (world.revision !== command.expectedRevision) throw new DomainError('STALE_REVISION');
+    return applySpatial(world, command.action, command.rules);
+  }
+  if (!('rules' in world) && 'effect' in command) return transitionPicnic(world, command);
+  throw new DomainError('INVALID_WORLD');
 }

@@ -5,6 +5,98 @@ export interface ProductionImageAsset extends ImageAsset {
   displayMax: number;
 }
 export const VISUAL_ASSETS: ProductionImageAsset[] = [
+{
+  "id": "box",
+  "path": "assets/game/rescue/box.svg",
+  "width": 256,
+  "height": 256,
+  "bytes": 472,
+  "sha256": "35db8af7dfb8681be8f9f1dd2af3251c8b0fbae5c2f6416c14abaeba8598254b",
+  "alpha": true,
+  "type": "image/svg+xml",
+  "purpose": "Refoundation interactive box",
+  "version": "rescue-paper-v1",
+  "review": "PENDING",
+  "source": "Original SVG authored by Codex 2026-09-20; no external imagery; human art/rights review pending",
+  "master": {
+    "path": "public/assets/game/rescue/box.svg",
+    "width": 256,
+    "height": 256,
+    "bytes": 472,
+    "sha256": "35db8af7dfb8681be8f9f1dd2af3251c8b0fbae5c2f6416c14abaeba8598254b",
+    "alpha": true
+  },
+  "displayMax": 240
+},
+{
+  "id": "basket",
+  "path": "assets/game/rescue/basket.svg",
+  "width": 256,
+  "height": 256,
+  "bytes": 524,
+  "sha256": "1b1e93e9509eec17326d53c2bebc4494772d0802e7e128b9c6de3655aed9e240",
+  "alpha": true,
+  "type": "image/svg+xml",
+  "purpose": "Refoundation interactive basket",
+  "version": "rescue-paper-v1",
+  "review": "PENDING",
+  "source": "Original SVG authored by Codex 2026-09-20; no external imagery; human art/rights review pending",
+  "master": {
+    "path": "public/assets/game/rescue/basket.svg",
+    "width": 256,
+    "height": 256,
+    "bytes": 524,
+    "sha256": "1b1e93e9509eec17326d53c2bebc4494772d0802e7e128b9c6de3655aed9e240",
+    "alpha": true
+  },
+  "displayMax": 240
+},
+{
+  "id": "apple",
+  "path": "assets/game/rescue/apple.svg",
+  "width": 256,
+  "height": 256,
+  "bytes": 444,
+  "sha256": "ecbe2de23b7d661cbe57f91e77bac1a6fcdc6af4e6070774de751722ef893063",
+  "alpha": true,
+  "type": "image/svg+xml",
+  "purpose": "Refoundation interactive apple",
+  "version": "rescue-paper-v1",
+  "review": "PENDING",
+  "source": "Original SVG authored by Codex 2026-09-20; no external imagery; human art/rights review pending",
+  "master": {
+    "path": "public/assets/game/rescue/apple.svg",
+    "width": 256,
+    "height": 256,
+    "bytes": 444,
+    "sha256": "ecbe2de23b7d661cbe57f91e77bac1a6fcdc6af4e6070774de751722ef893063",
+    "alpha": true
+  },
+  "displayMax": 240
+},
+{
+  "id": "door",
+  "path": "assets/game/rescue/door.svg",
+  "width": 256,
+  "height": 256,
+  "bytes": 433,
+  "sha256": "80191642d84cbd7a2102d01f7992678c14c425ab649ae53dcec7647f137cbb59",
+  "alpha": true,
+  "type": "image/svg+xml",
+  "purpose": "Refoundation interactive door",
+  "version": "rescue-paper-v1",
+  "review": "PENDING",
+  "source": "Original SVG authored by Codex 2026-09-20; no external imagery; human art/rights review pending",
+  "master": {
+    "path": "public/assets/game/rescue/door.svg",
+    "width": 256,
+    "height": 256,
+    "bytes": 433,
+    "sha256": "80191642d84cbd7a2102d01f7992678c14c425ab649ae53dcec7647f137cbb59",
+    "alpha": true
+  },
+  "displayMax": 240
+},
   {
     "id": "bag",
     "path": "assets/game/tabby/bag.webp",

@@ -1,3 +1,4 @@
+import { QUEST_AUDIO } from "../content/quest.ts";
 import { SENTENCE_AUDIO } from "../content/sentences.ts";
 import { AUDIO } from "../content/manifest.ts";
 import { matchesFormat } from "../content/resource-contract.ts";
@@ -31,7 +32,7 @@ export class StoryAudio {
     this.stop();
     const asset =
       AUDIO.find((a) => a.text === text) ??
-      SENTENCE_AUDIO.find((a) => a.text === text);
+      SENTENCE_AUDIO.find((a) => a.text === text) ?? QUEST_AUDIO.find((a) => a.text === text);
     const source = asset?.path
       ? "recording"
       : "speechSynthesis" in window

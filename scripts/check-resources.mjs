@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { SENTENCE_AUDIO } from "../src/content/sentences.ts";
-import { IMAGES, AUDIO } from "../src/content/manifest.ts";
+import { IMAGES, AUDIO, ALL_QUEST_AUDIO } from "../src/content/manifest.ts";
 import {
   validateResources,
   matchesFormat,
@@ -9,7 +9,7 @@ import {
 import { validateStory } from "../src/content/validate.ts";
 import { PACK } from "../src/content/story.ts";
 const policy = process.argv.includes("--release") ? "release" : "development";
-validateResources(IMAGES, [...AUDIO, ...SENTENCE_AUDIO], policy);
+validateResources(IMAGES, [...AUDIO, ...SENTENCE_AUDIO, ...ALL_QUEST_AUDIO], policy);
 if (policy === "release" && PACK.review !== "APPROVED")
   throw new Error("内容包尚未通过教研审核");
 validateStory();

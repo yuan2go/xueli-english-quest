@@ -6,7 +6,7 @@ export function SentenceBuilder({
   submit,
   disabled = false,
 }: {
-  task: SentenceTask;
+  task: Pick<SentenceTask, "id" | "tokens">;
   submit: (ids: string[]) => void;
   disabled?: boolean;
 }) {

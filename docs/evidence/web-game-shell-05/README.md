@@ -2,6 +2,8 @@
 
 2026-09-20；实现 SHA `efc52f30542bd3c0df48721e551368e4a8fd6a12`，baseline `9b20d629dd4a4472f33afff3b935597a47741771`。命令结果见 [STATUS](../../STATUS.md)。本目录是本轮证据；其他旧包 evidence 为 historical，不与本轮 PASS 混用。
 
+本包随后增加了贴图动作/输入性能优化，最新结果见 [motion 证据](motion/README.md)。本页初次交付的 8 项结果对应上方实现 SHA，不覆盖后续变化。
+
 ## 表面、执行与边界
 
 Playwright Chromium，生产 `dist` 经 Vite preview HTTP 正式 `/` 入口；浏览器回归端口 4174，额外最终试玩端口 4185。macOS arm64，Node v26.3.1 / npm 11.16.0。8/8 浏览器回归实际通过（51.2s），正式路径未注入预置通关状态。资产损坏、旧档/坏档、拒绝存储等仅在明确的故障用例注入。

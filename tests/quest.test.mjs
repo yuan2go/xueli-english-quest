@@ -400,3 +400,16 @@ test("G01/G11 authored content and bounded search use production rules with hone
     );
   }
 });
+test("G07 reopening meaning inside an independent window permanently records text support", () => {
+  const r = runner();
+  r.go({ kind: "enter", mode: "workshop" });
+  r.go({ kind: "teach", word: "box" });
+  r.go({ kind: "practice", mode: "independent", exercise: "spelling" });
+  r.go({ kind: "teach", word: "box" });
+  r.go({ kind: "spell", word: "box", answer: "box" });
+  assert.equal(r.s.events.at(-1).evidence, "assisted");
+  assert.deepEqual(current(r.s).support, ["text"]);
+  r.go({ kind: "undo" });
+  assert.deepEqual(current(r.s).support, ["text"]);
+  assert.deepEqual(decodeQuest(encodeQuest(r.s)), r.s);
+});

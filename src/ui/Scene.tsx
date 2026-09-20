@@ -289,7 +289,7 @@ export function Scene({
               </span>
               <span className="entity-state">
                 {e.place.kind !== "node"
-                  ? `${e.place.kind} ${w.entities[e.place.id].word} · `
+                  ? `${e.place.kind} ${w.entities[e.place.id].word === assessmentWord ? lexeme(assessmentWord)?.zh : w.entities[e.place.id].word} · `
                   : ""}
                 {e.size !== "normal" ? e.size : ""}
                 {spec.rules.types[e.word].container || e.word === "door"

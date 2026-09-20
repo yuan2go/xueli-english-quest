@@ -30,6 +30,13 @@ export function GameShell({
   >(null);
   const opener = useRef<HTMLElement | null>(null);
   function setTool(next: typeof tool) {
+    if (
+      b.practice === "independent" &&
+      b.exercise === "spelling" &&
+      next !== "spell" &&
+      next !== null
+    )
+      send({ kind: "support", value: "text" });
     opener.current = document.activeElement as HTMLElement;
     cancelAudio();
     setToolState(next);
@@ -140,7 +147,9 @@ export function GameShell({
         receipt={receipt}
         reduced={reduced}
         assessmentWord={
-          b.practice === "independent" && tool === "spell" ? word : undefined
+          b.practice === "independent" && b.exercise === "spelling"
+            ? word
+            : undefined
         }
       />
       {b.level === "workshop" && (

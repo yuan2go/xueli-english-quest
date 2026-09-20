@@ -436,6 +436,8 @@ export function runQuest(
           v = verdict("outside", "这个词还没有收录。");
           break;
         }
+        if (b.practice === "independent" && !b.support.includes("text"))
+          b.support.push("text");
         if (!b.taught.includes(i.word)) b.taught.push(i.word);
         v = verdict("valid", lexeme(i.word)!.meaning);
         record(n, b, v, "meaning", i.word);

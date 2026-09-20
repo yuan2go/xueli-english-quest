@@ -137,6 +137,17 @@ a {
   flex-direction: column;
   position: relative;
 }
+/* iOS callouts and text selection compete with holding/dragging game pieces.
+   Scope this to play; adult records remain selectable and tools still scroll. */
+.game-shell,
+.game-shell * {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.game-shell img {
+  pointer-events: none;
+}
 .game-hud {
   display: flex;
   gap: 20px;

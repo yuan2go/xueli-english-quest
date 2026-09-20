@@ -185,6 +185,8 @@ export function GameShell({
       className={`game-shell ${tool ? "tool-open" : selected ? "object-open" : "world-open"}`}
       data-encounter={model.id}
       data-motion-paused={inactive || undefined}
+      onContextMenu={(e) => e.preventDefault()}
+      onDragStart={(e) => e.preventDefault()}
       onKeyDown={(e) => {
         if (e.key === "Escape" && !inactive) {
           close();

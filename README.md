@@ -26,7 +26,7 @@ npm run check:resources
 npm run test:browser
 ```
 
-浏览器回归从正常首页真实操作，使用生产 HTTP `127.0.0.1:4174`；需已安装 Playwright Chromium。`dist` 是静态构建产物，Vite dev/preview 是本地体验服务。没有公网部署。旧 `/#design` 不再是独立页面；本包只交付正式入口。
+浏览器回归从正常首页真实操作，使用生产 HTTP `127.0.0.1:4174`；先运行 `npx playwright install chromium webkit` 安装所需浏览器。WebKit 回归运行于桌面，不能代替 iPhone 原生长按菜单验收。`dist` 是静态构建产物，Vite dev/preview 是本地体验服务。本分支没有执行公网部署。旧 `/#design` 不再是独立页面；本包只交付正式入口。
 
 ## 当前权威与限制
 

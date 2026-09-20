@@ -177,8 +177,8 @@ const fenceRules: SpatialRules = {
   types: TYPES,
   nodes: [
     { id: "home", label: "集合点", x: 14, y: 73, clearance: 3 },
-    { id: "step", label: "门外", x: 37, y: 57, clearance: 3 },
-    { id: "inside", label: "门内", x: 66, y: 57, clearance: 3 },
+    { id: "step", label: "门外", x: 37, y: 72, clearance: 3 },
+    { id: "inside", label: "门内", x: 66, y: 72, clearance: 3 },
     { id: "garden", label: "花园", x: 84, y: 75, clearance: 3 },
     { id: "hole", label: "小洞", x: 51, y: 86, clearance: 1 },
   ],

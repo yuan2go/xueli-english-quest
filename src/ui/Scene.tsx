@@ -144,7 +144,15 @@ export function Scene({
       const p = position(e.place.id);
       return {
         x: p.x + (e.place.kind === "in" ? (p.x > 70 ? -15 : 15) : 0),
-        y: p.y - (e.place.kind === "on" ? 25 : 23),
+        y:
+          p.y -
+          (e.place.kind === "on"
+            ? 9 +
+              (spec.rules.types[w.entities[e.place.id].word].height?.[
+                { small: 0, normal: 1, big: 2 }[w.entities[e.place.id].size]
+              ] ?? 0) *
+                8
+            : 23),
       };
     }
     const peers = objects.filter(

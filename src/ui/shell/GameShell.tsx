@@ -91,6 +91,13 @@ export function GameShell({
         text: EXERCISES.command.example,
         selected: "box-main",
       });
+      if (b.exercise === "description")
+        send({
+          kind: "sentence",
+          task: taskId(session),
+          text: EXERCISES.description.example,
+          selected: "box-main",
+        });
     }
   }
 

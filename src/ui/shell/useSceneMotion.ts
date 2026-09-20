@@ -108,9 +108,54 @@ export function useSceneMotion(
       const base = transform === "none" ? "" : transform;
       const old = sameScene ? from?.rect : undefined;
       if (old && moving.has(id)) {
-        const dx = old.x + old.width / 2 - to.x - to.width / 2,
-          dy = old.y + old.height / 2 - to.y - to.height / 2;
-        const initial = `translate(${dx}px,${dy}px) ${base} scale(${old.width / to.width},${old.height / to.height})`;
+        // New containment uses the new parent's animated local coordinates. Otherwise its
+        // FLIP would add the same viewport displacement (and scale) a second time.
+        const ancestor =
+          parent && moving.has(parent)
+            ? nodes.find((node) => node.id === parent)
+            : undefined;
+        const parentOld = sameScene ? ancestor?.from?.rect : undefined;
+        const sx =
+          parentOld && ancestor ? parentOld.width / ancestor.to.width : 1;
+        const sy =
+          parentOld && ancestor ? parentOld.height / ancestor.to.height : 1;
+        const px =
+          parentOld && ancestor
+            ? parentOld.x +
+              parentOld.width / 2 -
+              ancestor.to.x -
+              ancestor.to.width / 2
+            : 0;
+        const py =
+          parentOld && ancestor
+            ? parentOld.y +
+              parentOld.height / 2 -
+              ancestor.to.y -
+              ancestor.to.height / 2
+            : 0;
+        const centerX = to.x + to.width / 2,
+          centerY = to.y + to.height / 2;
+        const dx =
+          (old.x +
+            old.width / 2 -
+            centerX -
+            px -
+            (sx - 1) *
+              (centerX -
+                (ancestor ? ancestor.to.x + ancestor.to.width / 2 : centerX))) /
+          sx;
+        const dy =
+          (old.y +
+            old.height / 2 -
+            centerY -
+            py -
+            (sy - 1) *
+              (centerY -
+                (ancestor
+                  ? ancestor.to.y + ancestor.to.height / 2
+                  : centerY))) /
+          sy;
+        const initial = `translate(${dx}px,${dy}px) ${base} scale(${old.width / to.width / sx},${old.height / to.height / sy})`;
         const end = `translate(0,0) ${base} scale(1,1)`;
         const actor = role?.action === "walk";
         const crossing = cue.kind === "cross" && actor && pad;

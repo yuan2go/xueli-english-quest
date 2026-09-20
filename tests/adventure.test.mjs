@@ -75,14 +75,16 @@ function tokens(task, text) {
 export function demonstrate(s, task) {
   const request = `lesson-${s.revision}`;
   for (let step = 0; step < 4; step++)
-    s = act(s, {
-      action: "help",
-      task,
-      value: "demo",
-      request,
-      phase: "shown",
-      step,
-    });
+    for (const part of ["action", "words"])
+      s = act(s, {
+        part,
+        action: "help",
+        task,
+        value: "demo",
+        request,
+        phase: "shown",
+        step,
+      });
   return act(s, {
     action: "help",
     task,

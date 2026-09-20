@@ -74,14 +74,16 @@ function ids(task) {
 }
 function demonstrate(s, task) {
   for (let step = 0; step < 4; step++)
-    s = act(s, {
-      action: "help",
-      task,
-      value: "demo",
-      phase: "shown",
-      step,
-      request: "lesson",
-    });
+    for (const part of ["action", "words"])
+      s = act(s, {
+        part,
+        action: "help",
+        task,
+        value: "demo",
+        phase: "shown",
+        step,
+        request: "lesson",
+      });
   return act(s, {
     action: "help",
     task,
@@ -324,6 +326,58 @@ test("crossing separates stationary support, moving actor and worn attachment; a
     s.activities.dress.world.entities["cat-companion"].location.targetId,
     "picnic-mat",
   );
+  assert.ok(s.activities.dress.facts.includes("tried-sun"));
+  assert.ok(!s.activities.dress.facts.includes("tried-breeze"));
   assert.deepEqual(s.story, story);
   assert.deepEqual(decodeAdventure(encodeAdventure(s)), s);
+});
+
+test("completed word and transform tasks accept only the original audio request terminal receipt", async () => {
+  const { AUDIO } = await import("../src/content/manifest.ts");
+  let s = initialAdventure("audio-end", 0);
+  const voice = (state, task, word, value, request) => {
+    const a = AUDIO.find((a) => a.text === word);
+    return send(state, {
+      action: "audio",
+      task,
+      value,
+      request,
+      assetId: a.id,
+      audioVersion: a.version,
+      audioSource: "development-speech",
+    });
+  };
+  s = voice(s, "wake", "cat", "loading", "wake-audio").session;
+  s = voice(s, "wake", "cat", "playing", "wake-audio").session;
+  s = act(s, { action: "word", task: "wake", word: "cat" });
+  assert.equal(voice(s, "wake", "cat", "cancelled", "other").kind, "stale");
+  const end = voice(s, "wake", "cat", "cancelled", "wake-audio");
+  assert.equal(end.kind, "valid");
+  s = end.session;
+  assert.equal(s.story.help.wake.audio, "cancelled");
+  s = act(s, { action: "word", task: "bag", word: "bag" });
+  s = voice(s, "morph:cat-card", "cap", "loading", "morph-audio").session;
+  s = voice(s, "morph:cat-card", "cap", "playing", "morph-audio").session;
+  s = act(s, {
+    action: "transform",
+    task: "morph:cat-card",
+    source: "cat-card",
+    word: "cap",
+  });
+  const transformed = voice(
+    s,
+    "morph:cat-card",
+    "cap",
+    "cancelled",
+    "morph-audio",
+  );
+  assert.equal(transformed.kind, "valid");
+  assert.equal(
+    transformed.session.story.help["morph:cat-card"].audio,
+    "cancelled",
+  );
+  assert.deepEqual(
+    decodeAdventure(encodeAdventure(transformed.session)),
+    transformed.session,
+  );
 });

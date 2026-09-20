@@ -69,6 +69,7 @@ export function decodeAdventure(raw: string): Adventure {
     "audioVersion",
     "assetId",
     "phase",
+    "part",
     "step",
   ];
   for (const item of v.journal) {
@@ -91,6 +92,7 @@ export function decodeAdventure(raw: string): Adventure {
         "audioVersion",
         "assetId",
         "phase",
+        "part",
       ].some(
         (k) =>
           item[k] !== undefined &&

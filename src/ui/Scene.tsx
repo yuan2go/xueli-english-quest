@@ -137,6 +137,11 @@ export function Scene({
         className={`entity-anchor anchor-${item.word} ${item.kind === "actor" ? "anchor-actor" : ""} ${l.kind === "worn" ? "anchor-worn" : l.kind === "relation" ? `anchor-${l.relation}` : ""} ${l.kind === "zone" ? "anchor-road" : ""}`}
         style={style}
       >
+        {item.word === "bag" && (
+          <span className="bag-body object-art">
+            <Visual id={b.bagOpen ? "bag-open" : "bag"} label="旅行背包" />
+          </span>
+        )}
         <button
           className={`quest-object ${item.kind === "actor" ? "quest-cat" : ""} ${item.word === "mat" ? "quest-mat" : ""} ${l.kind === "worn" ? "quest-worn" : ""} ${selected === item.id ? "selected" : ""} ${target ? "legal-target" : ""} ${pointer.ghost?.label === item.id ? "drag-origin" : ""} ${target && pointer.ghost?.target === item.id ? "drop-hover" : ""}`}
           data-entity={item.id}
@@ -158,16 +163,12 @@ export function Scene({
                 (r) => r.id === item.id && r.action === "walk",
               )}
             />
-          ) : (
+          ) : item.word === "bag" ? null : (
             <span className="object-art">
-              {item.word === "bag" ? (
-                <Visual id={b.bagOpen ? "bag-open" : "bag"} label="旅行背包" />
-              ) : (
-                <Art
-                  word={item.word}
-                  paper={item.id === "cat-card" && item.word === "cat"}
-                />
-              )}
+              <Art
+                word={item.word}
+                paper={item.id === "cat-card" && item.word === "cat"}
+              />
               {cue?.kind === "transform" &&
                 cue.entity === item.id &&
                 cue.from && (
@@ -203,11 +204,75 @@ export function Scene({
         {onTop.map((child, index) => renderEntity(child, index, onTop.length))}
         {hats.map((child) => renderEntity(child))}
         {b.bagOpen && inside.length > 0 && (
-          <div className="bag-contents" aria-label="背包里面">
-            {inside.map((child) => renderEntity(child))}
-          </div>
+          <>
+            <div className="bag-contents" aria-label="背包里面">
+              {inside.map((child) => renderEntity(child))}
+            </div>
+            <span className="bag-front" aria-hidden="true">
+              <Visual id="bag-open" label="背包前袋" />
+            </span>
+          </>
         )}
       </div>
+    );
+  }
+  function dragTree(item: Entity): ReactNode {
+    const children = Object.values(e).filter(
+      (child) =>
+        "targetId" in child.location && child.location.targetId === item.id,
+    );
+    const on = children.filter(
+      (child) =>
+        child.location.kind === "relation" && child.location.relation === "on",
+    );
+    const inside = children.filter(
+      (child) =>
+        child.location.kind === "relation" && child.location.relation === "in",
+    );
+    return (
+      <span
+        className={`drag-tree drag-word-${item.word}`}
+        data-ghost-entity={item.id}
+      >
+        {item.kind === "actor" ? (
+          <CharacterArt />
+        ) : item.word === "bag" ? (
+          <Visual id={b.bagOpen ? "bag-open" : "bag"} label="背包" />
+        ) : (
+          <Art
+            word={item.word}
+            paper={item.kind === "token" && item.word === "cat"}
+          />
+        )}
+        {on.map((child, i) => (
+          <span
+            className="drag-on"
+            key={child.id}
+            style={{ left: `${((i + 1) * 100) / (on.length + 1)}%` }}
+          >
+            {dragTree(child)}
+          </span>
+        ))}
+        {children
+          .filter((child) => child.location.kind === "worn")
+          .map((child) => (
+            <span key={child.id} className="drag-hat">
+              {dragTree(child)}
+            </span>
+          ))}
+        {b.bagOpen && inside.length > 0 && (
+          <>
+            <span className="drag-inside">
+              {inside.map((child) => (
+                <span key={child.id}>{dragTree(child)}</span>
+              ))}
+            </span>
+            <span className="bag-front">
+              <Visual id="bag-open" label="背包前袋" />
+            </span>
+          </>
+        )}
+      </span>
     );
   }
   return (
@@ -297,24 +362,7 @@ export function Scene({
           className="drag-ghost object-ghost"
           aria-hidden="true"
         >
-          {e[pointer.ghost.label].kind === "actor" ? (
-            <span className="drag-actor">
-              <CharacterArt />
-              {Object.values(e)
-                .filter(
-                  (x) =>
-                    x.location.kind === "worn" &&
-                    x.location.targetId === pointer.ghost!.label,
-                )
-                .map((hat) => (
-                  <span key={hat.id} className="drag-hat">
-                    <Art word={hat.word} />
-                  </span>
-                ))}
-            </span>
-          ) : (
-            <Art word={e[pointer.ghost.label].word} />
-          )}
+          {dragTree(e[pointer.ghost.label])}
         </div>
       )}
     </section>

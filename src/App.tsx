@@ -285,6 +285,7 @@ export default function App() {
                             {
                               {
                                 shown: "已显示",
+                                partial: "部分呈现",
                                 loading: "请求加载",
                                 playing: "开始播放",
                                 completed: "已完成",

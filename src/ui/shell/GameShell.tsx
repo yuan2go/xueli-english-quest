@@ -86,9 +86,11 @@ export function GameShell({
       if (document.hidden) cancel();
     };
     window.addEventListener("resize", cancel);
+    window.addEventListener("pagehide", cancel);
     document.addEventListener("visibilitychange", visibility);
     return () => {
       window.removeEventListener("resize", cancel);
+      window.removeEventListener("pagehide", cancel);
       document.removeEventListener("visibilitychange", visibility);
       audio.stop();
     };
@@ -243,10 +245,14 @@ export function GameShell({
             cue?.kind === "blocked"
               ? "thinking"
               : cue
-                ? "action"
+                ? ["observe", "celebrate"].includes(cue.kind)
+                  ? "happy"
+                  : "action"
                 : model.ended
                   ? "happy"
-                  : "idle"
+                  : tool || selected
+                    ? "thinking"
+                    : "idle"
           }
           disabled={inactive}
           cue={cue}

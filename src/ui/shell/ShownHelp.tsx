@@ -20,14 +20,14 @@ export function ShownHelp({
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting || document.hidden) return;
+        if (entry.intersectionRatio < 0.95 || document.hidden) return;
         current.current(
           { action: "help", task, value: kind, phase: "shown" },
           true,
         );
         observer.disconnect();
       },
-      { threshold: 0.5 },
+      { threshold: 0.95 },
     );
     if (element.current) observer.observe(element.current);
     return () => observer.disconnect();

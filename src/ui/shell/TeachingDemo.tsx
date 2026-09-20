@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import type {
   Adventure,
   AdventureResult,
@@ -7,7 +7,7 @@ import type {
 import { lessonFrames } from "../../game/lesson.ts";
 import type { Tool } from "../../game/shell.ts";
 import { localId } from "../../platform/id.ts";
-import { Art, CharacterArt, Visual } from "../Art.tsx";
+import { Art, AssetContext, CharacterArt, Visual } from "../Art.tsx";
 import { Modal } from "../Modal.tsx";
 
 export function TeachingDemo({
@@ -28,34 +28,107 @@ export function TeachingDemo({
   const [request] = useState(localId);
   const frame = frames[step];
   const panel = useRef<HTMLDivElement>(null);
+  const words = useRef<HTMLDivElement>(null);
+  const assets = useContext(AssetContext);
+  const [failed, setFailed] = useState(false);
   const current = useRef({ send, step });
   current.current = { send, step };
   const ended = useRef(false);
   const [seen, setSeen] = useState(false);
   useEffect(() => {
     setSeen(false);
+    setFailed(false);
+    const visible = new Map<Element, number>();
+    const decoded = new WeakSet<HTMLImageElement>();
+    const decoding = new WeakSet<HTMLImageElement>();
+    const recorded = new Set<string>();
+    let frameId = 0,
+      alive = true;
+    function record(
+      part: "action" | "words",
+      phase: "shown" | "partial" | "failed",
+    ) {
+      const key = `${part}:${phase}`;
+      if (recorded.has(key)) return;
+      recorded.add(key);
+      current.current.send(
+        {
+          action: "help",
+          task: taskId,
+          value: "demo",
+          request,
+          phase,
+          part,
+          step,
+        },
+        true,
+      );
+    }
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting || document.hidden) return;
-        current.current.send(
-          {
-            action: "help",
-            task: taskId,
-            value: "demo",
-            request,
-            phase: "shown",
-            step,
-          },
-          true,
-        );
-        setSeen(true);
-        observer.disconnect();
+      (entries) => {
+        for (const entry of entries)
+          visible.set(entry.target, entry.intersectionRatio);
       },
-      { threshold: 0.5 },
+      { threshold: [0, 0.01, 0.95, 1] },
     );
     if (panel.current) observer.observe(panel.current);
-    return () => observer.disconnect();
-  }, [step, request, taskId]);
+    if (words.current) observer.observe(words.current);
+    function check() {
+      if (!alive || document.hidden) return;
+      const stage = panel.current;
+      const images = [...(stage?.querySelectorAll("img") ?? [])];
+      for (const image of images) {
+        if (image.complete && image.naturalWidth && !decoding.has(image)) {
+          decoding.add(image);
+          void image
+            .decode()
+            .then(() => decoded.add(image))
+            .catch(() => {});
+        }
+      }
+      const bad =
+        !!stage?.querySelector(".art-fallback") ||
+        images.some((image) => image.complete && !image.naturalWidth);
+      if (bad) {
+        record("action", "failed");
+        setFailed(true);
+      }
+      const ratio = stage ? (visible.get(stage) ?? 0) : 0;
+      if (ratio > 0 && images.some((image) => decoded.has(image)))
+        record("action", "partial");
+      const moving = stage
+        ?.getAnimations({ subtree: true })
+        .some(
+          (animation) =>
+            animation.playState === "running" &&
+            animation.effect?.getTiming().iterations !== Infinity,
+        );
+      if (
+        ratio >= 0.95 &&
+        !bad &&
+        images.length >= Object.keys(frame.world.entities).length &&
+        images.every((image) => decoded.has(image)) &&
+        !moving
+      )
+        record("action", "shown");
+      const wordRatio = words.current ? (visible.get(words.current) ?? 0) : 0;
+      if (wordRatio > 0) record("words", "partial");
+      if (wordRatio >= 0.95) record("words", "shown");
+      const ready = recorded.has("action:shown") && recorded.has("words:shown");
+      if (ready) setSeen(true);
+      else if (!(bad && recorded.has("words:shown")))
+        frameId = requestAnimationFrame(check);
+    }
+    // Allow React's new layout and CSS transitions to start before testing the presented frame.
+    frameId = requestAnimationFrame(() => {
+      frameId = requestAnimationFrame(check);
+    });
+    return () => {
+      alive = false;
+      observer.disconnect();
+      cancelAnimationFrame(frameId);
+    };
+  }, [step, request, taskId, assets.epoch]);
   useEffect(
     () => () => {
       if (!ended.current)
@@ -117,22 +190,32 @@ export function TeachingDemo({
           );
         })}
       </div>
-      <p className="lesson-caption" role="status">
-        {frame.caption}
-      </p>
-      <div className="lesson-chunks" lang="en">
-        {frame.chunks.map((chunk, i) => (
-          <span className={i === frame.highlight ? "highlight" : ""} key={i}>
-            {chunk}
-          </span>
-        ))}
+      <div ref={words}>
+        <p className="lesson-caption" role="status">
+          {frame.caption}
+        </p>
+        <div className="lesson-chunks" lang="en">
+          {frame.chunks.map((chunk, i) => (
+            <span className={i === frame.highlight ? "highlight" : ""} key={i}>
+              {chunk}
+            </span>
+          ))}
+        </div>
       </div>
+      {failed && (
+        <p role="alert">
+          示范图像没有加载完成。可以先退出，或
+          <button onClick={assets.retry}>重试图像</button>。
+        </p>
+      )}
       <button
         className="primary"
         disabled={!seen}
         onClick={() => {
-          if (step < frames.length - 1) setStep(step + 1);
-          else {
+          if (step < frames.length - 1) {
+            setSeen(false);
+            setStep(step + 1);
+          } else {
             const r = send(
               {
                 action: "help",

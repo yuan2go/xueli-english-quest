@@ -115,7 +115,8 @@ export interface Intent {
   audioSource?: string;
   audioVersion?: string;
   assetId?: string;
-  phase?: "shown" | "completed" | "cancelled" | "failed";
+  phase?: "shown" | "partial" | "completed" | "cancelled" | "failed";
+  part?: "action" | "words";
   step?: number;
 }
 export interface AdventureCommand extends Intent {
@@ -627,7 +628,9 @@ export function runAdventure(
             "demo",
             "feedback",
           ].includes(c.value ?? "") ||
-          !["shown", "completed", "cancelled", "failed"].includes(c.phase ?? "")
+          !["shown", "partial", "completed", "cancelled", "failed"].includes(
+            c.phase ?? "",
+          )
         )
           return reply("outside", "只记录实际显示的帮助，不把点击当成曝光。");
         if (
@@ -642,22 +645,31 @@ export function runAdventure(
           c.value === "demo" &&
           c.phase === "completed" &&
           ![0, 1, 2, 3].every((step) =>
-            support.exposures.some(
-              (x) =>
-                x.kind === "demo" &&
-                x.request === c.request &&
-                x.step === step &&
-                x.status === "shown",
+            ["action", "words"].every((part) =>
+              support.exposures.some(
+                (x) =>
+                  x.kind === "demo" &&
+                  x.request === c.request &&
+                  x.step === step &&
+                  x.part === part &&
+                  x.status === "shown",
+              ),
             ),
           )
         )
           return reply("blocked", "先观察每一步，再亲手试一试。");
-        const shown = c.phase === "shown";
+        if (c.part !== undefined && !["action", "words"].includes(c.part))
+          return reply("outside", "未知示范内容。");
+        const shown = c.phase === "shown" || c.phase === "partial";
         const answer: Exposure["answer"] =
-          c.value === "text" || (c.value === "demo" && c.step! >= 2)
+          c.value === "text" ||
+          (c.value === "demo" &&
+            c.part === "words" &&
+            c.step! >= 2 &&
+            c.phase === "shown")
             ? "full"
             : ["partial", "feedback"].includes(c.value!) ||
-                (c.value === "demo" && c.step === 1)
+                (c.value === "demo" && c.part === "words" && c.step! >= 1)
               ? "partial"
               : "none";
         const exposure: Exposure = {
@@ -668,6 +680,7 @@ export function runAdventure(
           status: c.phase!,
           answer,
           ...(c.step !== undefined ? { step: c.step } : {}),
+          ...(c.part ? { part: c.part } : {}),
         };
         b.help[c.task!] = {
           ...support,
@@ -694,6 +707,15 @@ export function runAdventure(
         const resource = [...AUDIO, ...SENTENCE_AUDIO].find(
           (a) => a.id === c.assetId,
         );
+        const endingRegisteredRequest =
+          ["completed", "failed", "cancelled", "muted"].includes(
+            c.value ?? "",
+          ) &&
+          !!c.request &&
+          support.request === c.request &&
+          support.assetId === c.assetId &&
+          support.audioVersion === c.audioVersion &&
+          support.audioSource === c.audioSource;
         const expectedText =
           availableWords(n).find((t) => t.id === c.task)?.word ??
           sentenceTasks(n).find((t) => t.id === c.task)?.example ??
@@ -705,7 +727,7 @@ export function runAdventure(
         if (
           !resource ||
           resource.version !== c.audioVersion ||
-          resource.text !== expectedText ||
+          (!endingRegisteredRequest && resource.text !== expectedText) ||
           !["recording", "development-speech", "unavailable"].includes(
             c.audioSource ?? "",
           ) ||
@@ -715,7 +737,7 @@ export function runAdventure(
           return reply("stale", "忽略不属于本任务的语音。");
 
         if (
-          !validTask(n, c.task) ||
+          (!endingRegisteredRequest && !validTask(n, c.task)) ||
           !c.request ||
           ![
             "loading",
@@ -792,6 +814,9 @@ export function runAdventure(
                   : "小猫走到树荫边，小帽子也有自己的办法。"
                 : "贴头帽稳稳的。小猫走两步，还在头上！";
           }
+          b.facts = b.facts.filter(
+            (f) => !["tried-sun", "tried-breeze"].includes(f),
+          );
           fact(b, `tried-${c.value}`);
         } else if (
           n.mode === "helper" &&
@@ -819,7 +844,7 @@ export function runAdventure(
           if (c.value === "depart") {
             b.bagOpen = false;
             fact(b, "departure-preview");
-          }
+          } else b.facts = b.facts.filter((f) => f !== "departure-preview");
           message =
             c.value === "depart"
               ? "物品收好，袋口合上，小猫起身准备出发。"
@@ -1079,7 +1104,7 @@ export function runAdventure(
           kind = "mismatch";
           language = "adjust";
           message =
-            "这件物品还不是声音里的路线图。再听一次，或先把纸恢复成地图。";
+            "小猫摇摇头：它听到的是另一件物品。可以重听，也可以打开帮助找线索。";
           break;
         }
         fact(b, "found-map");

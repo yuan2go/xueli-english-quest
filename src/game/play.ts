@@ -8,7 +8,13 @@ export function playfulState(s: Adventure) {
     const cap = at(b, "cat-card", "worn"),
       hat = at(b, "hat-main", "worn");
     return {
-      scene: b.variant ? "breeze" : "sun",
+      scene: b.facts.includes("tried-breeze")
+        ? "breeze"
+        : b.facts.includes("tried-sun")
+          ? "sun"
+          : b.variant
+            ? "breeze"
+            : "sun",
       clue: b.variant
         ? "树叶动了。试试哪种帽檐更贴头。"
         : "在太阳下和树荫里，帽子各有什么用？",

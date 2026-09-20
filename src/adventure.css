@@ -1406,14 +1406,16 @@ dialog input {
   padding: 8px 16px;
 }
 .bag-contents {
-  top: 48%;
-  left: -18%;
-  width: 136%;
+  top: 10%;
+  left: 0;
+  width: 100%;
   border: 0;
   background: transparent;
   gap: 3px;
+  pointer-events: none;
 }
 .bag-contents > .anchor-in {
+  pointer-events: auto;
   min-width: 44px;
 }
 .quest-object .item-label {
@@ -1459,4 +1461,60 @@ dialog input {
     width: 80%;
     max-width: 170px;
   }
+}
+
+/* Open-bag contents peek through the mouth; the separate lower body remains a clear touch target.
+   The front is a clipped layer of the same registered image, not a second world entity. */
+.bag-body,
+.bag-front {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+.bag-body img,
+.bag-front img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+.bag-front {
+  z-index: 10;
+  clip-path: inset(41% 0 0);
+}
+.anchor-bag > .quest-object {
+  position: relative;
+  margin-top: 43%;
+  aspect-ratio: 1.5;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 11;
+}
+
+.drag-tree {
+  display: block;
+  position: relative;
+}
+.drag-on {
+  position: absolute;
+  width: 55%;
+  top: 42%;
+  transform: translate(-50%, -85%);
+}
+.drag-inside {
+  position: absolute;
+  top: 10%;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.drag-inside > span {
+  width: 50%;
+}
+.drag-word-mat > img {
+  aspect-ratio: 1.8;
+  object-fit: fill;
 }

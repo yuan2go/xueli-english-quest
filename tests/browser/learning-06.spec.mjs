@@ -125,6 +125,24 @@ test("normal-play motion samples: paper settles before cat crosses; hat stays at
   ).toBe("worn");
   await button(p, "继续冒险").click();
   await move(p, "hat-main", "背包里面 · in");
+  const packed = (await snapshot(p)).projection.story.world;
+  const bagBounds = await object(p, "bag-main").boundingBox();
+  await p.mouse.move(
+    bagBounds.x + bagBounds.width / 2,
+    bagBounds.y + bagBounds.height / 2,
+  );
+  await p.mouse.down();
+  await p.mouse.move(bagBounds.x + 90, bagBounds.y + 20, { steps: 4 });
+  await expect(
+    p.locator('.drag-ghost [data-ghost-entity="hat-main"]'),
+  ).toHaveCount(1);
+  await expect(p.locator('[data-motion-id="bag-main"]')).toHaveAttribute(
+    "data-drag-origin",
+    "true",
+  );
+  await p.keyboard.press("Escape");
+  await p.mouse.up();
+  expect((await snapshot(p)).projection.story.world).toEqual(packed);
   await bag(p, false);
   await expect(object(p, "hat-main")).toHaveCount(0);
   await bag(p);
@@ -162,12 +180,8 @@ test("teaching demo is observable and isolated, partial exposure persists, indep
   expect((await snapshot(p)).projection.story.facts).not.toContain(
     "sentence:pack-cap",
   );
-  await p.screenshot({
-    path: `evidence-placeholder`.replace(
-      "evidence-placeholder",
-      `${evidence}/teaching-action.png`,
-    ),
-  });
+  await expect(button(p, "看看下一步")).toBeEnabled();
+  await p.screenshot({ path: `${evidence}/teaching-action.png` });
   await button(p, "先回去试试").click();
   expect(
     (await snapshot(p)).projection.story.help["pack-cap"].exposures.some(
@@ -256,4 +270,136 @@ test("authored experiments change the isolated activity, not just a celebration"
   ).toBe("picnic-mat");
   await explore(p, "返回故事");
   expect((await snapshot(p)).projection.story).toEqual(story);
+});
+
+test("new worn and contained children preserve their first painted position while the desktop scene expands", async ({
+  page: p,
+}) => {
+  await p.setViewportSize({ width: 1440, height: 1000 });
+  await start(p);
+  for (const [task, text] of [
+    ["wake", "cat"],
+    ["bag", "bag"],
+    ["hat", "hat"],
+  ])
+    await word(p, task, text);
+  await bag(p);
+  const samples = [];
+  for (const target of ["戴在小猫头上", "背包里面 · in"]) {
+    await object(p, "hat-main").click();
+    await expect(button(p, target)).toBeVisible();
+    await p.evaluate((label) => {
+      const rect = () => {
+        const b = document
+          .querySelector('[data-motion-id="hat-main"]')
+          .getBoundingClientRect();
+        return { x: b.x, y: b.y, width: b.width, height: b.height };
+      };
+      window.__origin = null;
+      const listen = (e) => {
+        if (e.target.closest("button")?.textContent.trim() !== label) return;
+        document.removeEventListener("click", listen, true);
+        const from = rect();
+        requestAnimationFrame(() => {
+          window.__origin = { target: label, from, first: rect() };
+        });
+      };
+      document.addEventListener("click", listen, true);
+    }, target);
+    await button(p, target).click();
+    await expect.poll(() => p.evaluate(() => !!window.__origin)).toBe(true);
+    const sample = await p.evaluate(() => window.__origin);
+    samples.push(sample);
+    for (const key of ["x", "y", "width", "height"])
+      expect(
+        Math.abs(sample.from[key] - sample.first[key]),
+        `${target} ${key}`,
+      ).toBeLessThan(3);
+    await expect(
+      p.locator('[data-motion-id="hat-main"][data-moving]'),
+    ).toHaveCount(0);
+  }
+  await writeFile(
+    `${evidence}/reparent-samples.json`,
+    JSON.stringify(samples, null, 2),
+  );
+});
+
+test("a failed teaching image cannot yield a completed demonstration; visible words remain recorded", async ({
+  page: p,
+}) => {
+  await p.route("**/bag-open.webp", (route) => route.abort("failed"));
+  await p.setViewportSize({ width: 390, height: 844 });
+  await start(p);
+  await toMeadow(p);
+  await button(p, "帮背包收一件东西").click();
+  await expect(p.getByRole("dialog")).toContainText("示范图像没有加载完成");
+  await expect(button(p, "看看下一步")).toBeDisabled();
+  const help = (await snapshot(p)).projection.story.help["pack-cap"];
+  expect(
+    help.exposures.some((x) => x.part === "action" && x.status === "failed"),
+  ).toBe(true);
+  expect(
+    help.exposures.some((x) => x.part === "words" && x.status === "shown"),
+  ).toBe(true);
+  expect(help.exposures.some((x) => x.status === "completed")).toBe(false);
+  await button(p, "先回去试试").click();
+  expect((await snapshot(p)).projection.story.facts).not.toContain(
+    "sentence:pack-cap",
+  );
+});
+
+test("historical v4 bytes are verified and protected in the actual entry before explicit restart", async ({
+  page: p,
+}) => {
+  // Compatibility fixture only: no mainline completion is injected or inferred.
+  const { initialAdventure, runAdventure } = await import(
+    "../../src/legacy/quest-v4/adventure.ts"
+  );
+  const { encodeAdventure } = await import("../../src/legacy/quest-v4/save.ts");
+  const s = initialAdventure("historical-browser", 0);
+  const raw = encodeAdventure(
+    runAdventure(s, {
+      sessionId: s.id,
+      mode: s.mode,
+      revision: 0,
+      attemptId: "old-wake",
+      action: "word",
+      task: "wake",
+      word: "cat",
+    }).session,
+  );
+  await p.goto("/");
+  await p.evaluate(
+    (raw) => localStorage.setItem("xueli.adventure.v4", raw),
+    raw,
+  );
+  await p.reload();
+  await expect(p.getByRole("alert")).toContainText("旧版冒险已验证并备份");
+  expect(
+    await p.evaluate(() => localStorage.getItem("xueli.adventure.v5")),
+  ).toBeNull();
+  await button(p, "开始冒险").click();
+  await button(p, "返回").click();
+  expect(
+    await p.evaluate(() => localStorage.getItem("xueli.adventure.v4")),
+  ).toBe(raw);
+  await button(p, "开始冒险").click();
+  await button(p, "确认开始新冒险").click();
+  expect((await snapshot(p)).projection.events).toEqual([]);
+  expect(
+    await p.evaluate(
+      (raw) =>
+        Object.keys(localStorage).some(
+          (k) =>
+            k.startsWith("xueli.adventure.v4.backup.") &&
+            localStorage[k] === raw,
+        ),
+      raw,
+    ),
+  ).toBe(true);
+  await word(p, "wake", "cat");
+  await p.reload();
+  await button(p, "继续冒险").click();
+  await expect(object(p, "cat-companion")).toBeVisible();
 });

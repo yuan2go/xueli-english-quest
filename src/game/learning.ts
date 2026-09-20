@@ -18,6 +18,7 @@ export type Exposure = {
   channel: "visual" | "audio";
   status:
     | "shown"
+    | "partial"
     | "loading"
     | "playing"
     | "completed"
@@ -26,6 +27,7 @@ export type Exposure = {
     | "muted";
   answer: "none" | "partial" | "full";
   step?: number;
+  part?: "action" | "words";
 };
 export type Dimension =
   | "word-meaning"
@@ -59,7 +61,7 @@ export function answerExposed(s: Support) {
   return s.exposures.some(
     (x) =>
       x.answer !== "none" &&
-      ["shown", "playing", "completed"].includes(x.status),
+      ["shown", "partial", "playing", "completed"].includes(x.status),
   );
 }
 export function evidenceFor(

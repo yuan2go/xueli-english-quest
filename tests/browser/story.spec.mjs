@@ -16,11 +16,12 @@ import {
   shot,
   viewportOK,
   KEY,
+  explore,
 } from "./helpers.mjs";
 test("phone normal HTTP entrance: early reversible exploration, all acts, real crossing, sentences, choices and restore", async ({
   browser,
 }) => {
-  await mkdir("docs/evidence/gameplay-core-04", { recursive: true });
+  await mkdir("docs/evidence/web-game-shell-05", { recursive: true });
   const c = await browser.newContext({
     viewport: { width: 390, height: 844 },
     hasTouch: true,
@@ -97,7 +98,7 @@ test("desktop alternative preparation order, sentence reversal and actual world 
   await finish(p);
   await shot(p, "desktop-ending");
   await viewportOK(p);
-  await p.getByRole("button", { name: /^自由制作/ }).click();
+  await explore(p, "自由制作 · mat / hat");
   for (const letter of "mat") await button(p, `字母 ${letter}`).click();
   await p.getByRole("button", { name: /^施法/ }).click();
   await expect(object(p, "craft-mat")).toBeVisible();

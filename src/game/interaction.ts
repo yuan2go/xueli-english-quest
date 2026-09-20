@@ -1,6 +1,14 @@
 import type { World } from "../domain/world.ts";
-import type { Step } from "../content/story.ts";
-export function letterLayout(step: Step) {
+export interface LetterTask {
+  id: string;
+  type: string;
+  word: string;
+  from?: string;
+  letters: string;
+  editable?: number[];
+  mode: string;
+}
+export function letterLayout(step: LetterTask) {
   const editable =
     step.editable ??
     (step.type === "transform"

@@ -1,26 +1,35 @@
 # 04 · 技术架构
 
-一个 React/TypeScript/Vite 应用，一个确定性 `domain/world.transition`。WP-WEB-GAME-SHELL-05 正式入口为 `main.tsx → App.tsx → Scene/Letters/SentenceBuilder`；没有平行 Demo 或第二套世界引擎。
+一个 React/TypeScript/Vite 应用，一个确定性 `domain/world.transition`。正式入口 `main.tsx → App → GameShell`。没有第二套游戏状态或 Demo。输入/资源细节见 12，玩法和证据合同见 02/05。
 
-## 当前执行链
+## 唯一执行链
 
-玩家意图 → `game/adventure.runAdventure` 核对 session/revision/mode/attempt → 内容/语言与世界条件 → 同一 `domain.transition` → 原子提交世界/事实/证据/日志 → `goals` 投影 → UI 表现。
+Pointer/Keyboard → scoped interaction adapter → 显式 Adventure Intent → `runAdventure` 核对 session/revision/mode/attempt → 内容语义及世界守卫 → 同一 `domain.transition` → 原子提交 world/facts/events/journal → goals 投影 → presentation cue。
 
-`Adventure` 保存 story 和已开启活动 Board、固定种子、当前模式、事件与日志。每个 Board 保存 world、scene、bagOpen、真实事实、按任务保留的帮助与音频观察、variant/seed。操作 revision 与 world revision 分开。一次换帽的两个世界效果在克隆状态上执行，任何失败整体丢弃，避免部分提交。
-
-`availableTargets` 对同一受守卫的世界动作作无副作用试算，因此点击、拖动提示和执行许可一致；目标只从规则与当前世界派生。`sentenceTasks` 用当前情境生成有限内容；描述句没有 effect。独立活动复用既有初始物品构建并经同一 transition 编排，不修改主线 Board。
+`App` 只接会话保存/恢复、外层 Start/Review、暂停/重开/帮助和资源生命周期。`GameShell` 组合持续 `Scene`、`GameHUD`、按需 `ContextTool` 和 `FeedbackLayer`。工具关闭后恢复世界空间，提交后不自动接下一题；成人记录独立，Ending 保留真实布置并提供回顾入口。
 
 ## 模块边界
 
-- `domain/world.ts`：实体、词形、唯一位置、包含/占用/角色保护；无 React/DOM/storage/audio/provider。
-- `content/adventure.ts` / `sentences.ts`：三幕、词义/用途、活动变体、制作配额、语义句型与未审核开发语音目录。
-- `game/adventure.ts` / `sentences.ts`：应用命令、情境守卫、语法/语义、目标/能力/证据投影。
-- `platform/adventure-save.ts`：schema 4 envelope、严格重放与投影一致性检查、原档备份/导出；`audio.ts` 保留单一可取消通道。
-- `App`：页面/焦点/工具草稿与平台接入；`Scene` 从唯一 location 递归显示包内、垫上、佩戴关系；没有独立完成状态。
-- `game/session.ts`、`content/story.ts`、旧存档和摘要模块：仅保留旧版精确日志解码/回归，正式 App 不调用旧 step runner。既有 picnic 初始实体构建被复用，旧 play reducer不驱动新页面。
+| 模块 | 责任 |
+| --- | --- |
+| `domain/world.ts` | 身份、位置、包含/占用、角色保护；独立于 DOM/React/平台 |
+| `content/adventure.ts` / `sentences.ts` | 故事、手工活动变体、有限词块/语义/配额；内容版本未改变 |
+| `content/encounters.ts` | 稳定场景 encounter ID、邀请、句子对应对象和角色反应；不自行判完成 |
+| `game/adventure.ts` / `sentences.ts` | 命令、幂等/revision、守卫、句子语义、目标和证据；沿用既有核心 |
+| `game/shell.ts` | `sceneModel/resolveTool/presentation` 纯投影：现有可用任务映射到对象/工具；提交前后映射到有限反馈，不写世界 |
+| `ui/Scene.tsx` / `ui/pointer.ts` | 递归关系物品、局部布局、可见命中与统一手势；合法目标仍用应用层试算 |
+| `ui/shell/*` | HUD、上下文工具、焦点与表现；字母/词块草稿局部持有 |
+| `platform/useAssets.ts` / `content/assets.ts` | 单一 manifest 的 critical/scene/lazy 调度、校验/失败重试/取消 |
+| `platform/adventure-save.ts` / `audio.ts` | 原 schema 4 重放/投影核验、旧档备份导出；单一可取消语音通道 |
 
-## 表现与恢复
+`availableTargets` 在克隆世界无副作用试算；点击和拖动使用同一 Intent。旧 `content/story`、`game/session`、旧 save/summary/feedback 和回归仅供历史日志兼容；`initialPicnic` 仍用于既有活动初始构造。旧 Experience/Picnic/ObjectButton 与三份旧 CSS 已删除。
 
-UI 只有选中、未提交字母/词块、拖影和短反馈。世界先提交，CSS 位置过渡有界（350ms），减少动态效果直接显示稳定态；反馈 6.5 秒后收起，不延迟进度。暂停、后台和刷新无需等待动画回调，拖动取消保持原位。佩戴物以角色局部坐标定位，不镜像角色或遮住定位器；包内/垫上子节点跟随父物品。
+## 三类状态
 
-语音来自现有资源服务，播放新任务取消旧请求；观察核对任务、资源 ID/版本、来源和 request，拒绝旧回调。静音/缺音频可文字辅助。无后端、网络模型、全局事件总线或通用编排框架。所有证据仍仅在设备本地。
+| 状态 | 所在位置 | 生命周期 |
+| --- | --- | --- |
+| committed | Adventure / Board | 世界、事实、目标投影、学习记录和日志；通过 schema 4 保存/重放 |
+| UI interaction | GameShell / Letters / SentenceBuilder | 选中、工具、焦点和未提交草稿；暂停保留，收起工具放弃草稿，刷新重新观察 |
+| ephemeral presentation | scoped pointer / FeedbackLayer | 拖影、命中高亮、移动几何、cue；暂停/后台/旋转/超时/跳过清除，不序列化 |
+
+业务先提交，不等待 animationend。普通表现 0.65–1 秒，变形 1.4 秒，抵达/过路/结局 2.4 秒；角色过路约 1.3 秒；reduced-motion 直接显示稳定终态。场景与关系位置来自世界投影，移动副本只补视觉路径。手势与语音回调按当前活动/工具生命周期清理，不成为第二条状态推进路径。

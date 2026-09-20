@@ -5,7 +5,7 @@
 ## 架构决策
 当前采用 **React + TypeScript + Vite 的事件驱动单机网页游戏架构**。保留唯一确定性领域转换，不引入第二套游戏状态、不默认引入 Phaser/Pixi/Cocos、不增加后端。当前玩法是点击/拖放、拼写、组句、物品关系、有限演出和场景条件推进，尚无持续物理、自由角色控制或大规模逐帧实体模拟。
 
-## 目标分层
+## 当前分层
 Browser/App Shell 下分 Start/Pause/Ending/Review 与 Game Shell；Game Shell 由 Scene View、HUD、Context Tool、Feedback Layer、Accessibility 组成。Application 保持 Adventure Session；Domain 保持 world.transition；Content 保存 scenes/encounters/tasks/manifest；Platform 保存 save/replay/audio/assets/browser lifecycle。依赖方向 UI → Application → Domain；Domain 不依赖 React、DOM、Storage、Audio。
 
 ## Game Shell
@@ -51,5 +51,12 @@ Desktop：Scene 主区 + Context Tool 侧区。Tablet：Scene 优先，工具按
 ## 引擎升级门槛
 只有出现连续自由移动/物理碰撞、大量精灵粒子、复杂镜头动画，或 DOM 场景经测量无法满足目标设备性能，才提 ADR 比较继续 DOM、PixiJS、Phaser/Cocos。若迁移，采用 renderer adapter 渐进切换；Domain/Application/Content/Save 不随渲染器重写。
 
-## 下一阶段目标
-把现有可通关产品表面推进为 **Scene-first Web Game Shell**：持续世界、上下文工具、直接操控、反馈层、资源生命周期、响应式游戏布局和稳定恢复形成统一运行时；不是另起一套 Demo。
+## 实际模块与边界
+
+落点见 04 的模块表。GameShell 不用旧 Step 伪装工具；Letters 接受有限 `LetterTask`，SentenceBuilder 保留唯一 token ID、拖入/排序/退回和键盘按钮。`sceneModel` 将 Adventure 的真实可用任务映射为对象相关邀请与出口，结束条件仍由 `complete/goals` 提供。
+
+资源以唯一 manifest ID 分类：critical 为伙伴与当前背景；scene 为当前所需道具；lazy 为延迟姿态/草地欢呼图。未来背景不在首页预取；实际显示可立即按需请求。请求去重、成功缓存、卸载取消；失败显示 fallback，重试仅失败 ID，epoch 只重建图片，不重置工具/世界。没有 Service Worker 或第二份资源登记。
+
+每个拖动表面限定命中 scope，捕获后仍以视口坐标命中当前可见元素；关系对象用父对象百分比局部定位。失去 capture、多指、旋转、后台和 Escape 都清理；释放 capture 不触发第二次提交。键盘 Enter/Space 不被上一拖动的合成 click 抑制。句尾有明确落点，已有词块是插入点。
+
+Phone 未开工具时世界占满剩余视口；打开工具后世界至少保留主体区域，底部 sheet 最大约 45%，内部滚动，句子行保持可见便于拖入。窄横屏改侧栏。命中尺寸与遮挡通过实际回归检查，真机范围仍见 STATUS。

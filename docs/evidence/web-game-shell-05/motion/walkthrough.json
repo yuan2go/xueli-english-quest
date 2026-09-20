@@ -1,0 +1,78 @@
+{
+  "surface": "normal production HTTP /",
+  "viewport": "390x844 Chromium touch emulation",
+  "injectedGameState": false,
+  "beforeCross": {
+    "x": 17.390625,
+    "y": 369.7578125,
+    "width": 103.59375,
+    "height": 129.203125
+  },
+  "padFirst": [
+    {
+      "progress": 0,
+      "delay": 220
+    }
+  ],
+  "duringCross": {
+    "x": 159.7671661376953,
+    "y": 369.7577819824219,
+    "width": 103.59373474121094,
+    "height": 129.203125
+  },
+  "afterCross": {
+    "x": 254.203125,
+    "y": 369.7578125,
+    "width": 103.59375,
+    "height": 129.203125
+  },
+  "pad": {
+    "x": 130.25,
+    "y": 415.046875,
+    "width": 159.09375,
+    "height": 106.9375
+  },
+  "ink": {
+    "x": 143.1875,
+    "y": 416.234375,
+    "width": 125.796875,
+    "height": 105.5625
+  },
+  "motion": [
+    {
+      "playState": "running",
+      "progress": 0.6443348591937798,
+      "keyframes": [
+        {
+          "offset": null,
+          "easing": "linear",
+          "composite": "auto",
+          "transform": "translate(-236.812px, 0px) matrix(1, 0, 0, 1, -51.7969, -65.1016) scale(1, 1)",
+          "computedOffset": 0
+        },
+        {
+          "offset": null,
+          "easing": "linear",
+          "composite": "auto",
+          "transform": "translate(0px, 0px) matrix(1, 0, 0, 1, -51.7969, -65.1016) scale(1, 1)",
+          "computedOffset": 1
+        }
+      ],
+      "timing": {
+        "delay": 220,
+        "direction": "normal",
+        "duration": 850,
+        "easing": "cubic-bezier(0.22, 0.7, 0.2, 1)",
+        "endDelay": 0,
+        "fill": "backwards",
+        "iterationStart": 0,
+        "iterations": 1
+      }
+    }
+  ],
+  "ending": "cap worn / hat packed",
+  "activityRoundTrip": true,
+  "refreshRestored": true,
+  "errors": [],
+  "ceiling": "Agent engineering walkthrough and video; no physical-device FPS or child study"
+}

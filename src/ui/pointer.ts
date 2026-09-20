@@ -20,13 +20,24 @@ export function usePointerDrop(
   const disabledRef = useRef(disabled);
   disabledRef.current = disabled;
   const suppressed = useRef(false);
+  const position = useRef({ x: 0, y: 0 });
+  const ghostElement = useRef<HTMLDivElement | null>(null);
+  const frame = useRef<number | null>(null);
+  const hover = useRef<string | null>(null);
   const [ghost, setGhost] = useState<{
-    x: number;
-    y: number;
     label: string;
     target: string | null;
   } | null>(null);
+  function paint() {
+    const { x, y } = position.current;
+    if (ghostElement.current)
+      ghostElement.current.style.transform =
+        `translate3d(${x}px, ${y}px, 0) translate(-50%, -65%)`;
+  }
   function release() {
+    if (frame.current !== null) cancelAnimationFrame(frame.current);
+    frame.current = null;
+    hover.current = null;
     const a = active.current;
     active.current = null;
     if (a?.owner.hasPointerCapture(a.id)) a.owner.releasePointerCapture(a.id);
@@ -65,13 +76,21 @@ export function usePointerDrop(
       const a = active.current;
       if (!a || a.id !== e.pointerId || disabledRef.current) return;
       if (Math.hypot(e.clientX - a.x, e.clientY - a.y) > 8) a.moved = true;
-      if (a.moved)
-        setGhost({
-          x: e.clientX,
-          y: e.clientY,
-          label: a.source,
-          target: hit(e.clientX, e.clientY),
-        });
+      if (!a.moved) return;
+      position.current = { x: e.clientX, y: e.clientY };
+      if (frame.current !== null) return;
+      frame.current = requestAnimationFrame(() => {
+        frame.current = null;
+        if (active.current !== a) return;
+        const { x, y } = position.current;
+        const target = hit(x, y);
+        // Coordinates belong to the compositor; React only renders semantic drag changes.
+        if (!ghostElement.current || target !== hover.current) {
+          hover.current = target;
+          setGhost({ label: a.source, target });
+        }
+        paint();
+      });
     };
     const up = (e: globalThis.PointerEvent) => {
       if (active.current?.id !== e.pointerId) return;
@@ -115,6 +134,10 @@ export function usePointerDrop(
   }, []);
   return {
     ghost,
+    ghostRef(node: HTMLDivElement | null) {
+      ghostElement.current = node;
+      if (node) paint();
+    },
     cancel,
     start(e: PointerEvent<HTMLElement>, source: string) {
       if (

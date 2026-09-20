@@ -1,0 +1,53 @@
+{
+  "label": "final-implementation",
+  "environment": "Chromium headless, 390x844, CDP CPU 4x; actual normal entry wake+bag then 120 pointer moves and Escape; engineering measurement, not physical-device FPS",
+  "runs": [
+    {
+      "run": 0,
+      "LayoutCount": 4,
+      "RecalcStyleCount": 139,
+      "LayoutDuration": 0.001137,
+      "RecalcStyleDuration": 0.011631,
+      "ScriptDuration": 0.050431,
+      "TaskDuration": 0.22939199999999998,
+      "pointerMoves": 121,
+      "styleMutations": 120,
+      "frames": 122,
+      "frameMedian": 16.699999999999818,
+      "frameP95": 16.700000000000728,
+      "framesOver33ms": 0
+    },
+    {
+      "run": 1,
+      "LayoutCount": 4,
+      "RecalcStyleCount": 136,
+      "LayoutDuration": 0.001556,
+      "RecalcStyleDuration": 0.009105,
+      "ScriptDuration": 0.045812,
+      "TaskDuration": 0.204376,
+      "pointerMoves": 121,
+      "styleMutations": 120,
+      "frames": 121,
+      "frameMedian": 16.699999999999818,
+      "frameP95": 16.700000000000728,
+      "framesOver33ms": 0
+    },
+    {
+      "run": 2,
+      "LayoutCount": 4,
+      "RecalcStyleCount": 138,
+      "LayoutDuration": 0.002102,
+      "RecalcStyleDuration": 0.011386,
+      "ScriptDuration": 0.0561,
+      "TaskDuration": 0.23538099999999998,
+      "pointerMoves": 121,
+      "styleMutations": 120,
+      "frames": 122,
+      "frameMedian": 16.699999999999818,
+      "frameP95": 16.799999999999272,
+      "framesOver33ms": 0
+    }
+  ],
+  "implementationSha": "b50964ee394784fea7063c3ccffa02f48b38170d",
+  "scopeNote": "Profiled home drag path; subsequent trail alignment changes do not alter this path."
+}

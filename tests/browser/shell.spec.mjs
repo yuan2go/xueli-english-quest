@@ -85,6 +85,7 @@ test("persistent world, scoped touch/keyboard, sheet scrolling, focus and portra
     await expect(p.locator(".answer")).toHaveCount(0);
     const saved = (await snapshot(p)).projection;
     await button(p, "字母 m").click();
+    await expect(button(p, "第1格 m")).toBeFocused();
     const surfaceBefore = await scene.boundingBox();
     await p
       .locator(".quest-tools")
@@ -141,6 +142,10 @@ test("phone full adventure with dragged/reordered sentence tokens and reload dur
   await button(p, "继续冒险").click();
   expect((await snapshot(p)).projection.story.world).toEqual(crossed);
   await expect(p.locator(".presentation")).toHaveCount(0);
+  const pad = await object(p, "route-sheet").boundingBox();
+  const ink = await button(p, "湿墨小径").boundingBox();
+  expect(pad.y + pad.height / 2).toBeGreaterThan(ink.y);
+  expect(pad.y + pad.height / 2).toBeLessThan(ink.y + ink.height);
   await move(p, "route-sheet", "放回地面 / 取出 / 摘下");
   await morph(p, "route-sheet", "p");
   await button(p, "跟着地图去草地 →").click();

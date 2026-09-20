@@ -1,6 +1,4 @@
-import { QUEST_AUDIO } from "../content/quest.ts";
-import { SENTENCE_AUDIO } from "../content/sentences.ts";
-import { AUDIO } from "../content/manifest.ts";
+import { ALL_AUDIO } from "../content/manifest.ts";
 import { matchesFormat } from "../content/resource-contract.ts";
 import type { AudioObservation, AudioStatus } from "../game/audio-evidence.ts";
 import { localId } from "./id.ts";
@@ -30,9 +28,7 @@ export class StoryAudio {
     settled?: (status: AudioStatus) => void,
   ) {
     this.stop();
-    const asset =
-      AUDIO.find((a) => a.text === text) ??
-      SENTENCE_AUDIO.find((a) => a.text === text) ?? QUEST_AUDIO.find((a) => a.text === text);
+    const asset = ALL_AUDIO.find((a) => a.text === text);
     const source = asset?.path
       ? "recording"
       : "speechSynthesis" in window

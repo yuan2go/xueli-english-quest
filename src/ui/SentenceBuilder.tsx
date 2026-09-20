@@ -129,8 +129,13 @@ export function SentenceBuilder({
       {pointer.ghost && (
         <div
           className="drag-ghost"
+          ref={pointer.ghostRef}
           aria-hidden="true"
-          style={{ left: pointer.ghost.x, top: pointer.ghost.y }}
+          style={{
+            left: 0,
+            top: 0,
+            translate: `${pointer.ghost.x}px ${pointer.ghost.y}px`,
+          }}
         >
           {task.tokens.find((t) => t.id === pointer.ghost?.label)?.text}
         </div>

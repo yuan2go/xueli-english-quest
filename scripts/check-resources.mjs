@@ -1,3 +1,5 @@
+import { validateQuestContent } from "../src/content/quest-validation.ts";
+import { QUEST_PACK } from "../src/content/quest.ts";
 import { readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { SENTENCE_AUDIO } from "../src/content/sentences.ts";
@@ -9,10 +11,17 @@ import {
 import { validateStory } from "../src/content/validate.ts";
 import { PACK } from "../src/content/story.ts";
 const policy = process.argv.includes("--release") ? "release" : "development";
-validateResources(IMAGES, [...AUDIO, ...SENTENCE_AUDIO, ...ALL_QUEST_AUDIO], policy);
+validateResources(
+  IMAGES,
+  [...AUDIO, ...SENTENCE_AUDIO, ...ALL_QUEST_AUDIO],
+  policy,
+);
 if (policy === "release" && PACK.review !== "APPROVED")
   throw new Error("内容包尚未通过教研审核");
 validateStory();
+validateQuestContent();
+if (policy === "release" && QUEST_PACK.review !== "APPROVED")
+  throw new Error("新内容包尚未通过教研审核");
 for (const a of [...IMAGES, ...AUDIO].filter((a) => a.path)) {
   const data = readFileSync(new URL(`../public/${a.path}`, import.meta.url));
   if (

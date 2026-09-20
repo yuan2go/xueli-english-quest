@@ -216,15 +216,31 @@ function transitionPicnic(
 }
 
 /** The only domain write entry. Historical picnic commands retain their exact rules. */
-type PicnicCommand = { expectedRevision: number; effect: Effect; mode?: "story" | "picnic" };
-type RescueCommand = { expectedRevision: number; action: Action; rules: SpatialRules };
+type PicnicCommand = {
+  expectedRevision: number;
+  effect: Effect;
+  mode?: "story" | "picnic";
+};
+type RescueCommand = {
+  expectedRevision: number;
+  action: Action;
+  rules: SpatialRules;
+};
 export function transition(world: World, command: PicnicCommand): World;
-export function transition(world: SpatialWorld, command: RescueCommand): { world: SpatialWorld; motions: Motion[] };
-export function transition(world: World | SpatialWorld, command: PicnicCommand | RescueCommand) {
-  if ('rules' in world && 'action' in command) {
-    if (world.revision !== command.expectedRevision) throw new DomainError('STALE_REVISION');
+export function transition(
+  world: SpatialWorld,
+  command: RescueCommand,
+): { world: SpatialWorld; motions: Motion[] };
+export function transition(
+  world: World | SpatialWorld,
+  command: PicnicCommand | RescueCommand,
+) {
+  if ("rules" in world && "action" in command) {
+    if (world.revision !== command.expectedRevision)
+      throw new DomainError("STALE_REVISION");
     return applySpatial(world, command.action, command.rules);
   }
-  if (!('rules' in world) && 'effect' in command) return transitionPicnic(world, command);
-  throw new DomainError('INVALID_WORLD');
+  if (!("rules" in world) && "effect" in command)
+    return transitionPicnic(world, command);
+  throw new DomainError("INVALID_WORLD");
 }

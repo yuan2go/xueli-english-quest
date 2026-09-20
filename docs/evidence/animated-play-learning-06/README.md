@@ -50,3 +50,5 @@
 `npm test` 52/52（[原始输出](core-test.log)）、`npm run typecheck`、`npm run typecheck:domain`、`npm run build`、`npm run check:resources`、`npm run test:browser` 16/16 均 PASS。`check:release` [实际输出](release-check.log) 退出 1，首个阻塞为未审核 bag；门槛未放宽。构建 JS 321.91kB / gzip105.98kB，历史 decoder 延迟块24.09kB / gzip9.50kB；CSS20.83kB / gzip5.53kB。
 
 实体 iPhone/iPad/Android、Safari/WebKit 真机、目标儿童试玩、正式资源权利/发音/教研、公网部署 NOT_RUN。新增资产和现有素材均没有由开发 agent 填写正式审核通过。四帧步态不是自由物理移动；开包图与原图有轻微比例差，教学效果未证明。
+
+GitHub 交付：[PR #12](https://github.com/yuan2go/xueli-english-quest/pull/12)，未合并。CI NOT_RUN：只读 API 核对仓库 `actions/permissions.enabled=false`，分支 run/check 为空；workflow 定义 active 不等于仓库允许执行。本包未改动开关。

@@ -55,7 +55,9 @@
     "rightsReview": "NOT_RUN",
     "pronunciationAndTeachingReview": "NOT_RUN",
     "runtimeProvider": "NOT_RUN (outside scope)",
-    "desktopNativeBackground": "PASS: independent headed Chromium, noDefaults true; hidden=true, moving=0, world unchanged on resume"
+    "desktopNativeBackground": "PASS: independent headed Chromium, noDefaults true; hidden=true, moving=0, world unchanged on resume",
+    "githubCI": "NOT_RUN: repository actions/permissions.enabled=false; branch run list and PR checks empty; no switch changed"
   },
-  "review": "Two read-only code-review axes; original concrete findings fixed and re-reviewed; reviewers did not independently repeat browser evidence."
+  "review": "Two read-only code-review axes; original concrete findings fixed and re-reviewed; reviewers did not independently repeat browser evidence.",
+  "pullRequest": "https://github.com/yuan2go/xueli-english-quest/pull/12"
 }

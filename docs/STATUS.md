@@ -43,5 +43,5 @@ baseline：刷新后默认分支 origin/main `a9a62e3eb632781595b40171dfb442bf0f
 - NOT_RUN：运行时 Provider（本包范围外）；开发内置图像生成的真实资产来源已登记，不能把它当运行时教学 Provider 验证。
 - BLOCKED：正式发布资源门槛。其余已授权工程工作没有因外部审核而跳过。
 - 动作边界：四帧步态和有限姿态，不是自由物理移动/骨骼系统；开包生成图与旧闭合图有轻微比例差，现有 512px 欢呼图未冒充高清 master。
-- 远端四个 Actions workflow 只读核对为 active，本包没有改动文件或开关；本地 PASS 不预填 CI 结果。
+- GitHub [PR #12](https://github.com/yuan2go/xueli-english-quest/pull/12) OPEN，未合并。CI **NOT_RUN**：仓库级 `actions/permissions.enabled=false`，该分支无 run/check；四个 workflow 定义状态虽然为 active，仍受仓库总开关阻止。本包未改动任何 Actions 文件或开关，本地 PASS 不冒充 CI。
 - 下一包尚未分配；优先用真实设备、正式音频/教研和儿童观察校准现有玩法，再决定工程迭代。不自动添加平台、账号、后台或新引擎。

@@ -15,6 +15,9 @@ export function usePointerDrop(
   scope?: RefObject<HTMLElement | null>,
 ) {
   const active = useRef<Gesture | null>(null);
+  const ghostRef = useRef<HTMLDivElement>(null);
+  const frame = useRef<number | null>(null);
+  const coordinates = useRef({ x: 0, y: 0 });
   const handler = useRef(drop);
   handler.current = drop;
   const disabledRef = useRef(disabled);
@@ -27,6 +30,8 @@ export function usePointerDrop(
     target: string | null;
   } | null>(null);
   function release() {
+    if (frame.current !== null) cancelAnimationFrame(frame.current);
+    frame.current = null;
     const a = active.current;
     active.current = null;
     if (a?.owner.hasPointerCapture(a.id)) a.owner.releasePointerCapture(a.id);
@@ -65,13 +70,23 @@ export function usePointerDrop(
       const a = active.current;
       if (!a || a.id !== e.pointerId || disabledRef.current) return;
       if (Math.hypot(e.clientX - a.x, e.clientY - a.y) > 8) a.moved = true;
-      if (a.moved)
-        setGhost({
-          x: e.clientX,
-          y: e.clientY,
-          label: a.source,
-          target: hit(e.clientX, e.clientY),
+      if (a.moved) {
+        coordinates.current = { x: e.clientX, y: e.clientY };
+        if (frame.current !== null) return;
+        frame.current = requestAnimationFrame(() => {
+          frame.current = null;
+          if (active.current !== a) return;
+          const { x, y } = coordinates.current;
+          const target = hit(x, y);
+          if (ghostRef.current)
+            ghostRef.current.style.translate = `${x}px ${y}px`;
+          setGhost((old) =>
+            old?.label === a.source && old.target === target
+              ? old
+              : { x, y, label: a.source, target },
+          );
         });
+      }
     };
     const up = (e: globalThis.PointerEvent) => {
       if (active.current?.id !== e.pointerId) return;
@@ -115,6 +130,7 @@ export function usePointerDrop(
   }, []);
   return {
     ghost,
+    ghostRef,
     cancel,
     start(e: PointerEvent<HTMLElement>, source: string) {
       if (

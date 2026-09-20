@@ -1,0 +1,10 @@
+{
+  "condition": "Chromium headless macOS, 390x844, CPU throttle 4, 3 identical cycles: resize/move/blocked drag 35 pointer samples",
+  "phase": "before",
+  "sourceSHA": "d45bb82ea23057ccb369d6c777c488b90e823929",
+  "wallMs": 2493,
+  "layoutCount": 129,
+  "layoutDurationMs": 17.69499999999999,
+  "scriptDurationMs": 162.067,
+  "longTasks": []
+}

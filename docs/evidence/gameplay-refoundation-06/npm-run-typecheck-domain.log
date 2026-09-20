@@ -1,0 +1,4 @@
+
+> xueli-wordspell@0.1.0 typecheck:domain
+> tsc --project tsconfig.domain.json
+

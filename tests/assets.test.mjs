@@ -76,9 +76,17 @@ test("visual registry native masters retain bytes, dimensions and hashes indepen
     const data = readFileSync(new URL(`../${asset.master.path}`, import.meta.url));
     assert.equal(data.byteLength, asset.master.bytes);
     assert.equal(createHash("sha256").update(data).digest("hex"), asset.master.sha256);
-    assert.ok(matchesFormat(data, "image/png"));
-    assert.equal(data.readUInt32BE(16), asset.master.width);
-    assert.equal(data.readUInt32BE(20), asset.master.height);
+    if (asset.master.path.endsWith('.svg')) {
+      assert.ok(matchesFormat(data, "image/svg+xml"));
+      assert.equal(Number(/width="(\d+)"/.exec(data.toString())[1]), asset.master.width);
+      assert.equal(Number(/height="(\d+)"/.exec(data.toString())[1]), asset.master.height);
+      assert.equal(asset.master.alpha, true);
+      assert.doesNotMatch(data.toString(), /<image|<script|<foreignObject/i);
+    } else {
+      assert.ok(matchesFormat(data, "image/png"));
+      assert.equal(data.readUInt32BE(16), asset.master.width);
+      assert.equal(data.readUInt32BE(20), asset.master.height);
+    }
     assert.ok(asset.master.width >= asset.width && asset.master.height >= asset.height);
   }
 });

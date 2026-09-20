@@ -1,6 +1,6 @@
 # 05 · 内容、领域、语言与恢复合同
 
-Refoundation 06 目标协议。基线仍是内容 4.0.0-dev.1 / schema 4；本次仅更新文档，未改变运行时格式。新格式由实现提交显式分配版本，禁止继续沿用旧版本号解释新行为。
+Refoundation 06 运行协议。当前内容 paper-rescue / 6.0.0-dev.2、rulesVersion rescue-1、schema 6、key xueli.quest.v6。旧内容 4.0.0-dev.1 / schema 4 保留原解释与只读恢复依赖，不解释为新章节。
 
 ## 内容登记
 
@@ -67,3 +67,11 @@ text/hint/demo 在当前评估窗口单调累计；撤销、关闭工具或重�
 ## 内容与资源发布
 
 新关卡/词句/物理规则改变行为时更新内容与规则版本；视觉资产变更有独立 manifest 版本/哈希，不伪造旧内容哈希。所有实际引用资源由唯一 manifest 与 BASE_URL 解析，审核状态独立保存。发布检查不得对未审核资源静默回退为 PASS。
+
+## 当前 envelope 与提交实现
+
+`schema/pack/id/seed/journal/projection` 为唯一 envelope 字段。pack 绑定完整 id/version/rulesVersion/review；projection 校验 active/story/boards/events/revision。每条命令仅包含 sessionId/revision/board/attemptId/intent；quest-command 白名单同时用于运行入口与 decoder。拒绝未知字段、外来词块、重复 token ID、同 attempt 不同载荷、未登记的音频 ID/version。限制为 6000 条命令和 4,000,000 字符；日志满时停止新提交并提示导出。
+
+语言事件显式保存 language、task、status、维度、支持与评估窗口。描述匹配读世界，语法正确但任务不符的合法指令仍可行动并记录 mismatch；blocked 保留 language=correct。输入未完成不增加语言尝试，拖空不发命令。开发音频按 audio-unverified 记录。
+
+旧/坏/未知原档保持在原 key，需备份写入并读回一致后才能明确新开；失败可导出或进入不写原档的内存模式。导出包含 wordspell.*、xueli.adventure.*、xueli.quest.* 及备份。当前关撤销栈最多 100 个世界快照，journal/帮助不删除；跨关历史保留。窗口、variant 和 seed 经重放恢复。当前版本不提供旧档成绩迁移。

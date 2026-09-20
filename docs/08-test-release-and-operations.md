@@ -4,7 +4,7 @@ Refoundation 06 验收合同。目标、已执行与阻塞分开；本文件列�
 
 ## 当前可用命令
 
-基线使用 Node >=22.12.0 与真实 npm lockfile：`npm ci`、`npm test`、`npm run typecheck`、`npm run typecheck:domain`、`npm run build`、`npm run check:resources`、`npm run check:release`、`npm run test:browser`。测试是 Node test runner，不假设存在 Vitest、lint 或新 check:levels 命令。需要新增关卡校验命令时先实现/登记，再执行。
+基线使用 Node >=22.12.0 与真实 npm lockfile：`npm ci`、`npm test`、`npm run typecheck`、`npm run typecheck:domain`、`npm run build`、`npm run check:resources`、`npm run check:release`、`npm run test:browser`。测试是 Node test runner，不假设存在 Vitest、lint 或新 check:levels 命令。`npm run check:levels` 已实现，使用同内核受控枚举，`-- --write` 输出见证与预算。
 
 浏览器套件需要已安装 Playwright 浏览器；当前生产构建预览回归使用 4174 端口。禁止只测开发组件、注入完成状态后截图或编造真实儿童数据。不为文档变更无差别跑全部游戏套件；修改玩法/语言/存档必须运行相关真实回归和最终构建。
 

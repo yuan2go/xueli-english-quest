@@ -1,339 +1,286 @@
+import { validateQuestContent } from "./content/quest-validation.ts";
 import { useEffect, useRef, useState } from "react";
-import { WORD_TASKS } from "./content/adventure.ts";
-import { SENTENCES } from "./content/sentences.ts";
+import { initialQuest, issue, current } from "./game/quest.ts";
+import type { Quest, Intent, Verdict } from "./game/quest.ts";
+import { puzzle, QUEST_AUDIO } from "./content/quest.ts";
 import {
-  board,
-  goals,
-  initialAdventure,
-  runAdventure,
-} from "./game/adventure.ts";
-import type { Adventure, Intent } from "./game/adventure.ts";
-import {
-  ADVENTURE_KEY,
-  backup,
-  exportRecords,
-  loadAdventure,
-  saveAdventure,
-} from "./platform/adventure-save.ts";
+  loadQuest,
+  saveQuest,
+  backupRaw,
+  exportQuest,
+  QUEST_KEY,
+} from "./platform/quest-save.ts";
+import { StoryAudio } from "./platform/audio.ts";
 import { localId } from "./platform/id.ts";
 import { useAssets } from "./platform/useAssets.ts";
-import {
-  Art,
-  AssetContext,
-  AssetNotice,
-  CharacterArt,
-  Visual,
-} from "./ui/Art.tsx";
-import { Modal } from "./ui/Modal.tsx";
+import { AssetContext, AssetNotice, CharacterArt } from "./ui/Art.tsx";
 import { GameShell } from "./ui/shell/GameShell.tsx";
-import "./adventure.css";
-const modeLabels = {
-  teaching: "引导学习",
-  assisted: "辅助练习",
-  independent: "独立应用",
-  exploration: "自由探索",
-  revisit: "复习回访",
-};
-const evidenceLabels = {
-  guided: "引导学习",
-  assisted: "使用了帮助",
-  demonstrated: "看过示范",
-  independent: "未使用帮助",
-  "audio-unverified": "语音未确认",
-  exploration: "探索记录",
-};
-const resultLabels = {
-  done: "当前目标完成",
-  valid: "已提交",
-  incomplete: "还未填完整",
-  structure: "语序需要调整",
-  outside: "范围外，未判对错",
-  mismatch: "与本次目标或眼前情境不符",
-  blocked: "世界条件限制",
-  stale: "场景已更新",
-};
-const typeLabels = {
-  spelling: "听音拼写",
-  substitution: "换字",
-  "sentence-command": "指令句",
-  "sentence-description": "观察描述",
-  listening: "听音找物",
-  operation: "世界操作",
-  exploration: "自由制作",
-};
-function taskLabel(id: string) {
-  return (
-    WORD_TASKS.find((t) => t.id === id)?.purpose ??
-    Object.values(SENTENCES).find((t) => t.id === id)?.title ??
-    (id === "recap"
-      ? "回望自己的布置"
-      : id === "find-map"
-        ? "听声音找路线"
-        : id.startsWith("morph:")
-          ? "纸张变形"
-          : "自由操作")
-  );
+import { WordBook } from "./ui/WordBook.tsx";
+import { Modal } from "./ui/Modal.tsx";
+import "./quest.css";
+function load() {
+  validateQuestContent();
+  try {
+    return loadQuest(localStorage);
+  } catch {
+    return { warning: "存储不可用，本次可以在内存中游玩。", blocked: true };
+  }
 }
 export default function App() {
-  const [loaded] = useState(loadAdventure);
-  const [session, setSession] = useState(
-    () =>
-      loaded.session ??
-      initialAdventure(localId(), Math.floor(Math.random() * 0xffffffff)),
-  );
-  const current = useRef(session),
-    canSave = useRef(!loaded.blocked);
-  const [screen, setScreen] = useState<"home" | "game" | "records">("home");
-  const [modal, setModal] = useState<"pause" | "restart" | "help" | null>(null);
-  const [warning, setWarning] = useState(loaded.warning);
-  const [muted, setMuted] = useState(false),
-    [volume, setVolume] = useState(0.8);
-  const assets = useAssets(screen === "home" ? "home" : board(session).scene);
-  const active = useRef(false);
-  active.current = screen === "game" && !modal;
-  const currentGoals = goals(session);
-  function saving(s: Adventure) {
-    current.current = s;
-    setSession(s);
-    if (canSave.current) {
-      const error = saveAdventure(s);
-      if (error) setWarning(error);
+  const [loaded] = useState(load),
+    [session, setSession] = useState<Quest>(
+      () => loaded.session ?? initialQuest(localId()),
+    );
+  const latest = useRef(session);
+  latest.current = session;
+  const [surface, setSurface] = useState<"home" | "game" | "book">("home"),
+    [receipt, setReceipt] = useState<Verdict>();
+  const [warning, setWarning] = useState(loaded.warning),
+    [memory, setMemory] = useState(false),
+    [blocked, setBlocked] = useState(loaded.blocked);
+  const [settings, setSettings] = useState(false),
+    [reduced, setReduced] = useState(
+      () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    );
+  const [voice, setVoice] = useState("开发语音 · 未经听审"),
+    [muted, setMuted] = useState(false);
+  const audio = useRef(new StoryAudio()),
+    assets = useAssets(current(session).level);
+  function send(i: Intent) {
+    const result = issue(latest.current, i, localId());
+    latest.current = result.session;
+    setSession(result.session);
+    setReceipt(result.verdict);
+    if (result.session !== session && !memory && !blocked) {
+      try {
+        const problem = saveQuest(result.session, localStorage);
+        if (problem) setWarning(problem);
+      } catch {
+        setWarning("保存失败，请导出本局记录。");
+      }
     }
   }
-  function dispatch(intent: Intent) {
-    const before = current.current;
-    const result = runAdventure(before, {
-      ...intent,
-      sessionId: before.id,
-      revision: before.revision,
-      mode: before.mode,
-      attemptId: localId(),
-    });
-    if (result.session !== before) saving(result.session);
-    return result;
+  function speak(text: string) {
+    audio.current.unlock();
+    const entry = QUEST_AUDIO.find((a) => a.text === text);
+    audio.current.play(
+      text,
+      setVoice,
+      entry
+        ? {
+            stepId: current(latest.current).level,
+            purpose: "task",
+            eventId: localId(),
+            observe: (o) =>
+              send({
+                kind: "audio",
+                value: o.status,
+                assetId: o.assetId,
+                source: o.source,
+                version: o.version,
+              }),
+          }
+        : undefined,
+    );
   }
-  function start() {
-    if (!canSave.current) setModal("restart");
-    else setScreen("game");
+  function stop() {
+    audio.current.stop();
   }
-  function download() {
+  function start(inMemory = false) {
+    if (!inMemory && blocked) {
+      try {
+        backupRaw(localStorage, QUEST_KEY);
+      } catch {
+        setWarning("备份未完成，原档未动。请导出或选择仅本次游玩。");
+        return;
+      }
+    }
+    setMemory(inMemory);
+    setBlocked(false);
+    setSurface("game");
+    audio.current.unlock();
+  }
+  function enter(mode: "story" | "workshop" | "revisit") {
+    stop();
+    send({ kind: "enter", mode });
+    setSurface("game");
+  }
+  function exportAll() {
+    let text: string;
+    try {
+      text = exportQuest(latest.current, localStorage);
+    } catch {
+      text = exportQuest(latest.current);
+    }
     const url = URL.createObjectURL(
-      new Blob([exportRecords(current.current)], { type: "application/json" }),
+      new Blob([text], { type: "application/json" }),
     );
     const a = document.createElement("a");
     a.href = url;
-    a.download = "xueli-quest-records.json";
+    a.download = "xueli-records.json";
     a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }
-  function restart() {
-    try {
-      backup(ADVENTURE_KEY);
-    } catch (e) {
-      setWarning((e as Error).message);
-      return;
-    }
-    canSave.current = true;
-    saving(initialAdventure(localId(), Math.floor(Math.random() * 0xffffffff)));
-    setWarning("原记录已保留；新故事从家门口开始。");
-    setModal(null);
-    setScreen("game");
+    setTimeout(() => URL.revokeObjectURL(url), 0);
   }
   useEffect(() => {
-    const pause = () => {
-      if (active.current) setModal("pause");
-    };
-    const hidden = () => {
-      if (document.hidden) pause();
-    };
-    window.addEventListener("pagehide", pause);
-    document.addEventListener("visibilitychange", hidden);
+    const cancel = () => audio.current.stop();
+    window.addEventListener("blur", cancel);
+    document.addEventListener("visibilitychange", cancel);
     return () => {
-      window.removeEventListener("pagehide", pause);
-      document.removeEventListener("visibilitychange", hidden);
+      cancel();
+      window.removeEventListener("blur", cancel);
+      document.removeEventListener("visibilitychange", cancel);
     };
   }, []);
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const change = () => setReduced(media.matches);
+    media.addEventListener("change", change);
+    return () => media.removeEventListener("change", change);
+  }, []);
   return (
-    <AssetContext.Provider value={assets}>
-      <main className={`quest-app ${screen === "game" ? "playing" : ""}`}>
-        {screen !== "game" && (
-          <header className="quest-header">
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setScreen("home");
+    <AssetContext value={assets}>
+      <div className={`quest-app ${reduced ? "reduced-motion" : ""}`}>
+        <header className="app-header">
+          <button
+            className="brand"
+            onClick={() => {
+              stop();
+              setSurface("home");
+            }}
+          >
+            雪梨英语奇旅 <span>纸上小径</span>
+          </button>
+          <nav aria-label="主要入口">
+            <button onClick={() => enter("story")}>去冒险</button>
+            <button onClick={() => enter("workshop")}>魔法工坊</button>
+            <button
+              onClick={() => {
+                stop();
+                send({ kind: "support", value: "text" });
+                setSurface("book");
               }}
-              className="quest-brand"
             >
-              雪梨英语奇旅<small>XUELI ENGLISH QUEST</small>
-            </a>
-            <span className="chapter-name">小猫的野餐冒险</span>
-          </header>
-        )}
+              词语册
+            </button>
+            <button
+              aria-label="暂停与设置"
+              onClick={() => {
+                stop();
+                setSettings(true);
+              }}
+            >
+              ☰
+            </button>
+          </nav>
+        </header>
         <AssetNotice />
-        {screen === "home" && assets.pending > 0 && (
-          <p className="micro" role="status">
-            正在准备插画…可以先开始，进度不会受影响。
-          </p>
-        )}
         {warning && (
-          <div className="notice save-warning" role="alert">
+          <div className="notice" role="alert">
             {warning}
+            <button onClick={exportAll}>导出记录</button>
           </div>
         )}
-        {screen === "home" && (
-          <section className="quest-cover">
-            <div>
-              <p className="eyebrow">一张纸，一次旅行，许多自己的办法。</p>
+        {surface === "home" ? (
+          <main className="title-page">
+            <div className="title-copy">
+              <span className="eyebrow">一场从「如果」开始的冒险</span>
               <h1>
-                小猫想去野餐。
+                把词语，
                 <br />
-                你会怎么帮它？
+                变成好办法。
               </h1>
-              <p>寻找身边的东西，用单词改变用途，用一句话安排世界。</p>
-              <button className="primary" onClick={start}>
-                {session.revision > 0 ? "继续冒险" : "开始冒险"}
-              </button>
-              <button className="quiet" onClick={() => setScreen("records")}>
-                本地记录
-              </button>
-              <p className="micro">
-                无需账号 · 触屏、鼠标和键盘均可
+              <p>
+                围栏那边有一只篮子。
                 <br />
-                图像与开发语音待审核；无声音时可选文字辅助。
+                带上你的主意，和小猫把它带回来。
               </p>
+              <button className="primary start" onClick={() => start()}>
+                {blocked
+                  ? "保留旧档，开始新冒险"
+                  : loaded.session
+                    ? "继续冒险"
+                    : "开始冒险"}{" "}
+                →
+              </button>
+              {blocked && (
+                <button onClick={() => start(true)}>
+                  仅本次游玩，不写原档
+                </button>
+              )}
+              <small>可以试错，可以撤销，也可以换个办法。</small>
             </div>
-            <div className="quest-cover-art">
-              <Visual id="scene-act-1" label="家门口" />
+            <div className="cover-stage">
+              <div className="cover-ring" />
               <CharacterArt />
-              <Art word="map" />
+              <span className="cover-note">
+                small / big
+                <br />
+                一个词，一种可能
+              </span>
             </div>
-          </section>
-        )}
-        {screen === "game" && (
+          </main>
+        ) : surface === "book" ? (
+          <WordBook session={session} speak={speak} />
+        ) : (
           <GameShell
-            key={session.id}
+            key={session.active}
             session={session}
-            dispatch={dispatch}
-            paused={!!modal}
-            muted={muted}
-            volume={volume}
-            onPause={() => setModal("pause")}
-            onHelp={() => setModal("help")}
-            onReview={() => setScreen("records")}
-            onMute={() => setMuted((v) => !v)}
+            send={send}
+            receipt={receipt}
+            reduced={reduced}
+            speak={speak}
+            cancelAudio={stop}
           />
         )}
-        {screen === "records" && (
-          <section className="quest-records">
-            <h1>这次真实发生了什么</h1>
-            <p>
-              按任务和帮助记录。探索不计练习成绩；无音频证明不记独立听音。一次组句不代表掌握语法。
-            </p>
-            <button onClick={download}>导出本局与旧记录</button>
-            <button onClick={() => setScreen("game")}>返回冒险</button>
-            <button onClick={() => setModal("restart")}>重新开始</button>
-            <ol>
-              {session.events.map((event) => (
-                <li
-                  key={event.id}
-                  data-type={event.type}
-                  data-evidence={event.evidence}
-                >
-                  <b>{taskLabel(event.task)}</b> · {modeLabels[event.practice]}{" "}
-                  · {typeLabels[event.type]} · {evidenceLabels[event.evidence]}{" "}
-                  · {resultLabels[event.result]}
-                  {event.language === "correct" &&
-                    event.result === "blocked" && <span>（语句成立）</span>}
-                  {event.type !== "operation" && (
-                    <span lang="en"> · {event.submitted}</span>
-                  )}
-                </li>
-              ))}
-            </ol>
-          </section>
-        )}
-        {modal && (
-          <Modal
-            title={
-              modal === "pause"
-                ? "小猫在这里等你"
-                : modal === "restart"
-                  ? "保留记录，开始新冒险？"
-                  : "试着观察，再行动"
-            }
-            close={() => setModal(null)}
+        <footer className="app-footer">
+          <span>{voice}</span>
+          <button
+            onClick={() => {
+              stop();
+              setMuted(!muted);
+              audio.current.muted = !muted;
+            }}
           >
-            {modal === "pause" ? (
-              <>
-                <button onClick={() => setModal(null)}>继续冒险</button>
-                <button onClick={() => setMuted((v) => !v)}>
-                  {muted ? "取消静音" : "静音"}
-                </button>
-                <label>
-                  音量
-                  <input
-                    type="range"
-                    aria-label="音量"
-                    min="0"
-                    max="1"
-                    step=".1"
-                    value={volume}
-                    onChange={(e) => setVolume(Number(e.target.value))}
-                  />
-                </label>
-                <button
-                  onClick={() => {
-                    setModal(null);
-                    setScreen("records");
-                  }}
-                >
-                  本地记录与导出
-                </button>
-                <button
-                  onClick={() => {
-                    setModal(null);
-                    setScreen("home");
-                  }}
-                >
-                  返回首页
-                </button>
-              </>
-            ) : modal === "restart" ? (
-              <>
-                <p>
-                  旧记录会保留备份。新目标从家门口开始，不把旧步骤换算成新目标。
-                </p>
-                <button onClick={download}>先导出记录</button>
-                <button className="primary" onClick={restart}>
-                  确认开始新冒险
-                </button>
-              </>
-            ) : (
-              <>
-                <p>
-                  点物品展开行动；先点物品再点场景里的目标，或拖过去。键盘 Tab
-                  选中、Enter 操作。
-                </p>
-                <p>
-                  包里先开包；戴着先摘下；垫上有东西先移走。点“放回地面”总能找到可逆退路。
-                </p>
-                <p>
-                  指令让物品行动；描述只核对眼前的布置。不会的地方可以重听、看文字或示范，会如实记为帮助。
-                </p>
-                <ul>
-                  {currentGoals
-                    .filter((g) => !g.done)
-                    .map((g) => (
-                      <li key={g.id}>{g.label}</li>
-                    ))}
-                </ul>
-              </>
-            )}
+            {muted ? "开启声音" : "静音"}
+          </button>
+          {surface === "game" && (
+            <span>
+              {puzzle(current(session).level).id === "workshop"
+                ? "工坊中的物品留在工坊里"
+                : "你的每一个办法，都留下自己的足迹。"}
+            </span>
+          )}
+        </footer>
+        {settings && (
+          <Modal title="歇一小会儿" close={() => setSettings(false)}>
+            <label className="setting">
+              <input
+                type="checkbox"
+                checked={reduced}
+                onChange={(e) => setReduced(e.target.checked)}
+              />
+              减少动画
+            </label>
+            <p>进度保存在本机。可以导出原档和本次记录。</p>
+            <button onClick={exportAll}>导出全部记录</button>
+            <button
+              onClick={() => {
+                send({ kind: "restart" });
+                setSettings(false);
+              }}
+            >
+              重开本关（保留尝试记录）
+            </button>
+            <details>
+              <summary>成人记录</summary>
+              <p>
+                本次行为 {session.events.length} 条。开发 TTS
+                不构成经审核的独立听力证据。教研、真实儿童与设备验收待完成。
+              </p>
+            </details>
           </Modal>
         )}
-      </main>
-    </AssetContext.Provider>
+      </div>
+    </AssetContext>
   );
 }

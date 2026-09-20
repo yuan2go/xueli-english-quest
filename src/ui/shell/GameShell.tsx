@@ -1,428 +1,505 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ACTIVITIES } from "../../content/adventure.ts";
-import type { ActivityId } from "../../content/adventure.ts";
-import { ENTITY_REACTIONS } from "../../content/encounters.ts";
-import { availableTargets, board, unlocked } from "../../game/adventure.ts";
-import type {
-  Adventure,
-  AdventureResult,
-  Intent,
-} from "../../game/adventure.ts";
-import { presentation, sceneModel, resolveTool } from "../../game/shell.ts";
-import type { Cue, SceneAction, Tool } from "../../game/shell.ts";
-import { StoryAudio } from "../../platform/audio.ts";
+import { useEffect, useRef, useState } from "react";
+import { current, goalSatisfied, taskId } from "../../game/quest.ts";
+import type { Intent, Quest, Verdict } from "../../game/quest.ts";
+import { puzzle, lexeme, EXERCISES } from "../../content/quest.ts";
+import { tokensFor } from "../../game/language.ts";
 import { Scene } from "../Scene.tsx";
-import { NAMES } from "../Art.tsx";
-import { Modal } from "../Modal.tsx";
-import { ContextTool } from "./ContextTool.tsx";
-import { GameHUD } from "./GameHUD.tsx";
-import type { Flight } from "./FeedbackLayer.tsx";
-import { FeedbackLayer } from "./FeedbackLayer.tsx";
+import { SentenceBuilder } from "../SentenceBuilder.tsx";
+import { MeaningTool } from "../MeaningTool.tsx";
 export function GameShell({
   session,
-  dispatch,
-  paused,
-  volume,
-  muted,
-  onPause,
-  onHelp,
-  onReview,
-  onMute,
+  send,
+  receipt,
+  reduced,
+  speak,
+  cancelAudio,
 }: {
-  session: Adventure;
-  dispatch: (intent: Intent) => AdventureResult;
-  paused: boolean;
-  volume: number;
-  muted: boolean;
-  onPause: () => void;
-  onHelp: () => void;
-  onReview: () => void;
-  onMute: () => void;
+  session: Quest;
+  send: (i: Intent) => void;
+  receipt?: Verdict;
+  reduced: boolean;
+  speak: (text: string) => void;
+  cancelAudio: () => void;
 }) {
-  const [selected, setSelected] = useState<string | null>(null);
-  const [tool, setTool] = useState<Tool | null>(null);
-  const [explore, setExplore] = useState(false);
-  const [feedback, setFeedback] = useState("");
-  const [flight, setFlight] = useState<Flight | null>(null);
-  const origin = useRef<{ rect: DOMRect; word: Flight["word"] } | null>(null);
-  const [cue, setCue] = useState<Cue | null>(null);
-  const current = useRef(session);
-  current.current = session;
-  const returnEntity = useRef<string | undefined>(undefined);
-  const trigger = useRef<HTMLElement | null>(null);
-  const shell = useRef<HTMLDivElement>(null);
-  const [audio] = useState(() => new StoryAudio());
-  const b = board(session),
-    model = sceneModel(session),
-    entities = b.world.entities;
-  const inactive = paused || explore;
-  useEffect(() => {
-    audio.muted = muted;
-    audio.volume = volume;
-    if (muted) audio.stop();
-  }, [audio, muted, volume]);
-  useEffect(() => {
-    if (inactive) {
-      audio.stop();
-      setCue(null);
-    }
-  }, [inactive, audio]);
-  useEffect(() => {
-    const cancel = () => {
-      setCue(null);
-      audio.stop();
-    };
-    window.addEventListener("resize", cancel);
-    return () => {
-      window.removeEventListener("resize", cancel);
-      audio.stop();
-    };
-  }, [audio]);
-  useEffect(() => {
-    if (!cue) return;
-    const timer = setTimeout(() => setCue(null), cue.duration);
-    return () => clearTimeout(timer);
-  }, [cue]);
-  useEffect(() => {
-    if (!feedback) return;
-    const timer = setTimeout(() => setFeedback(""), 6500);
-    return () => clearTimeout(timer);
-  }, [feedback]);
-  useLayoutEffect(() => {
-    const start = origin.current;
-    const end =
-      cue?.entity &&
-      shell.current
-        ?.querySelector<HTMLElement>(`[data-entity="${cue.entity}"]`)
-        ?.getBoundingClientRect();
-    if (cue?.kind === "move" && start && end)
-      setFlight({
-        x: start.rect.x,
-        y: start.rect.y,
-        width: start.rect.width,
-        height: start.rect.height,
-        dx: end.x - start.rect.x,
-        dy: end.y - start.rect.y,
-        word: start.word,
-      });
-    else setFlight(null);
-  }, [cue]);
-  function send(intent: Intent, silent = false) {
-    const before = current.current,
-      r = dispatch(intent);
-    current.current = r.session;
-    if (!silent) {
-      const nextCue = presentation(before, intent, r);
-      const el =
-        nextCue?.entity &&
-        shell.current?.querySelector<HTMLElement>(
-          `[data-entity="${nextCue.entity}"]`,
+  useEffect(() => () => cancelAudio(), [session.active]);
+  const b = current(session),
+    spec = puzzle(b.level, b.variant);
+  const [selected, setSelected] = useState<string>();
+  const [tool, setToolState] = useState<
+    "object" | "spell" | "sentence" | "learn" | null
+  >(null);
+  const opener = useRef<HTMLElement | null>(null);
+  function setTool(next: typeof tool) {
+    if (
+      b.practice === "independent" &&
+      b.exercise === "spelling" &&
+      next !== "spell" &&
+      next !== null
+    )
+      send({ kind: "support", value: "text" });
+    opener.current = document.activeElement as HTMLElement;
+    cancelAudio();
+    setToolState(next);
+  }
+  const [word, setWord] = useState("box"),
+    [answer, setAnswer] = useState(""),
+    [sentence, setSentence] = useState("");
+  const selectedEntity = selected ? b.world.entities[selected] : undefined;
+  const choose = (id: string) => {
+    setSelected(id);
+    setTool("object");
+  };
+  function teach(w: string) {
+    cancelAudio();
+    setWord(w);
+    setTool("learn");
+    send({ kind: "teach", word: w });
+  }
+  function close() {
+    cancelAudio();
+    setToolState(null);
+    const target = opener.current?.isConnected
+      ? opener.current
+      : document.querySelector<HTMLElement>(
+          `[data-entity="${selected ?? "cat-companion"}"]`,
         );
-      const word =
-        nextCue?.entity && board(before).world.entities[nextCue.entity]?.word;
-      origin.current =
-        el && word ? { rect: el.getBoundingClientRect(), word } : null;
-      setFeedback(r.message);
-      setCue(nextCue);
+    target?.focus();
+  }
+  const done = goalSatisfied(b);
+  const wasDone = useRef(done);
+  useEffect(() => {
+    if (done && !wasDone.current) {
+      cancelAudio();
+      setToolState(null);
+      document.querySelector<HTMLElement>(".chapter-arrival")?.focus();
     }
-    return r;
+    wasDone.current = done;
+  }, [done]);
+  const exercise = EXERCISES[b.exercise];
+  function practice(
+    mode: "assisted" | "independent",
+    type: "command" | "description" | "spelling",
+  ) {
+    setSentence("");
+    send({ kind: "practice", mode, exercise: type });
+    setTool(type === "spelling" ? "spell" : "sentence");
+    setWord("box");
   }
-  function focusWorld(id?: string) {
-    requestAnimationFrame(() => {
-      const el = id
-        ? shell.current?.querySelector<HTMLElement>(
-            `[data-entity="${id}"], [data-word-entity="${id}"]`,
-          )
-        : trigger.current;
-      if (el?.isConnected && !el.matches(":disabled"))
-        el.focus({ preventScroll: true });
-      else
-        shell.current
-          ?.querySelector<HTMLElement>(".quest-scene")
-          ?.focus({ preventScroll: true });
-    });
-  }
-  function close(focus = true) {
-    const id = tool ? returnEntity.current : (selected ?? undefined);
-    audio.stop();
-    setTool(null);
-    setSelected(null);
-    if (focus) focusWorld(id);
-  }
-  function openTool(next: Tool) {
-    trigger.current = document.activeElement as HTMLElement;
-    const resolved = resolveTool(current.current, next);
-    returnEntity.current =
-      resolved.word?.entity ??
-      resolved.morph?.id ??
-      model.actions.find((a) => a.tool?.id === next.id)?.anchor;
-    audio.unlock();
-    audio.stop();
-    setTool(next);
-    setSelected(null);
-    setFeedback(resolveTool(current.current, next).context);
-  }
-  function choose(id: string) {
-    if (tool?.kind === "find") {
-      const r = send({ action: "find", task: "find-map", source: id });
-      if (["valid", "done"].includes(r.kind)) {
-        close(false);
-        focusWorld(id);
-      }
-      return;
-    }
-    close(false);
-    trigger.current = document.activeElement as HTMLElement;
-    setSelected(id === selected ? null : id);
-    setFeedback(
-      ENTITY_REACTIONS[id] ?? "试着把它放到别处，或者看看它的另一种用途。",
-    );
-  }
-  function action(a: SceneAction) {
-    if (a.tool) openTool(a.tool);
-    else if (a.intent) {
-      close(false);
-      send(a.intent);
-      focusWorld();
+  function demonstrate() {
+    send({ kind: "support", value: "demo" });
+    if (b.level === "workshop") {
+      send({
+        kind: "world",
+        action: { type: "open", source: "box-main", open: true },
+      });
+      send({
+        kind: "sentence",
+        task: taskId(session),
+        text: EXERCISES.command.example,
+        selected: "box-main",
+      });
+      if (b.exercise === "description")
+        send({
+          kind: "sentence",
+          task: taskId(session),
+          text: EXERCISES.description.example,
+          selected: "box-main",
+        });
     }
   }
-  const contextual = model.actions.filter((a) => a.anchor === selected);
+
   return (
-    <div
-      ref={shell}
-      className={`game-shell ${tool ? "tool-open" : selected ? "object-open" : "world-open"}`}
-      data-encounter={model.id}
-      onKeyDown={(e) => {
-        if (e.key === "Escape" && !inactive) {
-          close();
-          setCue(null);
-        }
-      }}
-    >
-      <GameHUD
-        title={model.title}
-        problem={model.problem}
-        muted={muted}
-        explore={() => {
-          audio.stop();
-          setExplore(true);
-        }}
-        pause={onPause}
-        help={onHelp}
-        mute={onMute}
-      />
-      <div className="game-space">
-        <Scene
-          session={session}
-          selected={selected}
-          onSelect={choose}
-          onWord={(id) => openTool({ kind: "word", id })}
-          onMove={(source, target) => {
-            send({ action: "place", source, target });
-            close(false);
-            focusWorld(source);
-          }}
-          onMiss={() => {
-            setFeedback(
-              "没有放到合适的位置，物品留在原处。先点物品，再点目的地也可以。",
-            );
-            setCue({
-              id: Date.now(),
-              kind: "blocked",
-              message: "回到原位",
-              duration: 650,
-            });
-          }}
-          response={feedback}
-          pose={
-            cue?.kind === "blocked"
-              ? "thinking"
-              : cue
-                ? "action"
-                : model.ended
-                  ? "happy"
-                  : "idle"
-          }
-          disabled={inactive}
-          cue={cue}
+    <main className={`game-shell ${tool ? "has-tool" : ""}`}>
+      <div className="scene-heading">
+        <div>
+          <span className="eyebrow">{spec.subtitle}</span>
+          <h1>{spec.title}</h1>
+        </div>
+        <button
+          onClick={() => send({ kind: "undo" })}
+          disabled={!b.undo.length}
+          aria-label="撤销世界行动"
         >
-          <nav className="scene-invitations" aria-label="场景中的邀请">
-            {(!tool
-              ? model.actions.filter((a) => a.anchor !== selected)
-              : []
-            ).map((a) => (
-              <button
-                key={a.id}
-                data-encounter-action={a.id}
-                className={a.intent ? "scene-exit" : "encounter-marker"}
-                onClick={() => action(a)}
-              >
-                <span aria-hidden="true">{a.intent ? "↝" : "☏"}</span> {a.label}
-              </button>
-            ))}
-            {model.activityComplete && (
-              <div className="activity-success">
-                ✓ 小问题解决了！
-                <button
-                  onClick={() => {
-                    close(false);
-                    send({ action: "exit" });
-                  }}
-                >
-                  返回故事
-                </button>
-                <button
-                  onClick={() => {
-                    close(false);
-                    send({ action: "restart-activity" });
-                  }}
-                >
-                  换个情境重玩
-                </button>
-              </div>
-            )}
-            {model.ended && !tool && (
-              <div className="ending-choice">
-                <p>{model.ending}</p>
-                <button onClick={onReview}>回顾这次冒险</button>
-              </div>
-            )}
-          </nav>
-          <FeedbackLayer cue={cue} flight={flight} />
-        </Scene>
-        {(tool || selected) && (
-          <aside className="quest-tools" aria-label="行动工具" inert={inactive}>
-            {tool ? (
-              <ContextTool
-                key={`${session.mode}-${tool.kind}-${tool.id}`}
-                session={session}
-                tool={tool}
-                send={send}
-                close={() => close()}
-                paused={inactive}
-                audio={audio}
-                onSuccess={(id) => {
-                  close(false);
-                  focusWorld(id);
-                }}
-              />
-            ) : (
-              <section className="object-tool" aria-label="物品行动">
-                <div className="tool-heading">
-                  <h2>
-                    {selected === "ink-road"
-                      ? "湿墨小径"
-                      : selected === "cat-card" &&
-                          entities[selected]?.word === "cat"
-                        ? "小猫纸偶"
-                        : NAMES[entities[selected!]?.word]}
-                  </h2>
-                  <button onClick={() => close()}>取消选择</button>
-                </div>
-                <div className="context-actions">
-                  {selected === "bag-main" && (
-                    <button onClick={() => send({ action: "bag" })}>
-                      {b.bagOpen ? "合上背包" : "打开背包"}
-                    </button>
-                  )}
-                  {["cat-card", "route-sheet"].includes(selected!) && (
-                    <button
-                      onClick={() => openTool({ kind: "morph", id: selected! })}
-                    >
-                      试试换字
-                    </button>
-                  )}
-                  {contextual.map((a) => (
-                    <button key={a.id} onClick={() => action(a)}>
-                      {a.label}
-                    </button>
-                  ))}
-                  {availableTargets(session, selected!).map((t) => (
-                    <button
-                      key={t.key}
-                      onClick={() => {
-                        send({
-                          action: "place",
-                          source: selected!,
-                          target: t.target,
-                        });
-                        close(false);
-                        focusWorld(selected!);
-                      }}
-                    >
-                      {t.label}
-                    </button>
-                  ))}
-                </div>
-                <p className="micro">
-                  拖到亮起的位置，或点选行动。随时可以放回地面。
-                </p>
-              </section>
-            )}
-          </aside>
-        )}
-      </div>
-      <div className="sr-only" role="status">
-        {feedback}
-      </div>
-      {cue && ["arrive", "cross", "celebrate"].includes(cue.kind) && (
-        <button className="skip-presentation" onClick={() => setCue(null)}>
-          跳过演出
+          ↶ 撤销
         </button>
+      </div>
+      <p className="goal-ribbon">
+        {done ? "✓ " : ""}
+        {spec.goalText}
+      </p>
+      {spec.request && (
+        <details className="request-slip" open={!tool}>
+          <summary>朋友的请求</summary>
+          <span>朋友的小纸条</span>
+          <button onClick={() => speak(spec.request!)}>听朋友的请求</button>
+          <button onClick={() => send({ kind: "support", value: "text" })}>
+            看文字辅助
+          </button>
+          {b.support.includes("text") && <p lang="en">{spec.request}</p>}
+          <small>开发语音未听审；可用文字继续，按辅助记录。</small>
+        </details>
       )}
-      {explore && (
-        <Modal title="野餐小路" close={() => setExplore(false)}>
-          <p>走一条小路，回来时故事里的布置还在。</p>
-          <nav className="activity-doors" aria-label="短活动">
-            {(Object.keys(ACTIVITIES) as ActivityId[]).map((id) => (
-              <button
-                key={id}
-                disabled={!unlocked(session, id)}
-                onClick={() => {
-                  setExplore(false);
-                  close(false);
-                  send({ action: "activity", value: id });
-                }}
-              >
-                {ACTIVITIES[id].title}
-                {!unlocked(session, id) && " · 故事中发现"}
-              </button>
+      <Scene
+        board={b}
+        selected={selected}
+        select={choose}
+        send={send}
+        receipt={receipt}
+        reduced={reduced}
+        assessmentWord={
+          b.practice === "independent" && b.exercise === "spelling"
+            ? word
+            : undefined
+        }
+      />
+      {b.level === "workshop" && (
+        <section className="workshop-choices" aria-label="工坊练习">
+          <p>先认识意义，再挑一种方式试用</p>
+          <div>
+            {(["command", "description", "spelling"] as const).map((type) => (
+              <span key={type}>
+                <b>
+                  {type === "command"
+                    ? "句子行动"
+                    : type === "description"
+                      ? "观察描述"
+                      : "拼写造物"}
+                </b>
+                <button onClick={() => practice("assisted", type)}>
+                  辅助
+                  {type === "command"
+                    ? "指令"
+                    : type === "description"
+                      ? "描述"
+                      : "拼写"}
+                </button>
+                <button onClick={() => practice("independent", type)}>
+                  独立
+                  {type === "command"
+                    ? "指令"
+                    : type === "description"
+                      ? "描述"
+                      : "拼写"}
+                </button>
+              </span>
             ))}
-          </nav>
-          {b.scene === "meadow" && (
+          </div>
+        </section>
+      )}
+      <div className="tool-ribbon" aria-label="英语工具">
+        <button
+          onClick={() => {
+            setWord(spec.rules.quotas[0]?.word ?? "box");
+            setTool("spell");
+          }}
+        >
+          ✧ 拼词造物
+        </button>
+        <button onClick={() => setTool("sentence")}>说一句话</button>
+        <button onClick={() => teach("small")}>词义小样</button>
+        <button onClick={() => send({ kind: "support", value: "hint" })}>
+          给我提示
+        </button>
+      </div>
+      <div
+        className={`feedback ${receipt?.status ?? ""}`}
+        role="status"
+        aria-live="polite"
+      >
+        {receipt?.message ?? spec.invitation}
+      </div>
+      {done && b.level !== "workshop" && (
+        <div className="chapter-arrival" tabIndex={-1}>
+          {b.level === "R1" || b.level === "R2" ? (
             <button
+              className="primary"
               onClick={() => {
-                setExplore(false);
-                openTool({ kind: "craft", id: "craft" });
+                setTool(null);
+                setSelected(undefined);
+                send({ kind: "next" });
               }}
             >
-              自由制作 · mat / hat
+              沿小径继续 →
             </button>
-          )}
-          {session.mode !== "story" && (
+          ) : (
             <>
-              <button
-                onClick={() => {
-                  setExplore(false);
-                  close(false);
-                  send({ action: "exit" });
-                }}
-              >
-                返回故事
+              <h2>这一份心意，送到了。</h2>
+              <p>
+                苹果
+                {b.world.entities["apple-main"]?.place.kind === "in"
+                  ? "在篮子里面"
+                  : "在箱子上面"}
+                ，小猫已经来到朋友身边。这是你实际留下的布置。
+              </p>
+              <button onClick={() => setTool("sentence")}>
+                用描述回望布置
               </button>
-              <button
-                onClick={() => {
-                  setExplore(false);
-                  close(false);
-                  send({ action: "restart-activity" });
-                }}
-              >
-                换个情境重玩
+              <button onClick={() => send({ kind: "enter", mode: "revisit" })}>
+                雨后，再回花园
               </button>
             </>
           )}
-        </Modal>
+        </div>
       )}
-    </div>
+      {tool && (
+        <aside
+          className="context-tool"
+          aria-label="英语工具抽屉"
+          onKeyDown={(e) => {
+            if (e.key === "Escape") close();
+          }}
+        >
+          <header>
+            <h2>
+              {tool === "spell"
+                ? "WordSpell · 拼词造物"
+                : tool === "sentence"
+                  ? "让英语做点事情"
+                  : tool === "learn"
+                    ? "词义小样"
+                    : selectedEntity
+                      ? `${lexeme(selectedEntity.word)?.zh} · ${selectedEntity.word}`
+                      : "选一个物品"}
+            </h2>
+            <button aria-label="关闭工具" onClick={close}>
+              ×
+            </button>
+          </header>
+          <div className="tool-scroll">
+            {tool === "object" && selectedEntity && (
+              <>
+                <p>{lexeme(selectedEntity.word)?.meaning}</p>
+                <div className="action-row">
+                  {spec.rules.types[selectedEntity.word].resize && (
+                    <>
+                      {(["small", "normal", "big"] as const).map((size) => (
+                        <button
+                          key={size}
+                          onClick={() =>
+                            send({
+                              kind: "world",
+                              action: {
+                                type: "resize",
+                                source: selectedEntity.id,
+                                size,
+                              },
+                            })
+                          }
+                        >
+                          {size === "normal" ? "原来大小" : size}
+                        </button>
+                      ))}
+                    </>
+                  )}
+                </div>
+                {(spec.rules.types[selectedEntity.word].container ||
+                  selectedEntity.word === "door") && (
+                  <div className="action-row">
+                    <button
+                      onClick={() =>
+                        send({
+                          kind: "world",
+                          action: {
+                            type: "open",
+                            source: selectedEntity.id,
+                            open: true,
+                          },
+                        })
+                      }
+                    >
+                      Open · 打开
+                    </button>
+                    <button
+                      onClick={() =>
+                        send({
+                          kind: "world",
+                          action: {
+                            type: "open",
+                            source: selectedEntity.id,
+                            open: false,
+                          },
+                        })
+                      }
+                    >
+                      Close · 关上
+                    </button>
+                  </div>
+                )}
+                <p className="micro">
+                  点场景中的地点来移动；放进或放上其他物品：
+                </p>
+                <div className="destinations">
+                  {Object.values(b.world.entities)
+                    .filter((e) => e.id !== selectedEntity.id)
+                    .flatMap((e) =>
+                      (["in", "on"] as const)
+                        .filter((kind) =>
+                          kind === "in"
+                            ? spec.rules.types[e.word].container
+                            : spec.rules.types[e.word].support,
+                        )
+                        .map((kind) => (
+                          <button
+                            key={`${kind}-${e.id}`}
+                            onClick={() =>
+                              send({
+                                kind: "world",
+                                action: {
+                                  type: "move",
+                                  source: selectedEntity.id,
+                                  to: { kind, id: e.id },
+                                },
+                              })
+                            }
+                          >
+                            {kind} {e.word} · {kind === "in" ? "放入" : "放上"}
+                          </button>
+                        )),
+                    )}
+                </div>
+                <button
+                  className="text-button"
+                  onClick={() => teach(selectedEntity.word)}
+                >
+                  认识 {selectedEntity.word}
+                </button>
+              </>
+            )}
+            {tool === "learn" && (
+              <MeaningTool
+                board={b}
+                spec={spec}
+                word={word}
+                teach={teach}
+                send={send}
+                speak={speak}
+                onTry={() => {
+                  setTool("object");
+                  setSelected("cat-companion");
+                }}
+              />
+            )}
+            {tool === "spell" && (
+              <>
+                {b.level === "workshop" && b.practice === "assisted" && (
+                  <p lang="en">参考词：{word}</p>
+                )}
+                <p>用字母做一个{lexeme(word)?.zh}，放在场景里自由使用。</p>
+                <div className="action-row">
+                  {spec.rules.quotas.map((q) => (
+                    <button
+                      key={q.id}
+                      onClick={() => {
+                        setWord(q.word);
+                        setAnswer("");
+                      }}
+                    >
+                      {lexeme(q.word)?.zh}
+                    </button>
+                  ))}
+                </div>
+                {!b.taught.includes(word) ? (
+                  <button className="primary" onClick={() => teach(word)}>
+                    先认识这个词
+                  </button>
+                ) : (
+                  <>
+                    <button onClick={() => speak(word)}>听一听</button>
+                    <label className="spell-input">
+                      我的字母
+                      <input
+                        aria-label="我的字母"
+                        autoComplete="off"
+                        autoCapitalize="none"
+                        value={answer}
+                        maxLength={20}
+                        onChange={(e) => setAnswer(e.target.value)}
+                      />
+                    </label>
+                    <div className="letter-bank">
+                      {(b.practice === "independent"
+                        ? [..."abcdefghijklmnopqrstuvwxyz"]
+                        : [...new Set([...word, "a", "e", "t"])].sort()
+                      ).map((c) => (
+                        <button
+                          key={c}
+                          onClick={() => setAnswer((s) => s + c)}
+                          lang="en"
+                        >
+                          {c}
+                        </button>
+                      ))}
+                      <button onClick={() => setAnswer((s) => s.slice(0, -1))}>
+                        取回
+                      </button>
+                    </div>
+                    <button
+                      className="primary"
+                      disabled={answer.length < word.length}
+                      onClick={() => send({ kind: "spell", word, answer })}
+                    >
+                      施法造物
+                    </button>
+                  </>
+                )}
+              </>
+            )}
+            {tool === "sentence" && (
+              <>
+                {b.level === "workshop" && b.practice !== "exploration" && (
+                  <div className="exercise-request">
+                    <p>{exercise.prompt}</p>
+                    {b.practice === "assisted" && (
+                      <p lang="en">{exercise.example}</p>
+                    )}
+                    <button onClick={demonstrate}>看一次示范</button>
+                  </div>
+                )}
+                <p>选择指令或描述。含糊的 it 指向你当前选中的物品。</p>
+                <SentenceBuilder
+                  key={taskId(session)}
+                  task={{
+                    id: taskId(session),
+                    tokens: tokensFor(taskId(session)),
+                  }}
+                  submit={(ids) =>
+                    send({
+                      kind: "sentence",
+                      task: taskId(session),
+                      ids,
+                      selected,
+                    })
+                  }
+                />
+                <details>
+                  <summary>也可以打字</summary>
+                  <label>
+                    我的句子
+                    <input
+                      aria-label="输入句子"
+                      value={sentence}
+                      maxLength={240}
+                      onChange={(e) => setSentence(e.target.value)}
+                    />
+                  </label>
+                  <button
+                    onClick={() =>
+                      send({
+                        kind: "sentence",
+                        task: taskId(session),
+                        text: sentence,
+                        selected,
+                      })
+                    }
+                  >
+                    提交句子
+                  </button>
+                </details>
+              </>
+            )}
+          </div>
+        </aside>
+      )}
+    </main>
   );
 }

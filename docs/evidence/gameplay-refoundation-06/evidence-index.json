@@ -1,0 +1,131 @@
+{
+  "sourceSHA": "7f42995006884e3bf17ef9c61a17b3f64557ba5e",
+  "sourceTree": "2b9bb458e87681817521dd0c2d906b3c904b23f9",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 2976,
+      "sha256": "66d0da74b62e664ffad9d7ba5d65e73125f074a79dbeeb0d80ee0df249e5ac86"
+    },
+    {
+      "path": "checks.json",
+      "bytes": 1874,
+      "sha256": "71ea6df80d100653c36325e8f81e6e6fb4893bca6398abe44577259308e5c5bd"
+    },
+    {
+      "path": "git-diff--check.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "http-assets.json",
+      "bytes": 134,
+      "sha256": "1fc5022dca14ef511b82b433c590762436aab05e9e82aa270e5a7d5c4eeeae62"
+    },
+    {
+      "path": "http-chapter.json",
+      "bytes": 1838,
+      "sha256": "9c2d646f1b20619bcea5ac84dc9b7dde3d69b926a2d8ecb6619f77621592e77b"
+    },
+    {
+      "path": "npm-ci.log",
+      "bytes": 454,
+      "sha256": "2560c6e8e1fbcd86ac2144a1fc45b31edc393ae167463b7afff5dc7c565daf9a"
+    },
+    {
+      "path": "npm-run-build.log",
+      "bytes": 464,
+      "sha256": "8a549de4712eac958d543922b73dcc259ac7fd2a6a10ced5be0f997bfdf951f5"
+    },
+    {
+      "path": "npm-run-check-levels---write.log",
+      "bytes": 510,
+      "sha256": "886a189df3ea084e4fd860e7c088bdee341642e6d9956dae07537f7e6c64cb5c"
+    },
+    {
+      "path": "npm-run-check-release.log",
+      "bytes": 874,
+      "sha256": "818305616367e1b2adbdf614ebb53a6ff306980553808f42f81e34e3da662e1f"
+    },
+    {
+      "path": "npm-run-check-resources.log",
+      "bytes": 281,
+      "sha256": "38ca6c279d0fedfa3498556b0af974505317933b575e41c75d01f3cceb4f4107"
+    },
+    {
+      "path": "npm-run-test-browser.log",
+      "bytes": 1790,
+      "sha256": "c58879e07b0b8fd74335979d29885c41dc5e847e2024c9f092d2f5a35b7be733"
+    },
+    {
+      "path": "npm-run-typecheck-domain.log",
+      "bytes": 80,
+      "sha256": "b4e7c120034837a45cc18a9b8a533a881ec6ef0d36ae013c46174d4e51dc0951"
+    },
+    {
+      "path": "npm-test.log",
+      "bytes": 6132,
+      "sha256": "95439aa48a70e569059aab77f034aae297ec6ea0fe62afbff65c3bc3ecc4d865"
+    },
+    {
+      "path": "performance-before.json",
+      "bytes": 346,
+      "sha256": "9824db8bfe4e3236764c6982bc8dc8e8793d8c5b67c672809f1f103f051c6391"
+    },
+    {
+      "path": "performance-final.json",
+      "bytes": 355,
+      "sha256": "fe7c7835680dd6b187c061e56d1e40e6ba3389bf74c22551aafae93a8bf46068"
+    },
+    {
+      "path": "phone-ending.png",
+      "bytes": 122401,
+      "sha256": "c65c39f29ee8db0b524d35c36ea9bb5a16f5d91035d1138a0cf2c605ff20aca3"
+    },
+    {
+      "path": "r1-hole.png",
+      "bytes": 132076,
+      "sha256": "77b0991e66c00f1fa0a4caf4a99c6a39980c1e0314f41d0e9f324168618f1acd"
+    },
+    {
+      "path": "r1-step.png",
+      "bytes": 143279,
+      "sha256": "ba932ac9cabae32da421da20850a329556b7dc64202476494edd20b20c2f42ce"
+    },
+    {
+      "path": "r1-support.png",
+      "bytes": 160900,
+      "sha256": "6c8b2c2aac24eb5ce6723d2fe8b425f16c849a3dd1508907f8fb310059650948"
+    },
+    {
+      "path": "viewport-1024.png",
+      "bytes": 145684,
+      "sha256": "09e61c702360cd65529f256bcba6f91fde98f1df6b22ad05ad8842a16a7a067d"
+    },
+    {
+      "path": "viewport-1440.png",
+      "bytes": 163315,
+      "sha256": "05982f0a4b2f499b738b66a258bcd4f414399fbe4dd12b0d416b5764654539ec"
+    },
+    {
+      "path": "viewport-360.png",
+      "bytes": 79059,
+      "sha256": "bb756af60591ace8767501c93561f514322adb0ad43ffe3291b9d983db0a1f24"
+    },
+    {
+      "path": "viewport-390.png",
+      "bytes": 99123,
+      "sha256": "4f9a27557739793b54c60d673c7e81a132d97e7f53e2783acac224dbb742c9b4"
+    },
+    {
+      "path": "viewport-768.png",
+      "bytes": 115589,
+      "sha256": "a7d952109dc3f462761bb53e1762e58a24091473ec37a2f9a0472f41c368bee6"
+    },
+    {
+      "path": "witnesses.json",
+      "bytes": 12553,
+      "sha256": "bc265b3106948ba01be86258f89fcd78509cf85af11cc4819b4cf05d25275645"
+    }
+  ]
+}

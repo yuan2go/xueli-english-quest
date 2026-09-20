@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { checkAssets } from "../content/assets.ts";
 import { IMAGES } from "../content/manifest.ts";
-import { SCENES } from "../content/adventure.ts";
-import type { SceneId } from "../content/adventure.ts";
-export function useAssets(scene: SceneId) {
+import { puzzle } from "../content/quest.ts";
+export function useAssets(scene: string) {
   const [failed, setFailed] = useState<string[]>([]);
   const [epoch, setEpoch] = useState(0),
     [pending, setPending] = useState(0);
@@ -57,25 +56,20 @@ export function useAssets(scene: SceneId) {
   useEffect(() => {
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
-    // Critical identity/cover first; current-scene props next. No future background on first entry.
-    const critical = ["cat", `scene-act-${SCENES[scene].act}`];
-    const props = IMAGES.filter(
-      (a) =>
-        !a.id.startsWith("scene-") &&
-        !a.id.startsWith("cat") &&
-        (scene !== "home" || !["mat", "cap"].includes(a.id)),
-    );
+    const critical = ["cat"];
+    const spec = puzzle(scene);
+    const needed = new Set([
+      ...Object.values(spec.initial.entities).map((e) => e.word),
+      ...spec.rules.quotas.map((q) => q.word),
+    ]);
+    const props = IMAGES.filter((a) => needed.has(a.id) && a.id !== "cat");
     void Promise.all(critical.map((id) => load(id))).then(() => {
       if (cancelled) return;
       void Promise.all(props.map((a) => load(a.id)));
       timer = setTimeout(() => {
         if (!cancelled)
           void Promise.all(
-            [
-              "cat-thinking",
-              "cat-action",
-              ...(scene === "meadow" ? ["cat-happy"] : []),
-            ].map((id) => load(id)),
+            ["cat-thinking", "cat-action", "cat-happy"].map((id) => load(id)),
           );
       }, 800);
     });

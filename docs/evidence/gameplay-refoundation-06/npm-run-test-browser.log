@@ -1,0 +1,22 @@
+
+> xueli-wordspell@0.1.0 test:browser
+> playwright test
+
+[WebServer] (node:48690) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 9 tests using 1 worker
+
+(node:48691) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/browser/performance.spec.mjs:3:1 › same-condition local pointer and semantic action measurement (3.2s)
+  ✓  2 tests/browser/refoundation-boundaries.spec.mjs:27:1 › G06 touch cancel, second pointer, lost capture, rotation and keyboard have equivalent commands (858ms)
+  ✓  3 tests/browser/refoundation-boundaries.spec.mjs:121:1 › G05 repeated tokens reorder, blocked sentence retains draft, audio and resource recovery (1.0s)
+  ✓  4 tests/browser/refoundation-boundaries.spec.mjs:189:1 › G08 legacy/corrupt/future bytes survive verified backup, export and storage failure (1.2s)
+  ✓  5 tests/browser/refoundation-boundaries.spec.mjs:249:1 › G09 workshop teaching, independent exercise, demonstration, word book and refresh (733ms)
+  ✓  6 tests/browser/refoundation-boundaries.spec.mjs:288:1 › G10 responsive surfaces, reduced motion and assets on real HTTP (714ms)
+  ✓  7 tests/browser/refoundation-boundaries.spec.mjs:333:1 › G06 sentence pointer insertion/return and interrupted motion cannot commit twice (1.2s)
+  ✓  8 tests/browser/refoundation.spec.mjs:57:1 › R1 real home: two mechanically distinct solutions, undo and refresh (1.3s)
+  ✓  9 tests/browser/refoundation.spec.mjs:95:1 › G09 full mobile chapter, workshop/book, request, actual ending and changed revisit (2.2s)
+
+  9 passed (13.5s)

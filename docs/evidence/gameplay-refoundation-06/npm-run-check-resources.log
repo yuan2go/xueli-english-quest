@@ -1,0 +1,5 @@
+
+> xueli-wordspell@0.1.0 check:resources
+> node --experimental-strip-types scripts/check-resources.mjs
+
+development: resource bytes, hashes, formats, references and story path verified. Browser interaction and image recovery are verified separately. This is not teaching approval.

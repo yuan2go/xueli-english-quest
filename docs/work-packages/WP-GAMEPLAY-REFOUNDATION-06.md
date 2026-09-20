@@ -1,6 +1,6 @@
 # WP-GAMEPLAY-REFOUNDATION-06 · 英语工具解谜主玩法重构
 
-状态：READY_FOR_IMPLEMENTATION；运行实现 NOT_STARTED。本文件是当前唯一工作包，按阶段交付一个完整新章节，不要求一次建设完整商业平台。代码事实基线 `a9a62e3eb632781595b40171dfb442bf0fbbe55e`；执行时先读取包含本设计的最新 origin/main，不强行回退到该 SHA。
+状态：A/B/C ENGINEERING_COMPLETE；已实现完整章节，D 外部验收 PENDING / NOT_RUN。本文件是当前唯一工作包，按阶段交付一个完整新章节，不要求一次建设完整商业平台。代码事实基线 `a9a62e3eb632781595b40171dfb442bf0fbbe55e`；执行时先读取包含本设计的最新 origin/main，不强行回退到该 SHA。
 
 ## 目标
 
@@ -52,7 +52,7 @@ Codex 为本包唯一实现负责人；其他 agent 只审查或承担明确不�
 
 ## 实际执行记录
 
-尚未开始代码实施。当前交付是需求与技术合同；本节由实现负责人填写真实里程碑、失败修复、SHA 和证据，不预勾完成。
+本包在 codex/gameplay-refoundation-06 独立分支实施。最终运行代码 7f42995006884e3bf17ef9c61a17b3f64557ba5e，baseline 74ea7358ce41738d16bfa5dab29e94f581605a5c。最终交付提交以 Git/PR head 为准；只追加文档证据，不伪造自引用 SHA。
 
 ### A 验证记录
 
@@ -61,3 +61,11 @@ Codex 为本包唯一实现负责人；其他 agent 只审查或承担明确不�
 ### B 验证记录
 
 三关、封洞回访、学习工坊/词语册已接入正式页面。R2 支持缩小苹果/改变容器/制作另一箱子；大容器带水果被窄拱门拒绝。R3 手工两种英语请求关联实际 in/on 目标，描述不改世界；工坊返回保留原章节。54 Node 回归通过（exit 0）。`check:levels -- --write` 六个有界枚举均找到见证，R1 支撑与穿洞机制分开，结果含规则版本、预算和轨迹。继续 C 的输入/视觉/恢复/平台回归与交付证据。
+
+### C 与最终工程验证
+
+R1/R2/R3/R1-R、WordSpell、学习工坊/词语册、版本化日志、原档保护、动作表现和故障恢复已完成。最终执行 59/59 Node、typecheck:domain、build、check:resources、6 组 check:levels、9/9 browser 与 diff --check，均 exit 0。check:release exit 1（box 审核未完成），Actions enabled=false / CI NOT_RUN。所有命令与代码 SHA、截图、HTTP 和可解轨迹见 [证据索引](../evidence/gameplay-refoundation-06/README.md)。
+
+修复期间保留原断言：历史 UI 测试按页面退役完整归档并记录新覆盖；旧 Node 46 项全部运行。新增 master 格式分支验证 SVG，原 PNG 字节/尺寸/hash 断言保持。未注入通关状态，未更改安全或发布门槛。
+
+六项结论：ENGINEERING_READY=YES；VISUAL_COMPLETE=NO（工程视觉自检完成，独立视觉验收 PENDING）；DEVICE_VALIDATED=NO；TEACHING_REVIEWED=NO；FUN_VALIDATED=NO；PUBLIC_RELEASE_READY=NO。缺少外部条件仅影响对应验收，运行时 AI 调用 0。详细边界与下一包见 STATUS。

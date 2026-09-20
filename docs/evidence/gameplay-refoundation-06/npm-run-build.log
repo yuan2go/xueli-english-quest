@@ -1,0 +1,18 @@
+
+> xueli-wordspell@0.1.0 build
+> npm run typecheck && vite build
+
+
+> xueli-wordspell@0.1.0 typecheck
+> tsc --noEmit
+
+vite v8.3.0 building client environment for production...
+transforming...
+✓ 41 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.57 kB │ gzip:  0.43 kB
+dist/assets/index-B9PCjFVn.css   15.20 kB │ gzip:  4.59 kB
+dist/assets/index-CdQ46TdR.js   273.40 kB │ gzip: 88.44 kB
+
+✓ built in 98ms

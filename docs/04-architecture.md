@@ -1,6 +1,6 @@
 # 04 · 架构与重构边界
 
-版本：Refoundation 06。本文定义目标架构；当前代码差距见 [12](12-web-game-technical-design.md)，详细协议见 [05](05-content-and-runtime-contracts.md)。只有 STATUS 记录已实现/已验证。
+版本：Refoundation 06。本文定义运行架构；开工差距和已实施映射见 [12](12-web-game-technical-design.md)，详细协议见 [05](05-content-and-runtime-contracts.md)。只有 STATUS 记录已实现/已验证。
 
 ## 技术选择
 
@@ -20,10 +20,10 @@
 | --- | --- |
 | App | src/App.tsx：启动、恢复、外层表面、平台生命周期；不管理关卡细步骤 |
 | UI | src/ui/Scene.tsx、src/ui/shell/*、src/ui/pointer.ts：稳定实体、交互草稿、工具、焦点与动画 |
-| Application | src/game/adventure.ts、src/game/sentences.ts、src/game/shell.ts：意图、任务绑定、原子提交、会话隔离、目标/记录派生 |
-| Domain | src/domain/world.ts：身份、空间、属性、关系、动作规则；允许拆模块，但只能有一个写入入口 |
-| Content | src/content/adventure.ts、sentences.ts、encounters.ts：现有内容适配；新增章节/词义/关卡规则声明 |
-| Platform | src/platform/adventure-save.ts、save.ts、audio.ts、useAssets.ts：版本化恢复、音频、资源与浏览器能力 |
+| Application | src/game/quest.ts、quest-command.ts、language.ts：意图、任务绑定、原子提交、会话隔离、目标/记录派生 |
+| Domain | src/domain/world.ts → spatial.ts：唯一版本分派、身份、空间、属性、关系、动作规则 |
+| Content | src/content/quest.ts、quest-validation.ts：章节/词义/练习/空间与配额，整包校验；旧内容为 decoder/回归依赖 |
+| Platform | src/platform/quest-save.ts、audio.ts、useAssets.ts：版本化恢复、音频、资源；旧 save 模块为历史 decoder |
 
 具体新文件名由实现者决定；以上不是要求构建通用插件框架。优先按空间、动作、语言、恢复等真实变化原因拆分，不把一个巨型文件改成大量一行转发器。
 

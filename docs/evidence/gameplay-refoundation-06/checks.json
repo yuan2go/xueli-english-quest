@@ -1,0 +1,64 @@
+{
+  "sourceSHA": "7f42995006884e3bf17ef9c61a17b3f64557ba5e",
+  "sourceTree": "2b9bb458e87681817521dd0c2d906b3c904b23f9",
+  "node": "v26.3.1",
+  "npm": "11.16.0",
+  "system": "macOS-26.5.2-arm64-arm-64bit",
+  "commands": [
+    {
+      "command": "npm ci",
+      "exitCode": 0,
+      "log": "npm-ci.log",
+      "sourceSHA": "6a4a72216bfcef4ee69650c5c4ab71c9697436f2",
+      "note": "Dependency manifest and lockfile unchanged since this installation."
+    },
+    {
+      "command": "npm test",
+      "exitCode": 0,
+      "log": "npm-test.log",
+      "sourceSHA": "7f42995006884e3bf17ef9c61a17b3f64557ba5e"
+    },
+    {
+      "command": "npm run typecheck:domain",
+      "exitCode": 0,
+      "log": "npm-run-typecheck-domain.log",
+      "sourceSHA": "7f42995006884e3bf17ef9c61a17b3f64557ba5e"
+    },
+    {
+      "command": "npm run build",
+      "exitCode": 0,
+      "log": "npm-run-build.log",
+      "sourceSHA": "7f42995006884e3bf17ef9c61a17b3f64557ba5e"
+    },
+    {
+      "command": "npm run check:resources",
+      "exitCode": 0,
+      "log": "npm-run-check-resources.log",
+      "sourceSHA": "7f42995006884e3bf17ef9c61a17b3f64557ba5e"
+    },
+    {
+      "command": "npm run check:release",
+      "exitCode": 1,
+      "log": "npm-run-check-release.log",
+      "sourceSHA": "7f42995006884e3bf17ef9c61a17b3f64557ba5e"
+    },
+    {
+      "command": "npm run check:levels -- --write",
+      "exitCode": 0,
+      "log": "npm-run-check-levels---write.log",
+      "sourceSHA": "7f42995006884e3bf17ef9c61a17b3f64557ba5e"
+    },
+    {
+      "command": "npm run test:browser",
+      "exitCode": 0,
+      "log": "npm-run-test-browser.log",
+      "sourceSHA": "7f42995006884e3bf17ef9c61a17b3f64557ba5e"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "log": "git-diff--check.log",
+      "sourceSHA": "7f42995006884e3bf17ef9c61a17b3f64557ba5e"
+    }
+  ]
+}

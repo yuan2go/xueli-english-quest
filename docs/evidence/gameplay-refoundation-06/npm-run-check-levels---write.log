@@ -1,0 +1,10 @@
+
+> xueli-wordspell@0.1.0 check:levels
+> node --experimental-strip-types scripts/check-levels.mjs --write
+
+R1 variant=0 step: PASS, explored=99/25000, goal-reached, actions=7
+R1 variant=0 hole: PASS, explored=4/25000, goal-reached, actions=3
+R2 variant=0 any: PASS, explored=21/25000, goal-reached, actions=4
+R3 variant=0 any: PASS, explored=3/25000, goal-reached, actions=2
+R3 variant=1 any: PASS, explored=4/25000, goal-reached, actions=3
+R1-R variant=0 step: PASS, explored=99/25000, goal-reached, actions=7

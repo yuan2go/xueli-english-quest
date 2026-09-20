@@ -16,3 +16,11 @@
 | 2026-09-20 | Codex / GPT-6 | 历史：执行 WP-WEB-GAME-SHELL-05，治理旧设计、正式入口 Game Shell、输入/反馈/资源、正常入口试玩后修复 | SHELL-05 历史代码、权威文档、tests、evidence/web-game-shell-05 | 46 核心测试、8 浏览器测试及实际检查见 STATUS；agent 工程自检 | 未调用生图或运行时 Provider；未接受人工教研/儿童验收；费用/token unknown |
 
 当前没有运行时 AI 工坊。Fixture 不填 provider success；演示视频经过剪辑要标注。
+
+## 2026-09-20 · Refoundation 06 实际制作
+
+工具：Codex / GPT-6（本会话身份），本地 shell、Node/TypeScript、Playwright Chromium、Git/GitHub CLI。按用户的完整 WP06 授权读取 origin/main 与合同、重写正式入口及有限空间/语言/存档、制作原创 box/door/basket/apple SVG、执行有界内核见证和 HTTP 流程、查看截图并修复触摸/焦点/收纳遮挡等实际失败。
+
+产物：src/domain/spatial.ts、game/quest*.ts、language.ts、content/quest*.ts、platform/quest-save.ts、正式 App/UI；public/assets/game/rescue 四个原始 SVG 与现有唯一 registry；tests 与 evidence/gameplay-refoundation-06。代码提交从 f0b3496d5523d5f2b753ddcb5d0e999206102c39 到 7f42995006884e3bf17ef9c61a17b3f64557ba5e，具体历史见 Git。
+
+未调用 imagegen 或在线生成 Provider；新 SVG 为本次代码绘制，不是模型生图 master。狸花猫等原素材来源保留原 registry 记录。没有人工教研/美术/儿童验收，全部真实状态维持 PENDING/NOT_RUN。59 Node 与 9 HTTP 浏览器用例、资源和构建结果均见 STATUS/原始日志；release 实际 exit 1，没有把 fixture/TTS 写成真实 Provider 或正式录音。模型 token、费用 unknown；没有提交任何凭据或儿童资料。

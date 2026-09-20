@@ -1,0 +1,109 @@
+{
+  "sourceSHA": "7f42995006884e3bf17ef9c61a17b3f64557ba5e",
+  "responses": [
+    {
+      "path": "tabby/cat-idle.webp",
+      "status": 200
+    },
+    {
+      "path": "tabby/cat-idle.webp",
+      "status": 200
+    },
+    {
+      "path": "rescue/box.svg",
+      "status": 200
+    },
+    {
+      "path": "rescue/basket.svg",
+      "status": 200
+    },
+    {
+      "path": "rescue/door.svg",
+      "status": 200
+    },
+    {
+      "path": "tabby/cat-idle.webp",
+      "status": 200
+    },
+    {
+      "path": "rescue/door.svg",
+      "status": 200
+    },
+    {
+      "path": "rescue/basket.svg",
+      "status": 200
+    },
+    {
+      "path": "tabby/cat-action.webp",
+      "status": 200
+    },
+    {
+      "path": "tabby/companion.webp",
+      "status": 200
+    },
+    {
+      "path": "tabby/bag.webp",
+      "status": 200
+    },
+    {
+      "path": "rescue/apple.svg",
+      "status": 200
+    },
+    {
+      "path": "tabby/bag.webp",
+      "status": 200
+    },
+    {
+      "path": "rescue/apple.svg",
+      "status": 200
+    },
+    {
+      "path": "tabby/cat-thinking.webp",
+      "status": 200
+    },
+    {
+      "path": "rescue/apple.svg",
+      "status": 200
+    },
+    {
+      "path": "tabby/bag.webp",
+      "status": 200
+    },
+    {
+      "path": "rescue/box.svg",
+      "status": 200
+    },
+    {
+      "path": "tabby/mat.webp",
+      "status": 200
+    },
+    {
+      "path": "tabby/mat.webp",
+      "status": 200
+    },
+    {
+      "path": "tabby/mat.webp",
+      "status": 200
+    },
+    {
+      "path": "tabby/cat-idle.webp",
+      "status": 304
+    },
+    {
+      "path": "tabby/cat-idle.webp",
+      "status": 200
+    },
+    {
+      "path": "rescue/box.svg",
+      "status": 200
+    },
+    {
+      "path": "rescue/basket.svg",
+      "status": 200
+    },
+    {
+      "path": "rescue/door.svg",
+      "status": 200
+    }
+  ]
+}

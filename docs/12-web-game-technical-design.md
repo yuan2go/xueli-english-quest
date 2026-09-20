@@ -1,8 +1,8 @@
 # 12 · 技术设计与代码实施映射
 
-Refoundation 06 目标设计。检查基线：`a9a62e3eb632781595b40171dfb442bf0fbbe55e`，默认分支 main，2026-09-20 读取。本文不是已实施报告；必要契约见 04/05，验收见 08。路径指向本次已知结构，开工须核对最新代码而不是机械按旧行号修改。
+Refoundation 06 技术设计与实施映射。开工前代码检查基线：`a9a62e3eb632781595b40171dfb442bf0fbbe55e`，默认分支 main，2026-09-20 读取。本节早期差距表保留为历史；当前实施映射见末节，实际检查只见 STATUS。必要契约见 04/05，验收见 08。路径指向本次已知结构，开工须核对最新代码而不是机械按旧行号修改。
 
-## 1. 当前代码差距
+## 1. 开工时的代码差距（历史）
 
 | 位置/函数 | 已读取事实 | 新包需要改变什么 |
 | --- | --- | --- |
@@ -95,3 +95,13 @@ PuzzleSpec 的 goal 读取世界和明确的游戏事实，不要求参考 witne
 最新 origin/main `74ea7358ce41738d16bfa5dab29e94f581605a5c`，原主目录 main 干净。表 1 的六词/空间特判、六词句长阈值与 v4 白名单差距均仍存在。正式入口确为 main → App → GameShell；没有隐藏新玩法。未合并 #11/#12 为旧动画工作，不合并其旧流程。当前 Prompt/导航已指向本包，历史 superpowers/UI 工作包与证据只作历史输入。
 
 选择有限节点图与支撑高度模型：比连续物理更可解释，且两条 R1 路径共享可达性/净空规则；保留旧 Shell 会形成平行产品，故替换正式 Shell，仅保留旧规则和 decoder 依赖。新规则由同一 domain.transition 的版本分支进入；当前应用唯一 runQuest 提交日志。具体执行追踪见 [实施计划](superpowers/plans/2026-09-20-gameplay-refoundation-06.md)。
+
+## 10. 实际模块映射与证据边界
+
+唯一当前入口 `main → App → GameShell → Scene / MeaningTool / SentenceBuilder`；词语册为同应用表面。旧 GameHUD/ContextTool/FeedbackLayer/Letters 和旧 CSS 已退役，没有第二套 Shell。旧 domain/picnic/adventure/session/save 链只保留历史 decoder、fixture 与 46 个旧 Node 回归的依赖；旧 UI 浏览器断言完整移至 tests/historical-shell-05，并登记等价新覆盖。
+
+`game/quest.ts` 绑定 PuzzleSpec、评估窗口、不可洗白支持和 journal，`quest-command.ts` 严格校验，`language.ts` 为唯一有限语法，历史 sentences.ts 仅限制旧版本允许的结构。`domain.transition` 按绑定世界版本分派，spatial.ts 实现节点路径、净空、把手、容量/支撑和后态整体校验。`content/quest-validation.ts` 在启动及资源检查时整包验证词、音频引用、空间、目标和配额。
+
+`quest-save.ts` schema 6 不信任投影，逐条命令重放并比对；保留旧 key 与原文。UI 草稿/动画不入档。pointer 只在一次 animation frame 处理最新位置并以 DOM transform 显示拖影，只有目标语义改变才更新 React。表现用稳定实体及路径，打开容器的子物品跟随父路径；重复命令、取消或动画中撤销不能重复推进业务。
+
+当前关卡默认 seed=6；R3 另一请求通过内容 variant 与见证验证，默认 HTTP 主线为 in basket。回访固定封洞，不做任意随机布局。没有提供运行时 AI、账号或第二套后台。正式资源/音频/教研仍 PENDING，视觉工程自检不等于人工美术审核。完整 G01–G12 索引见 [本轮证据](evidence/gameplay-refoundation-06/README.md)。

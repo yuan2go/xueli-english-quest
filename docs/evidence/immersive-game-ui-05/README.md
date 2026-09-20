@@ -1,3 +1,5 @@
+> HISTORICAL：旧沉浸式 UI 分支的交付材料。已由 WP-WEB-GAME-SHELL-05 的单一正式入口取代；不得按此文重新执行旧计划或将历史 PASS 当作本轮验证。原代码及测试见 `e4495d2be33cd473f81f25c5ef78b5c2cf11a695`，原状态见 `docs/archive/immersive-game-ui-05-status.md`。
+
 # 整屏绘本冒险 · 本轮浏览器证据
 
 2026-09-20，WP-IMMERSIVE-GAME-UI-05。截图全部来自正式 `/` 的实际 HTTP 操作，生产构建由 Playwright 管理的 `http://127.0.0.1:4174/` 提供。主线和活动通过页面按钮/字母/词块/拖放进入，没有注入通关世界。图片关闭有限动画以捕获稳定画面；不代表动态效果、真机或儿童验收。

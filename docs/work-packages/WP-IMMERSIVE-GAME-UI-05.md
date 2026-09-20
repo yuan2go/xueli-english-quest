@@ -1,3 +1,5 @@
+> HISTORICAL：旧沉浸式 UI 分支的交付材料。已由 WP-WEB-GAME-SHELL-05 的单一正式入口取代；不得按此文重新执行旧计划或将历史 PASS 当作本轮验证。原代码及测试见 `e4495d2be33cd473f81f25c5ef78b5c2cf11a695`，原状态见 `docs/archive/immersive-game-ui-05-status.md`。
+
 # WP-IMMERSIVE-GAME-UI-05 · 整屏绘本冒险
 
 用户在 2026-09-20 确认整屏场景、物品旁行动、按需底部工具盘及游戏标题画面的方向，并授权直接实施。基线 `52fac621e6e81f6f645f6574096b937cd050b872`，独立工作树 `xueli-english-quest-game-ui-05`，唯一实现负责人 Codex。本包继续执行 WP-GAMEPLAY-CORE-04 的玩法合同。

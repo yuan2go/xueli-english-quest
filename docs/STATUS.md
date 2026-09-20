@@ -1,5 +1,17 @@
 # 项目状态 · WP-WEB-GAME-SHELL-05
 
+## 本轮全分支免测试集成 · 2026-09-20
+
+发布基线：本地主目录 main `52fac621e6e81f6f645f6574096b937cd050b872`，刷新后的远程 main `9b20d629dd4a4472f33afff3b935597a47741771`。本轮读取 10 个原有本地分支和 8 个原有工作区，先快进本地 main 并推送全部既有提交；Actions 回读 `enabled:false`。
+
+将旧 `codex/immersive-game-ui-05@e4495d2` 与新 `codex/web-game-shell-05@368d87e` 在独立集成工作区合并。两套实现都改写 App/Scene/CSS 和浏览器入口，不能并排作为当前产品：按已落地的 11/12 和 WP-WEB-GAME-SHELL-05 保留新 Game Shell 的全部运行代码、合同及测试。旧分支 3 个提交完整保留在合并祖先与远程分支，截图和文档标记 HISTORICAL，旧状态另存 [历史记录](archive/immersive-game-ui-05-status.md)。不重新引入 GameChrome/SceneActions 或绑定旧页面的浏览器套件。
+
+本轮仅进行 Git 分支/工作区/差异检查、提交、推送与 PR 合并；测试、测试钩子、类型检查、构建、资源检查、浏览器、真机及 Provider 均 NOT_RUN。下方原工程验证属于之前的交付，不是本次重跑。最新 SHA、实际提交数量及进行中工作区的最终处理以本轮交付回复为准。
+
+剩余发布限制和下一包仍见下方资源/录音/教研/真机验收边界；动作性能优化不得用此次免测试发布声称实测提升。
+
+## 原 Game Shell 工程交付记录
+
 2026-09-20：正式入口 Scene-first Game Shell 已实现并完成本轮工程验证。唯一实现负责人 Codex；分支 `codex/web-game-shell-05`，独立 worktree，原主工作区保持原状。未公开部署、未合并 main。
 
 - baseline / 当前读取的 origin/main：`9b20d629dd4a4472f33afff3b935597a47741771`。

@@ -1,3 +1,5 @@
+> HISTORICAL：旧 UI 实施计划，当前目标为 WP-GAMEPLAY-REFOUNDATION-06，不恢复本计划流程。
+
 > HISTORICAL：旧沉浸式 UI 分支的交付材料。已由 WP-WEB-GAME-SHELL-05 的单一正式入口取代；不得按此文重新执行旧计划或将历史 PASS 当作本轮验证。原代码及测试见 `e4495d2be33cd473f81f25c5ef78b5c2cf11a695`，原状态见 `docs/archive/immersive-game-ui-05-status.md`。
 
 # Immersive Game UI Implementation Plan

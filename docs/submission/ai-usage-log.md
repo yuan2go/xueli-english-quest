@@ -13,6 +13,6 @@
 
 | 日期 | 工具 | 实际任务 | 产物 | 人工/工程检查 | 范围限制 |
 | --- | --- | --- | --- | --- | --- |
-| 2026-09-20 | Codex / GPT-6 | 执行 WP-WEB-GAME-SHELL-05，治理旧设计、正式入口 Game Shell、输入/反馈/资源、正常入口试玩后修复 | 当前代码、权威文档、tests、evidence/web-game-shell-05 | 46 核心测试、8 浏览器测试及实际检查见 STATUS；agent 工程自检 | 未调用生图或运行时 Provider；未接受人工教研/儿童验收；费用/token unknown |
+| 2026-09-20 | Codex / GPT-6 | 历史：执行 WP-WEB-GAME-SHELL-05，治理旧设计、正式入口 Game Shell、输入/反馈/资源、正常入口试玩后修复 | SHELL-05 历史代码、权威文档、tests、evidence/web-game-shell-05 | 46 核心测试、8 浏览器测试及实际检查见 STATUS；agent 工程自检 | 未调用生图或运行时 Provider；未接受人工教研/儿童验收；费用/token unknown |
 
 当前没有运行时 AI 工坊。Fixture 不填 provider success；演示视频经过剪辑要标注。

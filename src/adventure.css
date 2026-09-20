@@ -1518,3 +1518,11 @@ dialog input {
   aspect-ratio: 1.8;
   object-fit: fill;
 }
+@media (max-width: 600px) {
+  .world-canvas > .anchor-actor {
+    width: 36%;
+  }
+  .world-canvas > .anchor-bag {
+    width: 26%;
+  }
+}

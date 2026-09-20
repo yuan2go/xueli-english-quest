@@ -1,5 +1,16 @@
 # 项目状态 · 场景驱动三幕已接通 / WP-GAMEPLAY-CORE-04
 
+## 2026-09-20 · 本轮免测试发布
+
+本轮按负责人追加指令，将全部本地分支推送并通过 PR 合入 main；该指令取代下方原交付时的“不自动合并”限制。本轮不新增玩法，沿用 WP-GAMEPLAY-CORE-04 已有实现与交付材料。
+
+- 发布基线：本地与远程 main 均为 `6e2cdf70b6f98a85808b51d83176f4160fd3f9a0`；发布前检查 8 个本地分支、6 个工作区，全部工作区干净。
+- 唯一待合入增量为 [PR #7](https://github.com/yuan2go/xueli-english-quest/pull/7) 的 2 个已推送提交：`27d1162ced8201966a711e4544fe180ae025f2e1`、`22a692d283e0332da2790c23d7bc46892a8b82cf`。本记录作为额外文档提交随该 PR 发布；最终合并 SHA 和提交数量以本轮交付回复及 GitHub 合并记录为准。
+- 已执行 `git fetch --all --prune`、全分支/工作区清点、`git diff --check origin/main...HEAD`（PASS，仅差异空白检查）及 `git -c core.hooksPath=/dev/null push --all --no-verify origin`（Everything up-to-date）。提交和推送不运行测试钩子。
+- 本轮 `npm test`、类型检查、构建、资源/发布检查、浏览器、真机与 Provider 均为 NOT_RUN；下方 PASS 是原实现交付记录，本轮未重跑。GitHub Actions API 回读 `enabled:false`，保持关闭。
+
+本轮只核对版本、提交与合并状态，不增加运行、视觉、教学或发布质量证据。剩余限制与下一包仍为正式素材/录音/教研审核、真实设备及儿童可用性验收。
+
 ## 2026-09-20 · 当前交付
 
 正式入口 `/` 已改为场景驱动冒险，唯一实现负责人 Codex。基线 `main`：`6e2cdf70b6f98a85808b51d83176f4160fd3f9a0`；实现提交：`27d1162ced8201966a711e4544fe180ae025f2e1`。独立分支 `codex/gameplay-core-04`，工作树 `/Volumes/DevSSD/Development/Workspace/projects/xueli-english-quest-gameplay-core-04`。最终提交包含本状态记录；准确最终 SHA/PR 见交付回复及 PR head。按授权推送和创建 PR，不自动合并、不强推。默认主工作区及无关分支未修改。

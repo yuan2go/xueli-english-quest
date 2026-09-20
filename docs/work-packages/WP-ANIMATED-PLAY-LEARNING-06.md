@@ -3,7 +3,7 @@
 本包是唯一有效实施清单；用户 2026-09-20 已授权清理后直接实施、提交推送新分支并新建 PR，不合并。唯一实现负责人 Codex。01–05/07/11/12 维护合同，本文件记录实施顺序和实际验收，不新建并行蓝图。
 
 **Goal:** 正式首页到结局完整接入有动作意义的世界、六个可重玩情境与保守的学习观察。
-**Architecture:** App → GameShell → Adventure → 唯一 domain.transition。原子提交先于可取消表现。演示复制隔离 Board 并调用同一 transition，不写正式 facts、奖励或存档世界。
+**Architecture:** App → GameShell → Adventure → 唯一 domain.transition。原子提交先于可取消表现。演示构造隔离 World 并调用同一 transition，不写正式 facts、奖励或存档世界。
 **Tech stack:** 现有 React/TypeScript/Vite、Pointer Events、Web Animations、单一 manifest；不新增依赖、后台或引擎。
 
 ## 全局约束
@@ -21,12 +21,21 @@
 ## 顺序与验证
 
 - [x] 读取仓库与远端，核对任务；先归档 WP05 状态，修订旧 PR、唯一 mat、组句和示范冲突。保留旧 decoder/素材来源/证据。
-- [ ] **动作纵向实现**：`ui/pointer.ts` 合并帧；`game/shell.ts` 提交差异角色；`ui/Scene.tsx` 稳定实例；`ui/shell/useSceneMotion.ts` 取消/中断/支撑物先行；`ui/Art.tsx`/manifest 实际动作资产与姿态。测试正常播放过路至少三个采样、换帽/收纳/变形唯一实体、连续输入和生命周期取消。
-- [ ] **教学与证据纵向实现**：`content/sentences.ts` 任务范式；`game/adventure.ts`/学习模块记录 objective、skills、曝光与回访；`platform/adventure-save.ts` 版本和旧档保护；`ui/shell/ContextTool.tsx` 逐级帮助；隔离演示组件使用 domain.transition。成人回顾显示具体观察与尚无独立回访。测示范不代答、情境无自动答案、播放失败/部分曝光和存档重放。
-- [ ] **玩法与构图**：深化 `content/adventure.ts` 六变体、世界反馈和恢复；首页场景主体、工具缩短、结果来自玩家布置；多物品明确情境映射，错误保留草稿。
-- [ ] **必要验证与修复**：`npm test`、`npm run typecheck`、`npm run typecheck:domain`、`npm run build`、`npm run check:resources`、`npm run check:release`；现有浏览器正常首页完整主线/六活动/异常，加教学/动作/保存回归。Phone/Tablet/Desktop、触控/键盘、后台/reduced-motion；无通关状态注入。相同 390×844 / Chromium / CPU 4x / 120 moves 三轮前后测量，完整 SHA 与脚本留证。
-- [ ] **最后工程试玩和交付**：正常播放录屏/多时点样本；从儿童视角完整体验修复卡点，标明非儿童研究；有效文档与 STATUS 写实际命令、边界。提交、推送 `codex/animated-play-learning-06`、创建新 PR、不合并、不修改 Actions。
+- [x] **动作纵向实现**：`ui/pointer.ts` 合并帧；`game/shell.ts` 提交差异角色；`ui/Scene.tsx` 稳定实例；`ui/shell/useSceneMotion.ts` 取消/中断/支撑物先行；`ui/Art.tsx`/manifest 实际动作资产与姿态。测试正常播放过路至少三个采样、换帽/收纳/变形唯一实体、连续输入和生命周期取消。
+- [x] **教学与证据纵向实现**：`content/sentences.ts` 任务范式；`game/adventure.ts`/学习模块记录 objective、skills、曝光与回访；`platform/adventure-save.ts` 版本和旧档保护；`ui/shell/ContextTool.tsx` 逐级帮助；隔离演示组件使用 domain.transition。成人回顾显示具体观察与尚无独立回访。测示范不代答、情境无自动答案、播放失败/部分曝光和存档重放。
+- [x] **玩法与构图**：深化 `content/adventure.ts` 六变体、世界反馈和恢复；首页场景主体、工具缩短、结果来自玩家布置；多物品明确情境映射，错误保留草稿。
+- [x] **必要验证与修复**：`npm test`、`npm run typecheck`、`npm run typecheck:domain`、`npm run build`、`npm run check:resources`、`npm run check:release`；现有浏览器正常首页完整主线/六活动/异常，加教学/动作/保存回归。Phone/Tablet/Desktop、触控/键盘、后台/reduced-motion；无通关状态注入。相同 390×844 / Chromium / CPU 4x / 120 moves 三轮前后测量，完整 SHA 与脚本留证。
+- [x] **最后工程试玩和交付**：正常播放录屏/多时点样本；从儿童视角完整体验修复卡点，标明非儿童研究；有效文档与 STATUS 写实际命令、边界。提交、推送 `codex/animated-play-learning-06`、创建新 PR、不合并、不修改 Actions。
 
 ## 验收状态
 
-实施中，以下均不得预填 PASS。外部素材权利、正式发音/教研、实体设备、目标儿童试玩为 NOT_RUN；资源 gate 保留。动作素材如不足仅阻断该动作资产，不阻断其他工程。最终源代码 SHA、动作资产尺寸/Alpha/锚点/来源、性能及测试记录将在实际完成后填入。
+工程实现与必要验证完成，源 SHA `1ee59d14545f0ec52d02f13ef383b53acb51cf54`，后续证据/文档提交不改变运行代码。完整范围、实际命令、未执行项目与发布阻塞见 [STATUS](../STATUS.md)，正常播放录屏、多时点状态、真实学习记录及性能原始数据见 [证据索引](../evidence/animated-play-learning-06/README.md)。
+
+- PASS：核心 52/52，浏览器 16/16（正式首页、完整主线、六变体及关键异常）、两项 typecheck、build、resources。生成资产已实际接入：1254×1254 原生四帧走路 atlas 与开包对应图；Alpha/帧/锚点/来源与处理均登记。
+- PASS：过路纸张先行并稳定；小猫/佩戴物独立通过；戴帽/入包首帧连续；嵌套物品拖动随行；连续操作/取消/刷新不改变已提交结果。
+- PASS：独立组句无自动完整答案；示范隔离、动作/词块分别确认、缺图不授予完整示范；音频取消真实保存；v5恢复及v4原字节保护。确定性回执夹具不冒充真实听音。
+- 测量：同条件各三轮 LayoutCount 122→3，帧间隔中位数仍16.7ms；不推断 FPS、真机或儿童体验提升。
+- BLOCKED：`check:release` 实跑因 `bag` 等未审核资源退出1。
+- NOT_RUN：权利、正式发音/教研、实体设备、儿童研究、公网部署、运行时 Provider。开发者未填写审核通过。
+
+双轴只读审查反馈与工程完整试玩中的真实问题已修复。按用户授权提交、推送独立分支并新建 PR，保留 PR #11 和所有其他工作区，不合并、不强推、不修改 Actions。本包完成后无第二个并行蓝图；下一包待分配。

@@ -1,0 +1,93 @@
+{
+  "sourceSha": "1ee59d14545f0ec52d02f13ef383b53acb51cf54",
+  "condition": "macOS26.5.2; independent headed Chromium 153.0.8010.12; fresh temporary profile, 1024x768, connectOverCDP(noDefaults:true). Actual tab switch, no synthetic visibility event or document override.",
+  "initialHarness": "Default Playwright headless/headed browsers kept document.hidden=false and did not exercise background; those attempts are not PASS evidence.",
+  "hidden": {
+    "hidden": true,
+    "visibility": "hidden",
+    "moving": 0,
+    "paused": true
+  },
+  "worldBefore": {
+    "revision": 5,
+    "entities": {
+      "cat-companion": {
+        "id": "cat-companion",
+        "word": "cat",
+        "kind": "actor",
+        "location": {
+          "kind": "stage"
+        }
+      },
+      "bag-main": {
+        "id": "bag-main",
+        "word": "bag",
+        "kind": "object",
+        "location": {
+          "kind": "stage"
+        }
+      },
+      "cat-card": {
+        "id": "cat-card",
+        "word": "cat",
+        "kind": "token",
+        "location": {
+          "kind": "stage"
+        }
+      },
+      "hat-main": {
+        "id": "hat-main",
+        "word": "hat",
+        "kind": "object",
+        "location": {
+          "kind": "relation",
+          "relation": "in",
+          "targetId": "bag-main"
+        }
+      }
+    },
+    "flags": []
+  },
+  "worldAfter": {
+    "revision": 5,
+    "entities": {
+      "cat-companion": {
+        "id": "cat-companion",
+        "word": "cat",
+        "kind": "actor",
+        "location": {
+          "kind": "stage"
+        }
+      },
+      "bag-main": {
+        "id": "bag-main",
+        "word": "bag",
+        "kind": "object",
+        "location": {
+          "kind": "stage"
+        }
+      },
+      "cat-card": {
+        "id": "cat-card",
+        "word": "cat",
+        "kind": "token",
+        "location": {
+          "kind": "stage"
+        }
+      },
+      "hat-main": {
+        "id": "hat-main",
+        "word": "hat",
+        "kind": "object",
+        "location": {
+          "kind": "relation",
+          "relation": "in",
+          "targetId": "bag-main"
+        }
+      }
+    },
+    "flags": []
+  },
+  "worldUnchanged": true,
+  "resumed": true
+}

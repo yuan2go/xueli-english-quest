@@ -1,0 +1,499 @@
+[
+  {
+    "id": "fb42934fa176eba151f6b8a644680e7c",
+    "mode": "story",
+    "task": "pack-cap",
+    "type": "sentence-command",
+    "practice": "teaching",
+    "result": "valid",
+    "language": "correct",
+    "evidence": "demonstrated",
+    "submitted": "Put the cap in the bag",
+    "support": {
+      "exposures": [
+        {
+          "id": "228421dd3b8952ebae6fe4094d57de87",
+          "request": "e006b6309aac49e238ee36acb478b24c",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "partial",
+          "answer": "none",
+          "step": 0,
+          "part": "words"
+        },
+        {
+          "id": "44d934aa51b9a474a10723201cd6f9e4",
+          "request": "e006b6309aac49e238ee36acb478b24c",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "shown",
+          "answer": "none",
+          "step": 0,
+          "part": "words"
+        },
+        {
+          "id": "52c9840f24c5f84369e7844dcd381c5c",
+          "request": "e006b6309aac49e238ee36acb478b24c",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "partial",
+          "answer": "none",
+          "step": 0,
+          "part": "action"
+        },
+        {
+          "id": "7ad7046006e04c03199ba71c9028ca9f",
+          "request": "e006b6309aac49e238ee36acb478b24c",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "shown",
+          "answer": "none",
+          "step": 0,
+          "part": "action"
+        },
+        {
+          "id": "2b68bdf0905d6b8dcb199508550e6659",
+          "request": "e006b6309aac49e238ee36acb478b24c",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "partial",
+          "answer": "partial",
+          "step": 1,
+          "part": "words"
+        },
+        {
+          "id": "85e865171133fe2bc77ab6c1059e1531",
+          "request": "e006b6309aac49e238ee36acb478b24c",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "shown",
+          "answer": "partial",
+          "step": 1,
+          "part": "words"
+        },
+        {
+          "id": "897f4d03d1e99f007f0d91e190c5c111",
+          "request": "e006b6309aac49e238ee36acb478b24c",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "partial",
+          "answer": "none",
+          "step": 1,
+          "part": "action"
+        },
+        {
+          "id": "f7e9b153f0d03867bd715d8660a1f453",
+          "request": "e006b6309aac49e238ee36acb478b24c",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "shown",
+          "answer": "none",
+          "step": 1,
+          "part": "action"
+        },
+        {
+          "id": "58fc4d91c11bb6956e4cecfddef5c595",
+          "request": "e006b6309aac49e238ee36acb478b24c",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "partial",
+          "answer": "partial",
+          "step": 2,
+          "part": "words"
+        },
+        {
+          "id": "49488159bac12b3470172179d1c9e6f9",
+          "request": "e006b6309aac49e238ee36acb478b24c",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "shown",
+          "answer": "full",
+          "step": 2,
+          "part": "words"
+        },
+        {
+          "id": "dbb4c6a35df43ac7433733eafd16f514",
+          "request": "e006b6309aac49e238ee36acb478b24c",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "partial",
+          "answer": "none",
+          "step": 2,
+          "part": "action"
+        },
+        {
+          "id": "227e4369d6777ed2c117d26116440051",
+          "request": "e006b6309aac49e238ee36acb478b24c",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "shown",
+          "answer": "none",
+          "step": 2,
+          "part": "action"
+        },
+        {
+          "id": "3acbeae59e60c8ab867dfb20e883676a",
+          "request": "e006b6309aac49e238ee36acb478b24c",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "cancelled",
+          "answer": "none",
+          "step": 2
+        },
+        {
+          "id": "7a1f9348c4360c57f158f7b342805228",
+          "request": "443f3cb63d16a23bc7f1f5d23162950e",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "partial",
+          "answer": "none",
+          "step": 0,
+          "part": "words"
+        },
+        {
+          "id": "d7d428375eb313f1b6548c0fac6c68a0",
+          "request": "443f3cb63d16a23bc7f1f5d23162950e",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "shown",
+          "answer": "none",
+          "step": 0,
+          "part": "words"
+        },
+        {
+          "id": "3bcd589163ea8ad86765201b0a450b1c",
+          "request": "443f3cb63d16a23bc7f1f5d23162950e",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "partial",
+          "answer": "none",
+          "step": 0,
+          "part": "action"
+        },
+        {
+          "id": "4fa6e4ab549a7170e7bd6550c0099e71",
+          "request": "443f3cb63d16a23bc7f1f5d23162950e",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "shown",
+          "answer": "none",
+          "step": 0,
+          "part": "action"
+        },
+        {
+          "id": "55509b625f39c8a637d2c7941a1e5fab",
+          "request": "443f3cb63d16a23bc7f1f5d23162950e",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "partial",
+          "answer": "partial",
+          "step": 1,
+          "part": "words"
+        },
+        {
+          "id": "5b4ede8cd1332aeeb8b35c3bedd6121d",
+          "request": "443f3cb63d16a23bc7f1f5d23162950e",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "shown",
+          "answer": "partial",
+          "step": 1,
+          "part": "words"
+        },
+        {
+          "id": "a8718a1167fcebccc2e0c82d7881c603",
+          "request": "443f3cb63d16a23bc7f1f5d23162950e",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "partial",
+          "answer": "none",
+          "step": 1,
+          "part": "action"
+        },
+        {
+          "id": "743f252527c3d5c375c513015fc97dbf",
+          "request": "443f3cb63d16a23bc7f1f5d23162950e",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "shown",
+          "answer": "none",
+          "step": 1,
+          "part": "action"
+        },
+        {
+          "id": "6f28efa86c6db8a826fe936f9016eba9",
+          "request": "443f3cb63d16a23bc7f1f5d23162950e",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "partial",
+          "answer": "partial",
+          "step": 2,
+          "part": "words"
+        },
+        {
+          "id": "64e179ce9ab4300a8b0c0eea8ad90cf4",
+          "request": "443f3cb63d16a23bc7f1f5d23162950e",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "shown",
+          "answer": "full",
+          "step": 2,
+          "part": "words"
+        },
+        {
+          "id": "36464ea7517772c40dc0c39afb52dcad",
+          "request": "443f3cb63d16a23bc7f1f5d23162950e",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "partial",
+          "answer": "none",
+          "step": 2,
+          "part": "action"
+        },
+        {
+          "id": "37f977d3ed75a69d6004a8fef0060922",
+          "request": "443f3cb63d16a23bc7f1f5d23162950e",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "shown",
+          "answer": "none",
+          "step": 2,
+          "part": "action"
+        },
+        {
+          "id": "1105a79ddb3201db110b87cee0b427ed",
+          "request": "443f3cb63d16a23bc7f1f5d23162950e",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "partial",
+          "answer": "partial",
+          "step": 3,
+          "part": "words"
+        },
+        {
+          "id": "6a99d8205be78f35d1580b2378d8ed48",
+          "request": "443f3cb63d16a23bc7f1f5d23162950e",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "shown",
+          "answer": "full",
+          "step": 3,
+          "part": "words"
+        },
+        {
+          "id": "c7e1a58ba1b8016649a118792308ec9b",
+          "request": "443f3cb63d16a23bc7f1f5d23162950e",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "partial",
+          "answer": "none",
+          "step": 3,
+          "part": "action"
+        },
+        {
+          "id": "f025c8a7614f5da65bfc472b2fafd92d",
+          "request": "443f3cb63d16a23bc7f1f5d23162950e",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "shown",
+          "answer": "none",
+          "step": 3,
+          "part": "action"
+        },
+        {
+          "id": "1e0c7e70228af52c6d143ecc69ac51c0",
+          "request": "443f3cb63d16a23bc7f1f5d23162950e",
+          "kind": "demo",
+          "channel": "visual",
+          "status": "completed",
+          "answer": "none",
+          "step": 3
+        }
+      ],
+      "text": false,
+      "hint": false,
+      "demo": true,
+      "request": "",
+      "audio": "unplayed",
+      "audioSource": "unavailable",
+      "audioVersion": "",
+      "assetId": "",
+      "replays": 0
+    },
+    "observation": {
+      "version": "learning-observation-v2",
+      "objective": "pack-cap",
+      "exercise": "example-reproduce",
+      "sourceId": "cat-card",
+      "targetId": "bag-main",
+      "skills": [
+        {
+          "dimension": "word-order-grammar",
+          "result": "observed"
+        },
+        {
+          "dimension": "situation-semantics",
+          "result": "observed"
+        },
+        {
+          "dimension": "world-operation",
+          "result": "observed"
+        }
+      ],
+      "taskMatch": "matched",
+      "world": "allowed"
+    }
+  },
+  {
+    "id": "7ce8cfd138886beded0fbfd4cc7869d7",
+    "mode": "story",
+    "task": "describe-hat",
+    "type": "sentence-description",
+    "practice": "assisted",
+    "result": "valid",
+    "language": "correct",
+    "evidence": "listen-rebuild",
+    "submitted": "the hat is on the mat",
+    "support": {
+      "exposures": [
+        {
+          "id": "c6465d38e0d78d8e8d845ea5d7e3aca3",
+          "request": "04bda5e0c4c70368e72fa21c1006cc03",
+          "kind": "audio",
+          "channel": "audio",
+          "status": "loading",
+          "answer": "full"
+        },
+        {
+          "id": "0fda3ca559d444e349292faf9ae32007",
+          "request": "04bda5e0c4c70368e72fa21c1006cc03",
+          "kind": "audio",
+          "channel": "audio",
+          "status": "playing",
+          "answer": "full"
+        }
+      ],
+      "text": false,
+      "hint": false,
+      "demo": false,
+      "request": "04bda5e0c4c70368e72fa21c1006cc03",
+      "audio": "playing",
+      "audioSource": "development-speech",
+      "audioVersion": "quest-speech-dev-v1",
+      "assetId": "quest-voice-1",
+      "replays": 0
+    },
+    "observation": {
+      "version": "learning-observation-v2",
+      "objective": "describe-hat",
+      "exercise": "listen-rebuild",
+      "sourceId": "hat-main",
+      "targetId": "picnic-mat",
+      "skills": [
+        {
+          "dimension": "word-order-grammar",
+          "result": "observed"
+        },
+        {
+          "dimension": "situation-semantics",
+          "result": "observed"
+        },
+        {
+          "dimension": "listening",
+          "result": "unassessed"
+        }
+      ],
+      "taskMatch": "matched",
+      "world": "observation"
+    }
+  },
+  {
+    "id": "80d118f0dee8f13efba0d0f6e58a5263",
+    "mode": "story",
+    "task": "invite-cat",
+    "type": "sentence-command",
+    "practice": "independent",
+    "result": "valid",
+    "language": "correct",
+    "evidence": "independent",
+    "submitted": "Put the cat on the mat",
+    "support": {
+      "exposures": [],
+      "text": false,
+      "hint": false,
+      "demo": false,
+      "request": "",
+      "audio": "unplayed",
+      "audioSource": "unavailable",
+      "audioVersion": "",
+      "assetId": "",
+      "replays": 0
+    },
+    "observation": {
+      "version": "learning-observation-v2",
+      "objective": "invite-cat",
+      "exercise": "scene-compose",
+      "sourceId": "cat-companion",
+      "targetId": "picnic-mat",
+      "skills": [
+        {
+          "dimension": "word-order-grammar",
+          "result": "observed"
+        },
+        {
+          "dimension": "situation-semantics",
+          "result": "observed"
+        },
+        {
+          "dimension": "world-operation",
+          "result": "observed"
+        }
+      ],
+      "taskMatch": "matched",
+      "world": "allowed"
+    }
+  },
+  {
+    "id": "cc4797840a453e3aefc9c9f9dcd67419",
+    "mode": "story",
+    "task": "recap",
+    "type": "sentence-description",
+    "practice": "revisit",
+    "result": "done",
+    "language": "correct",
+    "evidence": "independent",
+    "submitted": "the hat is in the bag",
+    "support": {
+      "exposures": [],
+      "text": false,
+      "hint": false,
+      "demo": false,
+      "request": "",
+      "audio": "unplayed",
+      "audioSource": "unavailable",
+      "audioVersion": "",
+      "assetId": "",
+      "replays": 0
+    },
+    "observation": {
+      "version": "learning-observation-v2",
+      "objective": "recap",
+      "exercise": "scene-compose",
+      "sourceId": "hat-main",
+      "targetId": "bag-main",
+      "skills": [
+        {
+          "dimension": "word-order-grammar",
+          "result": "observed"
+        },
+        {
+          "dimension": "situation-semantics",
+          "result": "observed"
+        }
+      ],
+      "taskMatch": "matched",
+      "world": "observation",
+      "revisitOf": "7ce8cfd138886beded0fbfd4cc7869d7"
+    }
+  }
+]

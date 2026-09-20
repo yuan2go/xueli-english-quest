@@ -1,0 +1,61 @@
+{
+  "sourceSha": "1ee59d14545f0ec52d02f13ef383b53acb51cf54",
+  "baselineSha": "a9a62e3eb632781595b40171dfb442bf0fbbe55e",
+  "recordedAt": "2026-09-20T06:32:53.031417+00:00",
+  "host": {
+    "os": "macOS 26.5.2 (25F84)",
+    "model": "Mac14,3",
+    "memoryBytes": 17179869184,
+    "node": "26.3.1",
+    "npm": "11.16.0",
+    "playwright": "1.63.0",
+    "chromium": "153.0.8010.12"
+  },
+  "browserConditions": "headless Chromium; normal motion unless the case explicitly changes reduced-motion; normal homepage commands; compatibility/corruption/network failure fixtures only in named exception cases",
+  "viewports": [
+    [
+      360,
+      640
+    ],
+    [
+      390,
+      844
+    ],
+    [
+      768,
+      1024
+    ],
+    [
+      1024,
+      768
+    ],
+    [
+      1440,
+      1000
+    ],
+    [
+      640,
+      360
+    ],
+    [
+      844,
+      390
+    ]
+  ],
+  "validation": {
+    "core": "PASS 52/52",
+    "browser": "PASS 16/16, one worker, 2.2m",
+    "typecheck": "PASS",
+    "typecheckDomain": "PASS",
+    "build": "PASS",
+    "resources": "PASS development",
+    "release": "BLOCKED: exit 1, first unreviewed resource bag",
+    "physicalDevices": "mobile iPhone/iPad/Android NOT_RUN; desktop host tab lifecycle separately verified",
+    "children": "NOT_RUN",
+    "rightsReview": "NOT_RUN",
+    "pronunciationAndTeachingReview": "NOT_RUN",
+    "runtimeProvider": "NOT_RUN (outside scope)",
+    "desktopNativeBackground": "PASS: independent headed Chromium, noDefaults true; hidden=true, moving=0, world unchanged on resume"
+  },
+  "review": "Two read-only code-review axes; original concrete findings fixed and re-reviewed; reviewers did not independently repeat browser evidence."
+}

@@ -23,7 +23,7 @@ SentenceTask 声明有限词块及独立 tokenId、语义 kind/source/relation/t
 
 `SentenceTask.exercise` 区分 `listen-rebuild`（可播放完整目标句，只记听后识别/重组）、`scene-compose`（情境指令，不自动显示/播放完整答案，主动示例音频也降低独立证据）、`example-reproduce`（隔离示范完整呈现后由孩子亲手完成）。任务指令说明行动，意义线索解释物品/关系，完整例句是答案曝光，结果反馈只描述本次结果。
 
-逐级帮助为 attention → meaning → partial → text/demo；按钮点击不算曝光。视觉帮助实际进入可见区域后登记；示范按 action/words 分别记录 partial/shown/failed，各步动作须图像解码、最终位置落稳，词块须进入视口，四步两部分齐备后才能 completed。取消保留已显示部分，不声称孩子已经看懂。演示失败不能签发完整示范；仍可退出重试。
+逐级帮助为 attention → meaning → partial → text/demo；按钮点击不算曝光。视觉帮助实际进入可见区域后登记，滚动裁切先记 partial，完整可见再记 shown；弹窗遮挡时不记录为已显示；示范按 action/words 分别记录 partial/shown/failed，各步动作须图像解码、最终位置落稳，词块须进入视口，四步两部分齐备后才能 completed。取消保留已显示部分，不声称孩子已经看懂。演示失败不能签发完整示范；仍可退出重试。
 
 音频资源/版本/来源/request 与任务绑定，loading/playing/completed/cancelled/failed/muted 分别保存。任务完成或换字后仍以已登记原 request 接收终态；旧 request、错误资源不能覆盖当前请求。事件的 support 是提交当时快照，任务的帮助过程保留随后回执；开始播放不等于完成播放或听懂。
 

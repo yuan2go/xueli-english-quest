@@ -1,0 +1,64 @@
+
+> xueli-wordspell@0.1.0 test
+> node --experimental-strip-types --test tests/*.test.mjs
+
+✔ three world-goal acts allow either preparation order, actual crossing, personal ending and bounded creation (142.616ms)
+✔ language, goal relevance and world permission are independent; descriptions never move things (7.850208ms)
+✔ unique repeated tokens, grammar variants, incomplete input and punctuation have honest feedback (7.40775ms)
+✔ help survives refresh, no audio does not earn independent listening, replay and failures are not language errors (1.259834ms)
+✔ duplicate/stale commands, reversible containment/occupancy and atomic failed swaps protect identities (7.490083ms)
+✔ all six authored variants are reachable and isolated, early unlocks and selected seeds survive refresh/replay (130.567791ms)
+✔ saves reject forged projection/version/stale journals and preserve known legacy bytes before explicit restart (6.142583ms)
+✔ all referenced images exist, match manifest dimensions/bytes/hash, audio gaps stay explicit (9.033458ms)
+✔ candidate release rejects missing/unreviewed resources, supports typed raster and recording metadata (0.309208ms)
+✔ visual registry native masters retain bytes, dimensions and hashes independently of save content (34.671416ms)
+✔ recording boundary validates bytes, retries rejected playback, cancels stale callbacks and times out loading (97.73375ms)
+✔ derived repairs, natural scene targets, first-error help, summary and restored assistance share real events (41.514625ms)
+✔ audio observations bind resource version, task and request; no playback cannot earn independent listening (4.839625ms)
+✔ operability validation rejects inaccessible source, missing replacement and locked target position (4.967042ms)
+✔ isolated teaching uses the same rules, keeps identity and never answers the player task (17.098208ms)
+✔ help is observed, sentence audio demotes contextual independence, skills do not all become earned (26.482666ms)
+✔ old v4 remains exactly decodable and backed up without fabricating exposure or upgrading progress (1.536ms)
+✔ crossing separates stationary support, moving actor and worn attachment; activity experiments have reversible effects (4.717166ms)
+✔ completed word and transform tasks accept only the original audio request terminal receipt (2.126958ms)
+✔ partial text exposure stays assisted and cannot become a complete displayed answer (14.917167ms)
+✔ picnic reuses six identities; reversible transforms, wearable uniqueness, extraction and occupied supports (74.875584ms)
+✔ all three activities have reachable 3-action goals; dress and helper accept different choices/orders; seeds persist (22.190416ms)
+✔ registered but semantically wrong instructions fail both validation and production commands (11.816458ms)
+✔ RIFF offsets remain bytes when size contains C2 A9; short/corrupt headers rejected (0.257292ms)
+✔ first map is not a revisit; later forms keep task type; exact prior story log migrates without losing help (6.943208ms)
+✔ full story uses production runner, distinct identities and exact evidence (8.386542ms)
+✔ map → mat → crossing → map and both saved boundaries cannot skip crossing (1.302875ms)
+✔ duplicates, conflicting attempts, old steps and revisions never repeat effects (0.129083ms)
+✔ wrong known word creates no item; incomplete, drops and replay are not language mistakes (0.444709ms)
+✔ damaged, future, forged order and unknown save fields are rejected without manufacturing progress (0.287708ms)
+✔ malformed content and unavailable letter targets are rejected (0.444542ms)
+✔ success after demonstration stays demonstrated; error escalation survives restore (0.386875ms)
+✔ visual cutover replays prior 3.1 saves at both ink boundaries without losing evidence (1.207375ms)
+✔ encounter affordances follow actual crossing and keep the current save byte-identical during UI projection (5.045917ms)
+✔ presentation consumes committed results without persisting transient state or turning a blocked transform into success (1.112917ms)
+✔ context tools hide independent listening answers until explicit help, while cancellation does not create evidence (0.200875ms)
+✔ draft twelve-challenge / thirteen-action world path is consistent (2.593084ms)
+✔ authored plan cannot omit crossing before restoring the map (1.5005ms)
+✔ map → mat → crossing → map preserves identity and input immutability (2.133708ms)
+✔ protects companion; only the separate paper token becomes cap (0.290833ms)
+✔ rejects stale revisions and duplicate creation (0.110958ms)
+✔ spawn does not retain mutable references to command data (0.067ms)
+✔ rejects a missing transformation source (0.07025ms)
+✔ hat to cap is not a single-letter change or an approved transform (0.079375ms)
+✔ a map cannot cover the ink road (0.068333ms)
+✔ cap in bag and cat on mat retain separate entities (0.136667ms)
+✔ rejects transforming a support with contents (0.121708ms)
+✔ rejects self-containment and cyclic containment (0.166833ms)
+✔ rejects missing destinations and incorrect relation targets (0.154875ms)
+✔ does not count another mat as the authored road-crossing effect (0.066083ms)
+✔ rejects invalid typed-state invariants (0.089167ms)
+✔ rejects unsafe entity IDs before object assignment (0.054ms)
+ℹ tests 52
+ℹ suites 0
+ℹ pass 52
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 563.531333

@@ -41,3 +41,5 @@ npm run test:browser
 复用带绿围巾、背包和画面颈部右侧白色定位器的狸花猫资产。素材权利、正式录音和教研状态保持 PENDING；浏览器 TTS 明示为开发语音。真机和真实儿童试玩尚未完成，`check:release` 仍阻断未审核资源。旧线性存档会原样备份、可导出，明确重开新目标，绝不把旧 step 映射成新通关。
 
 仓库公开可见不代表获得第三方素材复用许可；不提交密钥、儿童个人信息、内部课件或未经授权的品牌素材。AGENTS.md 与 CLAUDE.md 共用同一工程合同。
+
+本轮动画、教学曝光与性能验收见 [WP06 证据](docs/evidence/animated-play-learning-06/README.md)。当前工程验证通过，正式发布仍受未审核资源阻塞；具体证明范围见 [STATUS](docs/STATUS.md)。

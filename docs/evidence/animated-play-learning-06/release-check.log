@@ -1,0 +1,16 @@
+
+> xueli-wordspell@0.1.0 check:release
+> node --experimental-strip-types scripts/check-resources.mjs --release
+
+file:///Users/yuan/.codex/worktrees/animated-play-learning-06/xueli-english-quest/src/content/resource-contract.ts:58
+      throw new Error(`发布资源缺失或未审核 ${a.id}`);
+            ^
+
+Error: 发布资源缺失或未审核 bag
+    at validateResources (file:///Users/yuan/.codex/worktrees/animated-play-learning-06/xueli-english-quest/src/content/resource-contract.ts:58:13)
+    at file:///Users/yuan/.codex/worktrees/animated-play-learning-06/xueli-english-quest/scripts/check-resources.mjs:12:1
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:646:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v26.3.1

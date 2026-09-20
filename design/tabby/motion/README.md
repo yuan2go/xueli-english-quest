@@ -15,3 +15,5 @@ Bag: Use case: precise-object-edit. Production transparent game prop. Preserve t
 ## Limits
 
 Four authored frames provide a short stepping cycle, not free locomotion or a skeletal actor. Existing idle/thinking/action/happy poses remain; blink is a local eye overlay, and hats follow the actor anchor. Alignment/appearance has engineering sampling, while art direction/rights review and real-device perception remain NOT_RUN. Generated backpack proportions differ slightly from the closed reference; the same anchor and short opening transition are used. Formal asset approval remains PENDING.
+
+Open-container display uses two CSS layers of the same registered bag-open image: the foreground is clipped below 41% to occlude the lower portion of contained props, while the bag body keeps a separate lower touch area. This is a presentation layer, not another world entity or another raster asset. Drag projections carry nested/worn contents together and hide the source subtree.

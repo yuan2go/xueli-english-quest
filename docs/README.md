@@ -29,4 +29,4 @@
 
 需求权威在 01/02，交互权威在 03，领域协议在 05，交付状态只在 STATUS。代码与文档冲突时，先报告差异，判断是缺陷还是批准后的设计改变；禁止把当前代码的偶然行为默认为新需求。修改设计时同步对应测试与工作包，不追加平行蓝图。
 
-历史状态移至 [archive/status-through-core-04](archive/status-through-core-04.md)。历史工作包、evidence、旧内容 fixture 和 design/tabby/references 只供版本/来源追溯，不作为当前蓝图。
+历史状态移至 [archive/status-through-core-04](archive/status-through-core-04.md) 与 [archive/status-through-shell-05](archive/status-through-shell-05.md)。历史工作包、evidence、旧内容 fixture 和 design/tabby/references 只供版本/来源追溯，不作为当前蓝图。

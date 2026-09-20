@@ -1,0 +1,212 @@
+{
+  "condition": "Chromium headless 1024x768, normal animations, normal homepage commands; milliseconds are scheduled offsets, at is actual browser clock",
+  "samples": [
+    {
+      "at": 2829.7000000029802,
+      "pad": {
+        "x": 408.135498046875,
+        "y": 372.4878234863281,
+        "width": 290.46649169921875,
+        "height": 165.92062377929688
+      },
+      "cat": {
+        "x": 33.468746185302734,
+        "y": 283.93011474609375,
+        "width": 188.71875,
+        "height": 209.796875
+      },
+      "hat": {
+        "x": 93.8507080078125,
+        "y": 276.19561767578125,
+        "width": 113.23124694824219,
+        "height": 74.2083740234375
+      },
+      "actorMotion": "walk",
+      "walkAnimation": [
+        "running"
+      ],
+      "ids": [
+        "cat-companion",
+        "hat-main",
+        "bag-main",
+        "cat-card",
+        "route-sheet"
+      ]
+    },
+    {
+      "at": 3100.5,
+      "pad": {
+        "x": 401.359375,
+        "y": 332.390625,
+        "width": 300,
+        "height": 171.21875
+      },
+      "cat": {
+        "x": 126.16728210449219,
+        "y": 266.65155029296875,
+        "width": 195.6743621826172,
+        "height": 217.52377319335938
+      },
+      "hat": {
+        "x": 188.7747344970703,
+        "y": 258.63214111328125,
+        "width": 117.40461730957031,
+        "height": 76.9415283203125
+      },
+      "actorMotion": "walk",
+      "walkAnimation": [
+        "running"
+      ],
+      "ids": [
+        "cat-companion",
+        "hat-main",
+        "bag-main",
+        "cat-card",
+        "route-sheet"
+      ]
+    },
+    {
+      "at": 3402.1000000089407,
+      "pad": {
+        "x": 401.359375,
+        "y": 332.390625,
+        "width": 300,
+        "height": 171.21875
+      },
+      "cat": {
+        "x": 382.705078125,
+        "y": 218.83401489257812,
+        "width": 214.923583984375,
+        "height": 238.90753173828125
+      },
+      "hat": {
+        "x": 451.4714660644531,
+        "y": 210.02630615234375,
+        "width": 128.95413208007812,
+        "height": 84.50527954101562
+      },
+      "actorMotion": "walk",
+      "walkAnimation": [
+        "running"
+      ],
+      "ids": [
+        "cat-companion",
+        "hat-main",
+        "bag-main",
+        "cat-card",
+        "route-sheet"
+      ]
+    },
+    {
+      "at": 3701.9000000059605,
+      "pad": {
+        "x": 401.359375,
+        "y": 332.390625,
+        "width": 300,
+        "height": 171.21875
+      },
+      "cat": {
+        "x": 551.7885131835938,
+        "y": 231.015625,
+        "width": 220,
+        "height": 244.546875
+      },
+      "hat": {
+        "x": 622.1791381835938,
+        "y": 222,
+        "width": 132,
+        "height": 86.5
+      },
+      "actorMotion": "walk",
+      "walkAnimation": [
+        "running"
+      ],
+      "ids": [
+        "cat-companion",
+        "hat-main",
+        "bag-main",
+        "cat-card",
+        "route-sheet"
+      ]
+    },
+    {
+      "at": 4199.9000000059605,
+      "pad": {
+        "x": 401.359375,
+        "y": 332.390625,
+        "width": 300,
+        "height": 171.21875
+      },
+      "cat": {
+        "x": 697.1875,
+        "y": 266.5546875,
+        "width": 220,
+        "height": 244.546875
+      },
+      "hat": {
+        "x": 767.578125,
+        "y": 257.5390625,
+        "width": 132,
+        "height": 86.5
+      },
+      "walkAnimation": [],
+      "ids": [
+        "cat-companion",
+        "hat-main",
+        "bag-main",
+        "cat-card",
+        "route-sheet"
+      ]
+    }
+  ],
+  "world": {
+    "revision": 8,
+    "entities": {
+      "cat-companion": {
+        "id": "cat-companion",
+        "word": "cat",
+        "kind": "actor",
+        "location": {
+          "kind": "stage"
+        }
+      },
+      "bag-main": {
+        "id": "bag-main",
+        "word": "bag",
+        "kind": "object",
+        "location": {
+          "kind": "stage"
+        }
+      },
+      "cat-card": {
+        "id": "cat-card",
+        "word": "cat",
+        "kind": "token",
+        "location": {
+          "kind": "stage"
+        }
+      },
+      "route-sheet": {
+        "id": "route-sheet",
+        "word": "mat",
+        "kind": "object",
+        "location": {
+          "kind": "zone",
+          "id": "ink-road"
+        }
+      },
+      "hat-main": {
+        "id": "hat-main",
+        "word": "hat",
+        "kind": "object",
+        "location": {
+          "kind": "worn",
+          "targetId": "cat-companion"
+        }
+      }
+    },
+    "flags": [
+      "crossed-ink"
+    ]
+  }
+}

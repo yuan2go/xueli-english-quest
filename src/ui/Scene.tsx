@@ -288,6 +288,9 @@ export function Scene({
                 <b lang="en">{assessmentWord === e.word ? "" : e.word}</b>
               </span>
               <span className="entity-state">
+                {e.place.kind !== "node"
+                  ? `${e.place.kind} ${w.entities[e.place.id].word} · `
+                  : ""}
                 {e.size !== "normal" ? e.size : ""}
                 {spec.rules.types[e.word].container || e.word === "door"
                   ? e.open

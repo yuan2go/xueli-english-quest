@@ -15,6 +15,9 @@
 | [08 测试、发布与运行](08-test-release-and-operations.md) | 必要测试、真机、上线和提交清单 |
 | [09 路线图与 agent 协作](09-roadmap-and-agent-handoff.md) | 工作包顺序、负责人、并行和交接 |
 | [10 决策、风险与来源](10-decisions-risks-and-sources.md) | 对话中的取舍与修正、依据及未确认事项 |
+| [11 网页游戏产品蓝图](11-web-game-product-blueprint.md) | 页面式学习体验如何推进为可操作世界中的英语冒险 |
+| [12 网页游戏技术设计](12-web-game-technical-design.md) | Game Shell、状态、输入、资源、响应式与引擎升级边界 |
+| [WP-WEB-GAME-SHELL-05](work-packages/WP-WEB-GAME-SHELL-05.md) | 下一阶段 Scene-first Web Game 实施范围与验收 |
 | [WP-GAMEPLAY-CORE-04](work-packages/WP-GAMEPLAY-CORE-04.md) | 当前场景驱动主线、组句和活动验收 |
 | [WP-01](work-packages/WP-01.md) | 历史基础工作包 |
 | [WP-PLAYABLE-STORY-01](work-packages/WP-PLAYABLE-STORY-01.md) | 完整主线接续交付、覆盖关系与剩余门槛 |
@@ -22,6 +25,6 @@
 | [设计说明模板](submission/design-description.md) | 比赛提交材料；必须按实际交付更新 |
 | [AI 使用记录](submission/ai-usage-log.md) | 实际 AI 制作证据，不是营销陈述 |
 
-阅读顺序：README → STATUS → 01 → 02 → 04/05 → 当前工作包；UI 开发再读 03，AI 工坊开发再读 06。无需每次把所有文件复制进 Prompt。
+阅读顺序：README → STATUS → 01 → 02 → 04/05 → 11/12 → 当前工作包；UI 开发再读 03，AI 工坊开发再读 06。无需每次把所有文件复制进 Prompt。
 
 需求权威在 01/02，交互权威在 03，领域协议在 05，交付状态只在 STATUS。代码与文档冲突时，先报告差异，判断是缺陷还是批准后的设计改变；禁止把当前代码的偶然行为默认为新需求。修改设计时同步对应测试与工作包，不追加平行蓝图。

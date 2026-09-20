@@ -227,9 +227,6 @@ a {
   max-width: 150px;
   transform: translate(-50%, -50%);
   z-index: 4;
-  transition:
-    left 0.55s ease,
-    top 0.55s ease;
 }
 .entity-anchor.anchor-actor {
   width: 28%;
@@ -251,9 +248,7 @@ a {
   border: 2px solid transparent;
   background: transparent;
   touch-action: none;
-  transition:
-    filter 0.15s ease,
-    background 0.15s ease;
+  transition: background 0.15s ease;
 }
 .quest-object img,
 .missing-object img {
@@ -633,7 +628,9 @@ summary {
 }
 .drag-ghost {
   position: fixed;
-  transform: translate(-50%, -65%);
+  left: 0;
+  top: 0;
+  will-change: transform;
   z-index: 100;
   pointer-events: none;
   background: var(--paper-light);
@@ -734,81 +731,14 @@ summary {
   font-size: 12px;
   z-index: 20;
 }
-[data-feedback="appear"] > button,
-[data-feedback="transform"] > button {
-  animation: materialize 0.65s ease-out;
-}
-[data-feedback="move"] > button,
-[data-feedback="observe"] > button {
-  animation: settle 0.5s ease-out;
-}
-[data-feedback="blocked"] > button {
-  animation: refused 0.25s ease-out;
-}
-[data-feedback="cross"] {
-  animation: cross-ink 1.3s ease-in-out;
-}
-.motion-object {
-  position: fixed;
-  pointer-events: none;
-  animation: item-flight 0.65s ease-in-out both;
-}
-.motion-object img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-@keyframes item-flight {
-  from {
-    opacity: 0.9;
-    transform: translate(0, 0) scale(0.85);
-  }
-  to {
-    opacity: 0;
-    transform: translate(var(--dx), var(--dy)) scale(1);
-  }
-}
-@keyframes materialize {
-  from {
-    opacity: 0.35;
-    filter: brightness(1.7);
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    filter: brightness(1);
-    transform: scale(1);
-  }
-}
-@keyframes settle {
-  50% {
-    transform: translateY(-8px) rotate(-2deg);
-  }
-}
-@keyframes refused {
-  40% {
-    transform: translateX(-4px);
-  }
-  70% {
-    transform: translateX(4px);
-  }
-}
-@keyframes cross-ink {
-  from {
-    left: 16%;
-  }
-  to {
-    left: 80%;
-  }
-}
 @keyframes ribbon-in {
   from {
     opacity: 0;
-    margin-top: 8px;
+    transform: translate(-50%, 8px);
   }
   to {
     opacity: 1;
-    margin-top: 0;
+    transform: translate(-50%, 0);
   }
 }
 .sr-only {
@@ -843,7 +773,7 @@ summary {
   width: 100%;
   object-fit: cover;
 }
-.quest-cover-art > .character-art {
+.quest-cover-art > .character-sprite {
   position: absolute;
   bottom: 5%;
   left: 7%;
@@ -1113,7 +1043,7 @@ dialog input {
     width: 100%;
     order: -1;
   }
-  .quest-cover-art > .character-art {
+  .quest-cover-art > .character-sprite {
     width: 45%;
     left: 20%;
   }
@@ -1185,5 +1115,348 @@ dialog input {
   .presentation,
   .skip-presentation {
     display: none;
+  }
+}
+
+/* Artwork moves locally; hit regions and business state remain attached to committed entities. */
+.character-sprite,
+.object-art {
+  display: block;
+  position: relative;
+  width: 100%;
+}
+.character-sprite img {
+  display: block;
+  width: 100%;
+}
+.character-previous,
+.morph-previous {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  animation: pose-out 0.2s ease-out both;
+}
+.character-previous img,
+.morph-previous img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+@keyframes pose-out {
+  to {
+    opacity: 0;
+  }
+}
+[data-motion-id][data-moving] {
+  z-index: 12;
+}
+[data-motion-id][data-role="support"] {
+  z-index: 3;
+}
+[data-drag-origin] {
+  opacity: 0;
+}
+.drag-actor {
+  display: block;
+  position: relative;
+}
+.drag-hat {
+  position: absolute;
+  width: 62%;
+  left: 34%;
+  top: -6%;
+}
+.walk-window {
+  display: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.quest-cat .walk-window .walk-sheet {
+  position: absolute;
+  width: 200%;
+  max-width: none;
+  height: 200%;
+  aspect-ratio: auto;
+  object-fit: fill;
+  animation: walk-frames 0.5s steps(1, end) infinite;
+}
+[data-motion="walk"] .walk-window {
+  display: block;
+}
+[data-motion="walk"] .character-art,
+[data-motion="walk"] .character-previous,
+[data-motion="walk"] .cat-blink {
+  visibility: hidden;
+}
+[data-motion="walk"] .walk-window .art-fallback {
+  width: 100%;
+  height: 100%;
+}
+@keyframes walk-frames {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(-50%, 0);
+  }
+  50% {
+    transform: translate(0, -50%);
+  }
+  75% {
+    transform: translate(-50%, -50%);
+  }
+}
+.cat-blink {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.cat-blink i {
+  position: absolute;
+  width: 5%;
+  height: 1.5%;
+  top: 32.2%;
+  left: 56.5%;
+  border-radius: 90%;
+  background: #705333;
+  opacity: 0;
+  animation: blink 7.2s infinite;
+}
+.cat-blink i + i {
+  top: 28%;
+  left: 68%;
+}
+@keyframes blink {
+  0%,
+  93%,
+  98%,
+  100% {
+    opacity: 0;
+  }
+  95%,
+  96% {
+    opacity: 1;
+  }
+}
+.game-shell[data-motion-paused="true"] *,
+.quest-scene[data-dragging] .cat-blink i {
+  animation-play-state: paused !important;
+}
+.task-referents {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 4px 0;
+}
+.help-actions {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.help-message {
+  border-left: 3px solid var(--ochre);
+  padding: 6px 9px;
+}
+.lesson-stage {
+  height: 190px;
+  position: relative;
+  background: linear-gradient(#e8ecde, #fff7e6);
+  border-radius: 20px;
+  overflow: hidden;
+}
+.lesson-entity {
+  position: absolute;
+  top: 48%;
+  left: 30%;
+  width: 30%;
+  transform: translate(-50%, -50%);
+  transition:
+    transform 0.65s ease,
+    left 0.65s ease,
+    top 0.65s ease;
+}
+.lesson-entity img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+.lesson-target {
+  left: 73%;
+  top: 62%;
+  width: 38%;
+}
+.lesson-source {
+  z-index: 2;
+}
+.lesson-placed {
+  left: 73%;
+  top: 39%;
+  width: 25%;
+}
+.lesson-inside {
+  left: 73%;
+  top: 53%;
+  width: 19%;
+}
+.lesson-caption {
+  min-height: 48px;
+  font-size: 15px;
+}
+.lesson-chunks {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  min-height: 44px;
+  align-items: center;
+  font:
+    20px Arial,
+    sans-serif;
+}
+.lesson-chunks span {
+  padding: 5px;
+  border-radius: 6px;
+}
+.lesson-chunks .highlight {
+  background: var(--ochre-pale);
+  box-shadow: inset 0 -3px var(--ochre);
+}
+.quest-object .item-label {
+  transition: opacity 0.12s;
+}
+@media (min-width: 901px) {
+  .quest-object:not(:hover):not(:focus-visible):not(.selected) .item-label {
+    opacity: 0.75;
+  }
+}
+@media (max-width: 600px) {
+  .tool-context {
+    font-size: 12px;
+  }
+  .lesson-stage {
+    height: 160px;
+  }
+  .lesson-caption {
+    font-size: 13px;
+    min-height: 40px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .walk-window,
+  .cat-blink,
+  .character-previous,
+  .morph-previous {
+    display: none !important;
+  }
+  [data-motion="walk"] .character-art {
+    visibility: visible;
+  }
+}
+[data-related] > .quest-object {
+  border-color: #9a762d;
+  background: #fff2bc30;
+}
+.play-situation {
+  position: absolute;
+  top: 65px;
+  right: 8px;
+  display: flex;
+  gap: 5px;
+  z-index: 11;
+}
+.play-situation button {
+  font-size: 12px;
+  padding: 5px 8px;
+  background: #fffaf0ee;
+}
+.wind-leaves {
+  align-self: center;
+  font-size: 24px;
+}
+.scene-meadow:has(.situation-sun) .quest-cat::after {
+  content: "";
+  position: absolute;
+  bottom: 15%;
+  left: 25%;
+  width: 58%;
+  height: 6%;
+  border-radius: 50%;
+  background: #254b3d24;
+  z-index: -1;
+}
+@media (max-width: 600px) {
+  .play-situation {
+    top: 54px;
+  }
+  .play-situation button {
+    font-size: 11px;
+  }
+}
+
+/* Keep the route visibly spanning the ink, and reserve celebrations for clear space. */
+.quest-mat .object-art > img {
+  object-fit: fill;
+  aspect-ratio: 1.8;
+}
+.story-ribbon {
+  top: auto;
+  bottom: 11%;
+  font-size: 17px;
+  min-width: 220px;
+  padding: 8px 16px;
+}
+.bag-contents {
+  top: 48%;
+  left: -18%;
+  width: 136%;
+  border: 0;
+  background: transparent;
+  gap: 3px;
+}
+.bag-contents > .anchor-in {
+  min-width: 44px;
+}
+.quest-object .item-label {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  opacity: 0 !important;
+  pointer-events: none;
+}
+.quest-object:hover .item-label,
+.quest-object:focus-visible .item-label,
+.quest-object.selected .item-label {
+  opacity: 1 !important;
+}
+.bag-state {
+  font-size: 10px;
+  background: #fffaf0c7;
+}
+.quest-scene[data-ending="true"] .anchor-mat:not(.anchor-road) {
+  width: 57%;
+  max-width: 370px;
+}
+.quest-scene[data-ending="true"] .anchor-on.anchor-actor {
+  width: 78%;
+  max-width: 220px;
+}
+.quest-cover-art {
+  border-radius: 48% 48% 18px 18px;
+}
+@media (max-width: 600px) {
+  .story-ribbon {
+    font-size: 13px;
+    min-width: 180px;
+    bottom: 12%;
+    padding: 6px 10px;
+  }
+  .quest-scene[data-ending="true"] .anchor-mat:not(.anchor-road) {
+    width: 58%;
+  }
+  .quest-scene[data-ending="true"] .anchor-on.anchor-actor {
+    width: 80%;
+    max-width: 170px;
   }
 }

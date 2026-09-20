@@ -1,33 +1,32 @@
-import { evidenceFor, observeLearning, demoCompleted } from "./learning.ts";
-import type { Exposure, Observation } from "./learning.ts";
+// HISTORICAL v4 decoder dependency. Frozen semantics; never used by the formal game.
 import {
   DomainError,
   assertWorld,
   isWord,
   transition,
-} from "../domain/world.ts";
+} from "../../domain/world.ts";
 import type {
   Effect,
   Entity,
   Location,
   World,
   WordId,
-} from "../domain/world.ts";
-import { ADVENTURE_VERSION, CRAFTS, WORD_TASKS } from "../content/adventure.ts";
+} from "../../domain/world.ts";
+import { ADVENTURE_VERSION, CRAFTS, WORD_TASKS } from "./content.ts";
 import type {
   ActivityId,
   PracticeMode,
   SceneId,
-} from "../content/adventure.ts";
-import { AUDIO } from "../content/manifest.ts";
+} from "./content.ts";
+import { AUDIO } from "../../content/manifest.ts";
 import {
   SENTENCES,
   SENTENCE_AUDIO,
   recapSentence,
-} from "../content/sentences.ts";
-import type { SentenceTask } from "../content/sentences.ts";
-import { assemble, parseSentence, sameMeaning } from "./sentences.ts";
-import { initialPicnic } from "./picnic.ts";
+} from "./sentences.ts";
+import type { SentenceTask } from "./sentences.ts";
+import { assemble, parseSentence, sameMeaning } from "./grammar.ts";
+import { initialPicnic } from "../../game/picnic.ts";
 export type Mode = "story" | ActivityId;
 export type ResultKind =
   | "done"
@@ -39,7 +38,6 @@ export type ResultKind =
   | "blocked"
   | "stale";
 export interface Support {
-  exposures: Exposure[];
   text: boolean;
   hint: boolean;
   demo: boolean;
@@ -60,7 +58,6 @@ export interface Board {
   seed: number;
 }
 export interface Learning {
-  observation?: Observation;
   id: string;
   mode: Mode;
   task: string;
@@ -76,8 +73,6 @@ export interface Learning {
   result: ResultKind;
   language: "correct" | "adjust" | "unassessed";
   evidence:
-    | "demo-partial"
-    | "listen-rebuild"
     | "guided"
     | "assisted"
     | "demonstrated"
@@ -89,7 +84,6 @@ export interface Learning {
 }
 export interface Intent {
   action:
-    | "experiment"
     | "word"
     | "craft"
     | "transform"
@@ -115,8 +109,6 @@ export interface Intent {
   audioSource?: string;
   audioVersion?: string;
   assetId?: string;
-  phase?: "shown" | "completed" | "cancelled" | "failed";
-  step?: number;
 }
 export interface AdventureCommand extends Intent {
   sessionId: string;
@@ -148,8 +140,7 @@ export interface AdventureResult {
   focus?: string;
 }
 const stage: Location = { kind: "stage" };
-export const emptySupport = (): Support => ({
-  exposures: [],
+const emptySupport = (): Support => ({
   text: false,
   hint: false,
   demo: false,
@@ -618,70 +609,13 @@ export function runAdventure(
       case "help": {
         if (!validTask(n, c.task))
           return reply("stale", "这个练习还没有开放。");
-        if (
-          ![
-            "attention",
-            "meaning",
-            "partial",
-            "text",
-            "demo",
-            "feedback",
-          ].includes(c.value ?? "") ||
-          !["shown", "completed", "cancelled", "failed"].includes(c.phase ?? "")
-        )
-          return reply("outside", "只记录实际显示的帮助，不把点击当成曝光。");
-        if (
-          c.value === "demo" &&
-          (!c.request ||
-            !Number.isInteger(c.step) ||
-            c.step! < 0 ||
-            c.step! > 3)
-        )
-          return reply("outside", "示范步骤不完整。");
-        if (
-          c.value === "demo" &&
-          c.phase === "completed" &&
-          ![0, 1, 2, 3].every((step) =>
-            support.exposures.some(
-              (x) =>
-                x.kind === "demo" &&
-                x.request === c.request &&
-                x.step === step &&
-                x.status === "shown",
-            ),
-          )
-        )
-          return reply("blocked", "先观察每一步，再亲手试一试。");
-        const shown = c.phase === "shown";
-        const answer: Exposure["answer"] =
-          c.value === "text" || (c.value === "demo" && c.step! >= 2)
-            ? "full"
-            : ["partial", "feedback"].includes(c.value!) ||
-                (c.value === "demo" && c.step === 1)
-              ? "partial"
-              : "none";
-        const exposure: Exposure = {
-          id: c.attemptId,
-          request: c.request ?? c.attemptId,
-          kind: c.value as Exposure["kind"],
-          channel: "visual",
-          status: c.phase!,
-          answer,
-          ...(c.step !== undefined ? { step: c.step } : {}),
-        };
-        b.help[c.task!] = {
-          ...support,
-          text: support.text || (shown && c.value === "text"),
-          hint:
-            support.hint ||
-            (shown &&
-              ["attention", "meaning", "partial", "feedback"].includes(
-                c.value!,
-              )),
-          demo: support.demo || (shown && c.value === "demo"),
-          exposures: [...support.exposures, exposure],
-        };
-        message = "";
+        if (!["text", "hint", "demo"].includes(c.value ?? ""))
+          return reply("outside", "请选择提示方式。");
+        b.help[c.task!] = { ...support, [c.value!]: true };
+        message =
+          c.value === "demo"
+            ? "看过示范后请亲手尝试；记录会保留示范帮助。"
+            : "帮助已开启，本次会如实记录。";
         break;
       }
       case "replay": {
@@ -735,7 +669,7 @@ export function runAdventure(
         )
           return reply("stale", "忽略旧语音。");
         if (
-          !["loading", "muted", "failed"].includes(c.value ?? "") &&
+          c.value !== "loading" &&
           support.request &&
           support.request !== c.request
         )
@@ -752,82 +686,7 @@ export function runAdventure(
           audioSource: c.audioSource!,
           audioVersion: c.audioVersion!,
           assetId: c.assetId!,
-          exposures: [
-            ...support.exposures,
-            {
-              id: c.attemptId,
-              request: c.request!,
-              kind: "audio",
-              channel: "audio",
-              status: c.value as Exposure["status"],
-              answer: sentenceTasks(n).some((t) => t.id === c.task)
-                ? "full"
-                : "none",
-            },
-          ],
         };
-        break;
-      }
-      case "experiment": {
-        if (n.mode === "dress" && ["sun", "breeze"].includes(c.value ?? "")) {
-          const worn = Object.values(b.world.entities).find((e) =>
-            at(b, e.id, "worn"),
-          );
-          if (!worn)
-            return reply("blocked", "先选一顶帽子戴上，再看看会发生什么。");
-          if (c.value === "breeze" && worn.word === "hat") {
-            apply(b, { type: "place", sourceId: worn.id, target: stage });
-            message = "呼！大帽檐回到地上，像一艘小船。捡回来，或试试贴头帽。";
-          } else {
-            const target: Location =
-              c.value === "sun" && worn.word === "hat"
-                ? { kind: "relation", relation: "on", targetId: "picnic-mat" }
-                : stage;
-            const issue = move(b, "cat-companion", target, false);
-            if (issue) return reply("blocked", issue);
-            message =
-              c.value === "sun"
-                ? worn.word === "hat"
-                  ? "宽帽檐遮住太阳，小猫坐下来歇脚。"
-                  : "小猫走到树荫边，小帽子也有自己的办法。"
-                : "贴头帽稳稳的。小猫走两步，还在头上！";
-          }
-          fact(b, `tried-${c.value}`);
-        } else if (
-          n.mode === "helper" &&
-          b.variant === 1 &&
-          ["depart", "rest"].includes(c.value ?? "")
-        ) {
-          if (
-            c.value === "depart" &&
-            (b.world.entities["route-sheet"].word !== "map" ||
-              !at(b, "cat-card", "in", "bag-main"))
-          )
-            return reply(
-              "blocked",
-              "先让路线纸恢复地图，再用一句话收好小帽子。输入可以留着慢慢试。",
-            );
-          const issue = move(
-            b,
-            "cat-companion",
-            c.value === "depart"
-              ? stage
-              : { kind: "relation", relation: "on", targetId: "picnic-mat" },
-            false,
-          );
-          if (issue) return reply("blocked", issue);
-          if (c.value === "depart") {
-            b.bagOpen = false;
-            fact(b, "departure-preview");
-          }
-          message =
-            c.value === "depart"
-              ? "物品收好，袋口合上，小猫起身准备出发。"
-              : "小猫回到垫子上。再歇一下也可以，路线还在。";
-        } else return reply("outside", "先观察这个情境能试什么。");
-        type = "exploration";
-        record = true;
-        focus = "cat-companion";
         break;
       }
       case "bag":
@@ -984,8 +843,6 @@ export function runAdventure(
       case "sentence": {
         const task = sentenceTasks(n).find((t) => t.id === c.task);
         if (!task) return reply("stale", "这句话的情境已更新，先重新观察。");
-        if (task.exercise === "example-reproduce" && !demoCompleted(support))
-          return reply("blocked", "先看物品怎样行动，再由你亲手说出这句话。");
         const text = assemble(task, c.ids ?? []);
         if (text === undefined)
           return reply(
@@ -1128,8 +985,20 @@ export function runAdventure(
   b = board(n);
   assertWorld(b.world);
   if (kind === "valid" && complete(n)) kind = "done";
-  const task = sentenceTasks(s).find((t) => t.id === c.task);
-  const evidence = evidenceFor(type, practice, support, task);
+  const evidence: Learning["evidence"] =
+    practice === "exploration"
+      ? "exploration"
+      : support.demo
+        ? "demonstrated"
+        : practice === "teaching"
+          ? "guided"
+          : support.text || support.hint || practice === "assisted"
+            ? "assisted"
+            : type === "spelling" || type === "listening"
+              ? ["playing", "completed"].includes(support.audio)
+                ? "independent"
+                : "audio-unverified"
+              : "independent";
   return commit(
     n,
     c,
@@ -1168,15 +1037,7 @@ function commit(
     kind,
     message,
   });
-  if (event) {
-    event.observation = observeLearning(
-      n,
-      c,
-      event,
-      sentenceTasks(n).find((t) => t.id === c.task),
-    );
-    n.events.push(event);
-  }
+  if (event) n.events.push(event);
   return { session: n, kind, message, focus };
 }
 function validTask(s: Adventure, task?: string): boolean {

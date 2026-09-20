@@ -109,7 +109,12 @@ test("context tools hide independent listening answers until explicit help, whil
   const saved = encodeAdventure(s);
   assert.equal(resolveTool(s, { kind: "word", id: "map" }).reveal, false);
   assert.equal(encodeAdventure(s), saved);
-  const aided = act(s, { action: "help", task: "map", value: "text" });
+  const aided = act(s, {
+    action: "help",
+    task: "map",
+    value: "text",
+    phase: "shown",
+  });
   assert.equal(resolveTool(aided, { kind: "word", id: "map" }).reveal, true);
   assert.equal(
     presentation(

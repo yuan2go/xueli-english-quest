@@ -72,7 +72,34 @@ function tokens(task, text) {
     return token.id;
   });
 }
+export function demonstrate(s, task) {
+  const request = `lesson-${s.revision}`;
+  for (let step = 0; step < 4; step++)
+    s = act(s, {
+      action: "help",
+      task,
+      value: "demo",
+      request,
+      phase: "shown",
+      step,
+    });
+  return act(s, {
+    action: "help",
+    task,
+    value: "demo",
+    request,
+    phase: "completed",
+    step: 3,
+  });
+}
 const say = (s, id, text) => {
+  if (
+    id === "pack-cap" &&
+    !s.story.help[id]?.exposures.some(
+      (x) => x.kind === "demo" && x.status === "completed",
+    )
+  )
+    s = demonstrate(s, id);
   const task = sentenceTasks(s).find((t) => t.id === id);
   assert.ok(task, id);
   return act(s, {
@@ -140,6 +167,7 @@ test("three world-goal acts allow either preparation order, actual crossing, per
 });
 test("language, goal relevance and world permission are independent; descriptions never move things", () => {
   let s = meadow();
+  s = demonstrate(s, "pack-cap");
   const cap = SENTENCES["pack-cap"];
   const before = structuredClone(s.story.world);
   let r = send(s, {
@@ -192,6 +220,7 @@ test("unique repeated tokens, grammar variants, incomplete input and punctuation
     "outside",
   );
   let s = meadow();
+  s = demonstrate(s, "pack-cap");
   const count = s.events.length;
   const r = send(s, {
     action: "sentence",
@@ -203,7 +232,7 @@ test("unique repeated tokens, grammar variants, incomplete input and punctuation
 });
 test("help survives refresh, no audio does not earn independent listening, replay and failures are not language errors", () => {
   let s = word(initialAdventure("evidence"), "wake");
-  s = act(s, { action: "help", task: "map", value: "demo" });
+  s = demonstrate(s, "map");
   s = decodeAdventure(encodeAdventure(s));
   s = word(s, "map");
   assert.equal(s.events.at(-1).evidence, "demonstrated");

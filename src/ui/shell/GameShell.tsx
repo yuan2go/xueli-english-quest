@@ -1,4 +1,5 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { playfulState } from "../../game/play.ts";
+import { useEffect, useRef, useState } from "react";
 import { ACTIVITIES } from "../../content/adventure.ts";
 import type { ActivityId } from "../../content/adventure.ts";
 import { ENTITY_REACTIONS } from "../../content/encounters.ts";
@@ -16,7 +17,7 @@ import { NAMES } from "../Art.tsx";
 import { Modal } from "../Modal.tsx";
 import { ContextTool } from "./ContextTool.tsx";
 import { GameHUD } from "./GameHUD.tsx";
-import type { Flight } from "./FeedbackLayer.tsx";
+import { useSceneMotion } from "./useSceneMotion.ts";
 import { FeedbackLayer } from "./FeedbackLayer.tsx";
 export function GameShell({
   session,
@@ -43,19 +44,27 @@ export function GameShell({
   const [tool, setTool] = useState<Tool | null>(null);
   const [explore, setExplore] = useState(false);
   const [feedback, setFeedback] = useState("");
-  const [flight, setFlight] = useState<Flight | null>(null);
-  const origin = useRef<{ rect: DOMRect; word: Flight["word"] } | null>(null);
   const [cue, setCue] = useState<Cue | null>(null);
   const current = useRef(session);
   current.current = session;
   const returnEntity = useRef<string | undefined>(undefined);
   const trigger = useRef<HTMLElement | null>(null);
   const shell = useRef<HTMLDivElement>(null);
+  const focusFrame = useRef<number | null>(null);
+  useEffect(
+    () => () => {
+      if (focusFrame.current !== null) cancelAnimationFrame(focusFrame.current);
+    },
+    [],
+  );
   const [audio] = useState(() => new StoryAudio());
   const b = board(session),
     model = sceneModel(session),
     entities = b.world.entities;
-  const inactive = paused || explore;
+  const play = playfulState(session);
+  const [hidden, setHidden] = useState(document.hidden);
+  const inactive = paused || explore || hidden;
+  const captureMotion = useSceneMotion(shell, cue, inactive);
   useEffect(() => {
     audio.muted = muted;
     audio.volume = volume;
@@ -72,9 +81,15 @@ export function GameShell({
       setCue(null);
       audio.stop();
     };
+    const visibility = () => {
+      setHidden(document.hidden);
+      if (document.hidden) cancel();
+    };
     window.addEventListener("resize", cancel);
+    document.addEventListener("visibilitychange", visibility);
     return () => {
       window.removeEventListener("resize", cancel);
+      document.removeEventListener("visibilitychange", visibility);
       audio.stop();
     };
   }, [audio]);
@@ -88,47 +103,22 @@ export function GameShell({
     const timer = setTimeout(() => setFeedback(""), 6500);
     return () => clearTimeout(timer);
   }, [feedback]);
-  useLayoutEffect(() => {
-    const start = origin.current;
-    const end =
-      cue?.entity &&
-      shell.current
-        ?.querySelector<HTMLElement>(`[data-entity="${cue.entity}"]`)
-        ?.getBoundingClientRect();
-    if (cue?.kind === "move" && start && end)
-      setFlight({
-        x: start.rect.x,
-        y: start.rect.y,
-        width: start.rect.width,
-        height: start.rect.height,
-        dx: end.x - start.rect.x,
-        dy: end.y - start.rect.y,
-        word: start.word,
-      });
-    else setFlight(null);
-  }, [cue]);
   function send(intent: Intent, silent = false) {
-    const before = current.current,
-      r = dispatch(intent);
+    const before = current.current;
+    if (!silent) captureMotion();
+    const r = dispatch(intent);
     current.current = r.session;
     if (!silent) {
       const nextCue = presentation(before, intent, r);
-      const el =
-        nextCue?.entity &&
-        shell.current?.querySelector<HTMLElement>(
-          `[data-entity="${nextCue.entity}"]`,
-        );
-      const word =
-        nextCue?.entity && board(before).world.entities[nextCue.entity]?.word;
-      origin.current =
-        el && word ? { rect: el.getBoundingClientRect(), word } : null;
       setFeedback(r.message);
       setCue(nextCue);
     }
     return r;
   }
   function focusWorld(id?: string) {
-    requestAnimationFrame(() => {
+    if (focusFrame.current !== null) cancelAnimationFrame(focusFrame.current);
+    focusFrame.current = requestAnimationFrame(() => {
+      focusFrame.current = null;
       const el = id
         ? shell.current?.querySelector<HTMLElement>(
             `[data-entity="${id}"], [data-word-entity="${id}"]`,
@@ -192,6 +182,7 @@ export function GameShell({
       ref={shell}
       className={`game-shell ${tool ? "tool-open" : selected ? "object-open" : "world-open"}`}
       data-encounter={model.id}
+      data-motion-paused={inactive || undefined}
       onKeyDown={(e) => {
         if (e.key === "Escape" && !inactive) {
           close();
@@ -215,6 +206,20 @@ export function GameShell({
         <Scene
           session={session}
           selected={selected}
+          related={
+            tool
+              ? (() => {
+                  const r = resolveTool(session, tool);
+                  return r.sentence
+                    ? [r.sentence.sourceId, r.sentence.targetId]
+                    : r.morph
+                      ? [r.morph.id]
+                      : r.word
+                        ? [r.word.entity]
+                        : [];
+                })()
+              : []
+          }
           onSelect={choose}
           onWord={(id) => openTool({ kind: "word", id })}
           onMove={(source, target) => {
@@ -233,7 +238,7 @@ export function GameShell({
               duration: 650,
             });
           }}
-          response={feedback}
+          response={feedback || play?.response || play?.clue || ""}
           pose={
             cue?.kind === "blocked"
               ? "thinking"
@@ -246,6 +251,29 @@ export function GameShell({
           disabled={inactive}
           cue={cue}
         >
+          {play && !tool && (
+            <div
+              className={`play-situation situation-${play.scene}`}
+              aria-label="情境实验"
+            >
+              {play.scene === "breeze" && (
+                <span className="wind-leaves" aria-hidden="true">
+                  🍃
+                </span>
+              )}
+              {play.actions.map((a) => (
+                <button
+                  key={a.value}
+                  onClick={() => {
+                    close(false);
+                    send({ action: "experiment", value: a.value });
+                  }}
+                >
+                  {a.label}
+                </button>
+              ))}
+            </div>
+          )}
           <nav className="scene-invitations" aria-label="场景中的邀请">
             {(!tool
               ? model.actions.filter((a) => a.anchor !== selected)
@@ -288,7 +316,7 @@ export function GameShell({
               </div>
             )}
           </nav>
-          <FeedbackLayer cue={cue} flight={flight} />
+          <FeedbackLayer cue={cue} />
         </Scene>
         {(tool || selected) && (
           <aside className="quest-tools" aria-label="行动工具" inert={inactive}>

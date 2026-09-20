@@ -1,3 +1,4 @@
+import { learningFact } from "./game/learning.ts";
 import { useEffect, useRef, useState } from "react";
 import { WORD_TASKS } from "./content/adventure.ts";
 import { SENTENCES } from "./content/sentences.ts";
@@ -35,10 +36,12 @@ const modeLabels = {
   revisit: "复习回访",
 };
 const evidenceLabels = {
+  "demo-partial": "部分示范",
+  "listen-rebuild": "听后识别 / 重组",
   guided: "引导学习",
   assisted: "使用了帮助",
   demonstrated: "看过示范",
-  independent: "未使用帮助",
+  independent: "未显示答案",
   "audio-unverified": "语音未确认",
   exploration: "探索记录",
 };
@@ -92,6 +95,24 @@ export default function App() {
   const active = useRef(false);
   active.current = screen === "game" && !modal;
   const currentGoals = goals(session);
+  useEffect(() => {
+    if (!loaded.previousRaw) return;
+    let cancelled = false;
+    void import("./legacy/quest-v4/save.ts").then(({ decodeAdventure }) => {
+      try {
+        decodeAdventure(loaded.previousRaw!);
+        if (!cancelled && !canSave.current)
+          setWarning(
+            "旧版冒险已验证并备份。历史曝光未知，不升级为独立证据；请导出，再明确开始新冒险。",
+          );
+      } catch {
+        /* Original bytes remain backed up; no inferred migration. */
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [loaded]);
   function saving(s: Adventure) {
     current.current = s;
     setSession(s);
@@ -234,6 +255,57 @@ export default function App() {
             <button onClick={download}>导出本局与旧记录</button>
             <button onClick={() => setScreen("game")}>返回冒险</button>
             <button onClick={() => setModal("restart")}>重新开始</button>
+            <p>
+              这些是本次事实，不代表永久掌握或学习效果。
+              {session.events.some(
+                (e) =>
+                  e.practice === "revisit" &&
+                  e.evidence === "independent" &&
+                  ["valid", "done"].includes(e.result),
+              )
+                ? "已有未显示答案的回访；长期保持尚未验证。"
+                : "尚无独立回访。"}
+            </p>
+            <details>
+              <summary>实际帮助与音频过程</summary>
+              {[session.story, ...Object.values(session.activities)].flatMap(
+                (b, i) =>
+                  Object.entries(b.help).map(([task, h]) => (
+                    <div key={`${i}-${task}`}>
+                      <b>{taskLabel(task)}</b>
+                      <ul>
+                        {h.exposures.map((x) => (
+                          <li key={x.id}>
+                            {x.channel === "audio"
+                              ? "目标音频"
+                              : x.kind === "demo"
+                                ? `示范第 ${(x.step ?? 0) + 1} 步`
+                                : "视觉帮助"}{" "}
+                            ·{" "}
+                            {
+                              {
+                                shown: "已显示",
+                                loading: "请求加载",
+                                playing: "开始播放",
+                                completed: "已完成",
+                                cancelled: "已取消",
+                                failed: "失败",
+                                muted: "静音未播放",
+                              }[x.status]
+                            }{" "}
+                            ·{" "}
+                            {x.answer === "none"
+                              ? "无答案曝光"
+                              : x.answer === "partial"
+                                ? "局部答案"
+                                : "完整答案内容"}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )),
+              )}
+            </details>
             <ol>
               {session.events.map((event) => (
                 <li
@@ -244,6 +316,21 @@ export default function App() {
                   <b>{taskLabel(event.task)}</b> · {modeLabels[event.practice]}{" "}
                   · {typeLabels[event.type]} · {evidenceLabels[event.evidence]}{" "}
                   · {resultLabels[event.result]}
+                  <p>{learningFact(event)}</p>
+                  {event.observation && (
+                    <small>
+                      观察维度：
+                      {event.observation.skills
+                        .map(
+                          (s) =>
+                            `${{ "word-meaning": "词义识别", listening: "听力", "full-spelling": "完整拼写", "letter-change": "换字", "word-order-grammar": "词序 / 语法", "situation-semantics": "情境语义", "world-operation": "世界操作" }[s.dimension]}（${s.result === "observed" ? "本次有观察" : s.result === "adjust" ? "仍需调整" : "未确认"}）`,
+                        )
+                        .join("、")}
+                      {event.observation.revisitOf
+                        ? " · 关联先前任务的回访"
+                        : ""}
+                    </small>
+                  )}
                   {event.language === "correct" &&
                     event.result === "blocked" && <span>（语句成立）</span>}
                   {event.type !== "operation" && (

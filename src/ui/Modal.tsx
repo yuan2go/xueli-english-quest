@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
 import type { ReactNode } from "react";
 export function Modal({
   title,
@@ -10,6 +10,7 @@ export function Modal({
   close: () => void;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
   useEffect(() => {
     const before = document.activeElement as HTMLElement;
     const dialog = ref.current;
@@ -22,7 +23,7 @@ export function Modal({
   return (
     <dialog
       ref={ref}
-      aria-labelledby="modal-title"
+      aria-labelledby={titleId}
       onKeyDown={(e) => {
         if (e.key !== "Tab") return;
         const focusable = [
@@ -45,7 +46,7 @@ export function Modal({
         close();
       }}
     >
-      <h2 id="modal-title">{title}</h2>
+      <h2 id={titleId}>{title}</h2>
       {children}
       <button className="secondary" onClick={close}>
         返回

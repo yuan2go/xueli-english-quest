@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import {
+  demo,
   start,
   word,
   button,
@@ -146,6 +147,7 @@ test("phone full adventure with dragged/reordered sentence tokens and reload dur
   await button(p, "跟着地图去草地 →").click();
   await word(p, "mat", "mat", true);
   await button(p, "帮背包收一件东西").click();
+  await demo(p);
   for (const part of ["the", "Put", "cap", "in", "the", "bag"]) {
     const token = p
       .locator(".word-blocks button:enabled")

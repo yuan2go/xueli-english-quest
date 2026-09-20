@@ -1,5 +1,6 @@
-import type { WordId } from "../domain/world.ts";
-import type { PracticeMode } from "./adventure.ts";
+// HISTORICAL v4 decoder dependency. Frozen semantics; never used by the formal game.
+import type { WordId } from "../../domain/world.ts";
+import type { PracticeMode } from "./content.ts";
 export interface Meaning {
   kind: "command" | "description";
   source: WordId;
@@ -11,8 +12,6 @@ export interface SentenceTask {
   title: string;
   context: string;
   mode: PracticeMode;
-  exercise: "listen-rebuild" | "scene-compose" | "example-reproduce";
-  revisitOf?: string;
   target: Meaning;
   sourceId: string;
   targetId: string;
@@ -54,20 +53,6 @@ function sentence(
     title,
     context,
     mode,
-    exercise:
-      mode === "teaching"
-        ? "example-reproduce"
-        : mode === "assisted"
-          ? "listen-rebuild"
-          : "scene-compose",
-    revisitOf:
-      id === "helper-pack"
-        ? "pack-cap"
-        : id === "helper-seat"
-          ? "invite-cat"
-          : id.startsWith("find-") || id === "recap"
-            ? "describe-hat"
-            : undefined,
     target,
     sourceId,
     targetId,

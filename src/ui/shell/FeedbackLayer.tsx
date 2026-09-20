@@ -1,24 +1,6 @@
-import type { CSSProperties } from "react";
 import type { Cue } from "../../game/shell.ts";
-import type { WordId } from "../../domain/world.ts";
-import { Art } from "../Art.tsx";
-export type Flight = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  dx: number;
-  dy: number;
-  word: WordId;
-};
-/** Render-only copies can disappear at any time; neither cue nor geometry is a save input. */
-export function FeedbackLayer({
-  cue,
-  flight,
-}: {
-  cue: Cue | null;
-  flight: Flight | null;
-}) {
+/** Render-only feedback can disappear at any time; a cue is never a save input. */
+export function FeedbackLayer({ cue }: { cue: Cue | null }) {
   if (!cue) return null;
   const story = ["arrive", "cross", "celebrate"].includes(cue.kind);
   return (
@@ -28,23 +10,6 @@ export function FeedbackLayer({
       data-cue={cue.kind}
       aria-hidden="true"
     >
-      {flight && (
-        <div
-          className="motion-object"
-          style={
-            {
-              left: flight.x,
-              top: flight.y,
-              width: flight.width,
-              height: flight.height,
-              "--dx": `${flight.dx}px`,
-              "--dy": `${flight.dy}px`,
-            } as CSSProperties
-          }
-        >
-          <Art word={flight.word} />
-        </div>
-      )}
       {cue.kind === "transform" && (
         <div className="morph-ribbon">
           <span>{cue.from}</span>

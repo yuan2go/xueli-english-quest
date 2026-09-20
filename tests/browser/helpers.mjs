@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test";
-export const KEY = "xueli.adventure.v4";
+export const KEY = "xueli.adventure.v5";
 export const button = (p, name) => p.getByRole("button", { name, exact: true });
 export const object = (p, id) => p.locator(`[data-entity="${id}"]`);
 export async function start(p) {
@@ -19,6 +19,23 @@ export async function select(p, id) {
   if ((await object(p, id).getAttribute("aria-pressed")) !== "true")
     await object(p, id).click();
 }
+export async function helpText(p) {
+  const details = p.locator(".tool-support");
+  if ((await details.getAttribute("open")) === null)
+    await details.locator("summary").click();
+  await button(p, "文字辅助").click();
+  await expect(
+    p.locator(".context-tool .answer, .context-tool .letter-example"),
+  ).toBeVisible();
+}
+export async function demo(p) {
+  await expect(p.getByRole("dialog", { name: "看看小猫怎样做" })).toBeVisible();
+  for (let i = 0; i < 3; i++) await button(p, "看看下一步").click();
+  await button(p, "我来试试").click();
+  await expect(p.getByRole("dialog", { name: "看看小猫怎样做" })).toHaveCount(
+    0,
+  );
+}
 export async function word(p, task, word, help = false) {
   const labels = {
     wake: "唤醒伙伴",
@@ -28,7 +45,7 @@ export async function word(p, task, word, help = false) {
     mat: "制作野餐座位",
   };
   await button(p, labels[task]).click();
-  if (help) await button(p, "文字辅助").click();
+  if (help) await helpText(p);
   for (const letter of word) await button(p, `字母 ${letter}`).click();
   await p.getByRole("button", { name: /^施法/ }).click();
   await expect(button(p, "收起工具")).toHaveCount(0);
@@ -56,7 +73,12 @@ export async function morph(p, id, to) {
 export async function sentence(p, title, text, help = false) {
   await closeTool(p);
   await p.getByRole("button", { name: new RegExp(`^${title}`) }).click();
-  if (help) await button(p, "文字辅助").click();
+  if (help) await helpText(p);
+  if (
+    title === "帮背包收一件东西" &&
+    (await p.getByRole("dialog", { name: "看看小猫怎样做" }).count())
+  )
+    await demo(p);
   for (const part of text.split(" ")) {
     await p
       .locator(".word-blocks button:enabled")
@@ -107,7 +129,7 @@ export async function finish(p, cap = false) {
   await p
     .getByRole("button", { name: "听听小猫想找什么 →", exact: true })
     .click();
-  await button(p, "文字辅助").click();
+  await helpText(p);
   await object(p, "route-sheet").click();
   await move(p, cap ? "cat-card" : "hat-main", "戴在小猫头上");
   await move(
@@ -137,9 +159,8 @@ export async function shot(p, name) {
     Promise.all([...document.images].map((i) => i.decode().catch(() => {}))),
   );
   await p.screenshot({
-    path: `docs/evidence/web-game-shell-05/${name}.png`,
+    path: `docs/evidence/animated-play-learning-06/${name}.png`,
     fullPage: true,
-    animations: "disabled",
   });
 }
 export async function viewportOK(p) {

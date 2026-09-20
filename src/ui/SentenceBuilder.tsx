@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import type { SentenceTask } from "../content/sentences.ts";
 import { usePointerDrop } from "./pointer.ts";
 export function SentenceBuilder({
@@ -13,8 +13,21 @@ export function SentenceBuilder({
   const [ids, setIds] = useState<string[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const surface = useRef<HTMLDivElement>(null);
+  const focusTarget = useRef<string | null>(null);
+  useLayoutEffect(() => {
+    const selector = focusTarget.current;
+    focusTarget.current = null;
+    if (selector)
+      surface.current
+        ?.querySelector<HTMLElement>(selector)
+        ?.focus({ preventScroll: true });
+  }, [ids]);
   const move = (token: string, destination: string | null) => {
     if (!destination) return;
+    focusTarget.current =
+      destination === "words"
+        ? `.word-blocks [data-token="${token}"]`
+        : `.sentence-line [data-drop="${token}"]`;
     setIds((old) => {
       const next = old.filter((id) => id !== token);
       if (destination === "words") return next;
@@ -29,6 +42,7 @@ export function SentenceBuilder({
   const pointer = usePointerDrop(move, disabled, surface);
   const shift = (offset: number) => {
     if (!selected) return;
+    focusTarget.current = `.sentence-line [data-drop="${selected}"]`;
     setIds((old) => {
       const i = old.indexOf(selected),
         j = i + offset;
@@ -98,6 +112,7 @@ export function SentenceBuilder({
         <button
           disabled={disabled || !ids.length}
           onClick={() => {
+            focusTarget.current = ".word-blocks button";
             setIds([]);
             setSelected(null);
           }}
@@ -127,11 +142,7 @@ export function SentenceBuilder({
         说出这句话
       </button>
       {pointer.ghost && (
-        <div
-          className="drag-ghost"
-          aria-hidden="true"
-          style={{ left: pointer.ghost.x, top: pointer.ghost.y }}
-        >
+        <div ref={pointer.ghostRef} className="drag-ghost" aria-hidden="true">
           {task.tokens.find((t) => t.id === pointer.ghost?.label)?.text}
         </div>
       )}

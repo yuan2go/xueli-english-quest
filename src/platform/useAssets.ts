@@ -74,6 +74,7 @@ export function useAssets(scene: SceneId) {
             [
               "cat-thinking",
               "cat-action",
+              ...(scene === "trail" ? ["cat-walk"] : []),
               ...(scene === "meadow" ? ["cat-happy"] : []),
             ].map((id) => load(id)),
           );

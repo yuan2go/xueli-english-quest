@@ -1,5 +1,5 @@
 import type { WordId } from "../domain/world.ts";
-export const ADVENTURE_VERSION = "4.0.0-dev.1";
+export const ADVENTURE_VERSION = "5.0.0-dev.1";
 export type PracticeMode =
   | "teaching"
   | "assisted"

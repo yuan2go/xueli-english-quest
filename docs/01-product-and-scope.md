@@ -1,6 +1,6 @@
 # 01 · 产品与范围
 
-当前产品名：雪梨英语奇旅 / Xueli English Quest；仓库 `yuan2go/xueli-english-quest`。首个故事《小猫的野餐冒险》。当前工作包 WP-WEB-GAME-SHELL-05，覆盖并替代旧包中固定步骤和通关后才探索的限制。
+当前产品名：雪梨英语奇旅 / Xueli English Quest；仓库 `yuan2go/xueli-english-quest`。首个故事《小猫的野餐冒险》。当前工作包 WP-ANIMATED-PLAY-LEARNING-06，覆盖并替代旧包中固定步骤和通关后才探索的限制。
 
 ## 核心体验
 

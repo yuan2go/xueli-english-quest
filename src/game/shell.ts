@@ -114,12 +114,7 @@ export function resolveTool(s: Adventure, tool: Tool) {
         (morph.id === "route-sheet" &&
           !b.world.flags.includes("crossed-ink"))));
   const help = id ? b.help[id] : undefined;
-  const reveal =
-    teaching ||
-    sentence?.mode === "assisted" ||
-    !!help?.text ||
-    !!help?.hint ||
-    !!help?.demo;
+  const reveal = (!!word && teaching) || !!help?.text;
   const letter: LetterTask | undefined = word
     ? {
         id: word.id,
@@ -180,7 +175,11 @@ export function resolveTool(s: Adventure, tool: Tool) {
       word?.meaning ??
       sentence?.context ??
       (morph
-        ? "换一个词尾，看看同一件物品的新用途。"
+        ? morph.word === "map"
+          ? "小猫需要一条干路。展开这张路线纸，试试能垫脚的新用途。"
+          : morph.word === "mat"
+            ? "不再用来垫脚时，收好纸张，再恢复能指路的用途。"
+            : "这是纸偶。换个词尾，让它变成能戴的东西。"
         : tool.kind === "craft"
           ? "mat 做备用垫，hat 做备用帽；每种一件。"
           : "先听声音，再到场景中找。也可以开启文字辅助。"),
@@ -188,6 +187,20 @@ export function resolveTool(s: Adventure, tool: Tool) {
 }
 export type Cue = {
   id: number;
+  roles?: {
+    id: string;
+    role: "source" | "actor" | "support" | "attachment" | "displaced";
+    action:
+      | "walk"
+      | "place"
+      | "wear"
+      | "store"
+      | "take"
+      | "transform"
+      | "appear"
+      | "open"
+      | "close";
+  }[];
   kind:
     | "appear"
     | "transform"
@@ -199,8 +212,8 @@ export type Cue = {
     | "blocked";
   message: string;
   entity?: string;
-  from?: string;
-  to?: string;
+  from?: WordId;
+  to?: WordId;
   duration: number;
 };
 export function presentation(
@@ -225,7 +238,7 @@ export function presentation(
             : !board(before).world.flags.includes("crossed-ink") &&
                 board(result.session).world.flags.includes("crossed-ink")
               ? "cross"
-              : ["place", "sentence"].includes(intent.action) &&
+              : ["place", "sentence", "experiment"].includes(intent.action) &&
                   board(before).world.revision !==
                     board(result.session).world.revision
                 ? "move"
@@ -235,13 +248,65 @@ export function presentation(
     (intent.action === "sentence"
       ? sentenceTasks(before).find((t) => t.id === intent.task)?.sourceId
       : intent.source);
+  const prev = board(before),
+    next = board(result.session);
+  const roles: NonNullable<Cue["roles"]> = [];
+  for (const e of Object.values(next.world.entities)) {
+    const old = prev.world.entities[e.id];
+    const changed =
+      !old ||
+      old.word !== e.word ||
+      JSON.stringify(old.location) !== JSON.stringify(e.location);
+    const actor = e.kind === "actor";
+    if (changed || (actor && kind === "cross"))
+      roles.push({
+        id: e.id,
+        role: actor
+          ? "actor"
+          : kind === "cross" && e.id === "route-sheet"
+            ? "support"
+            : e.id === entity
+              ? "source"
+              : "displaced",
+        action: !old
+          ? "appear"
+          : old.word !== e.word
+            ? "transform"
+            : actor
+              ? "walk"
+              : e.location.kind === "worn"
+                ? "wear"
+                : e.location.kind === "relation" && e.location.relation === "in"
+                  ? "store"
+                  : old.location.kind !== "stage"
+                    ? "take"
+                    : "place",
+      });
+  }
+  for (const e of Object.values(next.world.entities)) {
+    if (
+      e.location.kind === "worn" &&
+      roles.some(
+        (r) => r.id === (e.location as { targetId: string }).targetId,
+      ) &&
+      !roles.some((r) => r.id === e.id)
+    )
+      roles.push({ id: e.id, role: "attachment", action: "wear" });
+  }
+  if (intent.action === "bag")
+    roles.push({
+      id: "bag-main",
+      role: "source",
+      action: next.bagOpen ? "open" : "close",
+    });
   return {
     id: result.session.revision,
+    roles,
     kind,
     entity,
     message: result.message,
-    from: entity && board(before).world.entities[entity]?.word,
-    to: entity && board(result.session).world.entities[entity]?.word,
+    from: entity ? board(before).world.entities[entity]?.word : undefined,
+    to: entity ? board(result.session).world.entities[entity]?.word : undefined,
     duration: ["arrive", "celebrate", "cross"].includes(kind)
       ? 2400
       : kind === "transform"

@@ -11,6 +11,8 @@ export interface SentenceTask {
   title: string;
   context: string;
   mode: PracticeMode;
+  exercise: "listen-rebuild" | "scene-compose" | "example-reproduce";
+  revisitOf?: string;
   target: Meaning;
   sourceId: string;
   targetId: string;
@@ -52,6 +54,20 @@ function sentence(
     title,
     context,
     mode,
+    exercise:
+      mode === "teaching"
+        ? "example-reproduce"
+        : mode === "assisted"
+          ? "listen-rebuild"
+          : "scene-compose",
+    revisitOf:
+      id === "helper-pack"
+        ? "pack-cap"
+        : id === "helper-seat"
+          ? "invite-cat"
+          : id.startsWith("find-") || id === "recap"
+            ? "describe-hat"
+            : undefined,
     target,
     sourceId,
     targetId,

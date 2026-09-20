@@ -1,0 +1,78 @@
+[
+  {
+    "id": "cat-walk",
+    "path": "assets/game/tabby/cat-walk.webp",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 399584,
+    "sha256": "dda4eb7772367125987784e22c3117f674481ca3fc22c0ba4b0f61d2ce130250",
+    "alpha": true,
+    "type": "image/webp",
+    "purpose": "Four-frame tabby walk; 2x2 native cells; identity and locator not mirrored",
+    "version": "tabby-motion-v1",
+    "review": "PENDING",
+    "source": "Built-in imagegen 2026-09-20; approved tabby/prop reference; model and seed not exposed; native-size Canvas WebP conversion at quality 0.9",
+    "master": {
+      "path": "design/tabby/motion/cat-walk-master.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 1809528,
+      "sha256": "e8c526cb97ced0093b0a43d1df6afa16f8a8a2f1ef0c4274addea2f58498c781",
+      "alpha": true
+    },
+    "displayMax": 220,
+    "motion": {
+      "columns": 2,
+      "rows": 2,
+      "cellWidth": 627,
+      "cellHeight": 627,
+      "frames": 4,
+      "fps": 8,
+      "groundAnchor": [
+        0.6,
+        0.93
+      ],
+      "headAnchor": [
+        0.69,
+        0.27
+      ],
+      "mirror": false
+    },
+    "transparentPixels": 881280
+  },
+  {
+    "id": "bag-open",
+    "path": "assets/game/tabby/bag-open.webp",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 184900,
+    "sha256": "3ade9c90d0a15b4db0d171881ecc18d5ce3ef27950547e78bd13ca5b93d4937a",
+    "alpha": true,
+    "type": "image/webp",
+    "purpose": "Opened backpack counterpart",
+    "version": "tabby-motion-v1",
+    "review": "PENDING",
+    "source": "Built-in imagegen 2026-09-20; approved tabby/prop reference; model and seed not exposed; native-size Canvas WebP conversion at quality 0.9",
+    "master": {
+      "path": "design/tabby/motion/bag-open-master.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 1312548,
+      "sha256": "266b8816c99635ba4a230228ddce3625b81d01c9a5ce884b97ac43cf7e302c3c",
+      "alpha": true
+    },
+    "displayMax": 150,
+    "motion": {
+      "frames": 1,
+      "groundAnchor": [
+        0.5,
+        0.84
+      ],
+      "mouthAnchor": [
+        0.5,
+        0.36
+      ]
+    },
+    "transparentPixels": 914347
+  }
+]

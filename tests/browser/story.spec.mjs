@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
 import {
+  demo,
   start,
   button,
   word,
@@ -49,6 +50,7 @@ test("phone normal HTTP entrance: early reversible exploration, all acts, real c
   await button(p, "继续冒险").click();
   expect((await snapshot(p)).projection.story.scene).toBe("meadow");
   await p.getByRole("button", { name: /^帮背包收一件东西/ }).click();
+  await demo(p);
   await shot(p, "phone-sentence");
   await button(p, "收起工具").click();
   await picnicLanguage(p);
@@ -79,6 +81,7 @@ test("desktop alternative preparation order, sentence reversal and actual world 
   await start(p);
   await toMeadow(p, { reverse: true });
   await p.getByRole("button", { name: /^帮背包收一件东西/ }).click();
+  await demo(p);
   for (const part of ["the", "Put", "cap", "in", "the", "bag", "."])
     await p
       .locator(".word-blocks button:enabled")

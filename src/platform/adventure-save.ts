@@ -7,7 +7,8 @@ import {
 } from "../game/adventure.ts";
 import type { Adventure, AdventureCommand } from "../game/adventure.ts";
 import { decode as decodeLegacy, SAVE_KEY as LEGACY_KEY } from "./save.ts";
-export const ADVENTURE_KEY = "xueli.adventure.v4";
+export const ADVENTURE_KEY = "xueli.adventure.v5";
+export const PREVIOUS_ADVENTURE_KEY = "xueli.adventure.v4";
 function projection(s: Adventure) {
   return {
     story: s.story,
@@ -19,7 +20,7 @@ function projection(s: Adventure) {
 }
 export function encodeAdventure(s: Adventure): string {
   return JSON.stringify({
-    schema: 4,
+    schema: 5,
     content: ADVENTURE_VERSION,
     id: s.id,
     seed: s.seed,
@@ -38,7 +39,7 @@ export function decodeAdventure(raw: string): Adventure {
   } catch {
     throw new Error("存档损坏，原始记录已保留。");
   }
-  if (!record(v) || v.schema !== 4 || v.content !== ADVENTURE_VERSION)
+  if (!record(v) || v.schema !== 5 || v.content !== ADVENTURE_VERSION)
     throw new Error("内容版本不同；不能猜测目标进度。请导出原档或明确重开。");
   if (
     typeof v.id !== "string" ||
@@ -67,6 +68,9 @@ export function decodeAdventure(raw: string): Adventure {
     "audioSource",
     "audioVersion",
     "assetId",
+    "phase",
+    "part",
+    "step",
   ];
   for (const item of v.journal) {
     if (
@@ -87,11 +91,17 @@ export function decodeAdventure(raw: string): Adventure {
         "audioSource",
         "audioVersion",
         "assetId",
+        "phase",
+        "part",
       ].some(
         (k) =>
           item[k] !== undefined &&
           (typeof item[k] !== "string" || (item[k] as string).length > 120),
       ) ||
+      (item.step !== undefined &&
+        (!Number.isInteger(item.step) ||
+          Number(item.step) < 0 ||
+          Number(item.step) > 12)) ||
       (item.ids !== undefined &&
         (!Array.isArray(item.ids) ||
           item.ids.length > 20 ||
@@ -136,6 +146,7 @@ export function loadAdventure(): {
   warning: string;
   blocked: boolean;
   legacy: boolean;
+  previousRaw?: string;
 } {
   let foundExisting = false;
   try {
@@ -152,6 +163,18 @@ export function loadAdventure(): {
       } catch (e) {
         return { warning: (e as Error).message, blocked: true, legacy: false };
       }
+    }
+    const previous = localStorage.getItem(PREVIOUS_ADVENTURE_KEY);
+    if (previous !== null) {
+      foundExisting = true;
+      backup(PREVIOUS_ADVENTURE_KEY);
+      return {
+        warning:
+          "已保留并备份旧版冒险原档。旧记录没有本版实际帮助曝光信息，不能升级为独立证据。请导出，再明确开始新冒险。",
+        blocked: true,
+        legacy: true,
+        previousRaw: previous,
+      };
     }
     const old = localStorage.getItem(LEGACY_KEY);
     if (old) {

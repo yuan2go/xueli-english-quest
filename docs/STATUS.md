@@ -1,69 +1,57 @@
-# 项目状态 · WP-WEB-GAME-SHELL-05
+# 项目状态 · WP-ANIMATED-PLAY-LEARNING-06
 
-## 本轮全分支免测试集成 · 2026-09-20
+2026-09-20：正式入口的工程实现与本轮必要验证完成；正式发布仍 BLOCKED，不能称为已验证教学效果或生产质量。唯一实现负责人 Codex；独立分支 `codex/animated-play-learning-06`，worktree `/Users/yuan/.codex/worktrees/animated-play-learning-06/xueli-english-quest`。
 
-发布基线：本地主目录 main `52fac621e6e81f6f645f6574096b937cd050b872`，刷新后的远程 main `9b20d629dd4a4472f33afff3b935597a47741771`。本轮读取 10 个原有本地分支和 8 个原有工作区，先快进本地 main 并推送全部既有提交；Actions 回读 `enabled:false`。
+baseline：刷新后默认分支 origin/main `a9a62e3eb632781595b40171dfb442bf0fbbe55e`。首轮运行代码/浏览器/性能验证源 SHA：`1ee59d14545f0ec52d02f13ef383b53acb51cf54`；手机长按追加修复源 SHA：`577107e60dd89b241dc95c0d29b0f7f97e55e430`，最终交付 HEAD 见 PR 和交付报告。主工作区仍为原 main 且干净；其他工作区没有修改。PR #9/#10 已合并，PR #11 OPEN 且未追加，本包吸收经核对的动作增量，在新分支交付新 PR，不自动合并。
 
-将旧 `codex/immersive-game-ui-05@e4495d2` 与新 `codex/web-game-shell-05@368d87e` 在独立集成工作区合并。两套实现都改写 App/Scene/CSS 和浏览器入口，不能并排作为当前产品：按已落地的 11/12 和 WP-WEB-GAME-SHELL-05 保留新 Game Shell 的全部运行代码、合同及测试。旧分支 3 个提交完整保留在合并祖先与远程分支，截图和文档标记 HISTORICAL，旧状态另存 [历史记录](archive/immersive-game-ui-05-status.md)。不重新引入 GameChrome/SceneActions 或绑定旧页面的浏览器套件。
+## 手机拖动追加修复 · 2026-09-20
 
-本轮仅进行 Git 分支/工作区/差异检查、提交、推送与 PR 合并；测试、测试钩子、类型检查、构建、资源检查、浏览器、真机及 Provider 均 NOT_RUN。下方原工程验证属于之前的交付，不是本次重跑。最新 SHA、实际提交数量及进行中工作区的最终处理以本轮交付回复为准。
+用户 iPhone 截图确认第二幕长按拖动会弹出保存图片菜单并选中文字。旧手机视口/触控模拟 PASS 没有覆盖这一原生浏览器行为，不能据此宣称手机可用性已完成验收。
 
-剩余发布限制和下一包仍见下方资源/录音/教研/真机验收边界；动作性能优化不得用此次免测试发布声称实测提升。
+本次以干净的 `159e0c2514775135b9c75de2a75b34a450ded339` 为修复基线；已确认 PR #12 OPEN，仍在原独立 worktree 完成。GameShell 内禁用 iOS callout、文字选择和原生 HTML 拖拽，插画不参与命中；对象按钮、工具滚动、键盘和成人记录文字选择保持可用。不改领域、存档和学习判定。
 
-## 原 Game Shell 工程交付记录
+修复源 `577107e60dd89b241dc95c0d29b0f7f97e55e430`：`npm test` 52/52、两项 typecheck、build、resources、`git diff --check` PASS；`npm run test:browser` **19/19 PASS**，含 Chromium 750ms 按住后触摸拖动、桌面 WebKit Pointer/键盘、取消/刷新和真实工具滚动。`check:release` 实跑 exit 1，仍被未审核 `bag` 阻断。最小菜单回归实际由红转绿；细节及原始输出见 [长按修复证据](evidence/animated-play-learning-06/mobile-native-gestures.md)。没有重复性能测量或新增 FPS 声称。
 
-2026-09-20：正式入口 Scene-first Game Shell 已实现并完成本轮工程验证。唯一实现负责人 Codex；分支 `codex/web-game-shell-05`，独立 worktree，原主工作区保持原状。未公开部署、未合并 main。
+**NOT_RUN**：修复后实体 iPhone Chrome/Safari 长按复验、截图中体验站的更新部署。线上只读检查仍是另一组构建资源，未推断其源码 SHA。GitHub CI 仍 NOT_RUN（仓库 Actions 总开关关闭，未修改）。修复推送 PR #12，不自动合并；下一步是更新体验站并进行真实设备复验。
 
-- baseline / 当前读取的 origin/main：`9b20d629dd4a4472f33afff3b935597a47741771`。
-- 先治理文档和死代码：`83756cb`；其后实现和实际截图：`efc52f30542bd3c0df48721e551368e4a8fd6a12`。
-- 本文件及证据索引是实现后的交付记录；最终分支 SHA 由 Git/关联 PR 标识，以下验证对应上述实现的相同源代码树。
+## 已实现
 
-## 当前能力与权威对应
+- 唯一 App → GameShell → Adventure → domain.transition；先原子提交，再按 actor/source/support/attachment/displaced 表现动作。纸垫先铺稳，小猫独立走过；同一实体 FLIP、父节点坐标换算、嵌套拖影、实际包口遮挡，支持连续动作、跳过、暂停/后台/pagehide、旋转、卸载与 reduced-motion 取消。
+- 原生 1254×1254 四帧步态 atlas 和开包图接入正式页，保留狸花猫身份与画面右颈定位器，不镜像。纸张折叠/换用途、戴帽调整、出现/移动/收纳/取出、局部眨眼和姿态变化使用同一实体。素材尺寸、Alpha、帧/锚点、来源与转换见 [motion assets](../design/tabby/motion/README.md)。
+- 三幕及六活动变体保留，强化阳光/风下帽子试验、藏物与遮挡线索、换座/收纳/休息/出发的世界后果；活动可退出并隔离主线。首页、手机对象尺寸、按需工具和真实结局布置同步调整。
+- 三种组句范式：听后重组、情境独立组句、示例后亲手复现。独立组句不自动播放/显示完整答案；逐级帮助记录实际曝光。隔离示范使用同一领域规则，逐步对照对象、词块、in/on 与指令/描述，不代答。图像失败、部分词块、动作未落稳均不能冒充完整示范；音频绑定原请求，完成任务后的取消仍保存。
+- 内容 `5.0.0-dev.1` / schema 5 / `learning-observation-v2`；任务目标、技能维度、帮助/答案曝光、实际结果与回访分开。成人回顾给具体事实，不给掌握率。v4 冻结 decoder 和旧线性 decoder 仅 historical；原文备份、导出、显式重开，不猜测旧曝光或升级旧成绩。
 
-开工前完整读取 main 的 README、STATUS、01–05、11/12、WP05、AGENTS/CLAUDE，核对 App/Scene/工具/输入、world/adventure、save/audio/assets 与回归。沿用 11/12，不新增平行蓝图。
+## 清理与审查
 
-正式入口为 `App → GameShell → Scene + HUD + ContextTool + FeedbackLayer → Adventure Intent → application → domain.transition`。`content/encounters.ts` 与 `game/shell.ts` 投影情境、对象入口、工具和反馈；App 只管理会话/平台与外层表面。committed 游戏状态、UI 选择/草稿、短暂表现分离；动画不推进目标、不写存档。
+业务编码前完整阅读 AGENTS/CLAUDE、README、01–05、07–12、WP05 及动作追加计划，先提交文档清理。旧状态归档、旧 PR 状态/唯一 mat/固定题数/两套入口/独立组句/示范定义冲突已修订；[WP06](work-packages/WP-ANIMATED-PLAY-LEARNING-06.md) 是唯一有效清单。旧证据见 [historical WP05](archive/status-through-shell-05.md)，不沿用其 PASS。
 
-场景持续存在，点击对象/邀请才展开拼写、变词、组句、听音或物品工具；成功后回到世界，不自动打开下一题。桌面/横屏侧栏、手机/纵屏底部有限高度工具，工具独立滚动。保留实际地图 → 垫子 → 放到墨迹并过路 → 取回地图的同一物品链，以及个人帽子/收纳结局、可逆探索和六活动变体。
+双轴只读审查的具体问题已修复并复核：音频终态丢失、父子重复位移、示范缺图/词块未曝光却记完整、找物反馈泄露答案、bag/hat 指向 cat 的教学文案。工程完整走查还修复包内物品拦截背包点击、收纳表现悬空、手机对象偏小和重复试验反馈残留。工程走查不等于真实儿童研究。
 
-统一 scoped pointer 处理阈值、capture/release/cancel/lostcapture、多指、可见命中与遮挡、resize/后台/Escape；词块可拖入、插入重排、退回，点击/键盘等价。世界坐标独立于工具层；放置从已提交世界吸附，取消/落空回退。恢复焦点、44px 控件、语义名称和 reduced-motion 保留。
+## 本轮命令与证据
 
-反馈覆盖选择/拖动、受阻、生成、变形、移动、过路、角色反应、抵达和结局；有限演出可跳过。资源沿单一 manifest 按 critical/scene/lazy 加载，失败可重试，成功检查缓存并去重；重试只刷新图片，不清工具草稿。音频、后台、旋转和关闭工具取消瞬时操作。错误组句可原位修正；正确句子被关闭背包阻挡时，可在工具内打开真实背包，保留词块后显式再提交。
-
-`domain/world.ts`、`game/adventure.ts`、`game/session.ts`、两个 save codec、历史 `content/story.ts`、package 与 lock 均与 baseline 相同。保留 schema 4 journal/replay、旧档保护、原子世界转换和学习证据分类；没有新引擎、依赖、后端或运行时 AI。
-
-## 过期设计治理
-
-旧 STATUS 移至 [historical archive](archive/status-through-core-04.md)；旧工作包、旧 evidence、旧页面参考图和内容 fixture 明确 historical。固定十二挑战/十三步骤仅留在历史证据和旧档兼容链。退役旧页面 UX、旧比赛日程、工坊 API/后台蓝图、失效 Prompt 和提交模板；统一当前 01–12/导航/README/AGENTS/CLAUDE。删除未使用的 `Experience.tsx`、`Picnic.tsx`、`ObjectButton.tsx` 及三份旧样式。资源来源与旧 decoder 有真实追溯/兼容价值，继续保留。
-
-## 本轮真实验证
-
-环境：macOS arm64，Node v26.3.1，npm 11.16.0。浏览器为 Playwright Chromium 生产构建 HTTP 正式首页，无通关状态注入；测试详见 [证据索引](evidence/web-game-shell-05/README.md)。
-
-| 实际执行 | 结果 |
+| 命令/检查 | 实际结果 |
 | --- | --- |
-| `npm ci` | PASS；真实 lock 安装，26 added / 27 audited，0 vulnerabilities；lock 未变 |
-| `npm test` | PASS，46/46，0 skipped；保留 43 个核心回归，新增 3 个 shell/证据/表现边界回归 |
-| `npm run typecheck` | PASS |
-| `npm run typecheck:domain` | PASS |
-| `npm run build` | PASS；CSS 16.38 kB / gzip 4.56，JS 289.57 kB / gzip 94.79 |
-| `npm run check:resources` | PASS |
-| `npm run check:release` | BLOCKED，实际 exit 1：`发布资源缺失或未审核 bag`；门槛未降低 |
-| `npm run test:browser` | PASS，8/8，51.2s；5 个已有真实路径保留并适配入口，新增 3 个回归 |
+| `npm ci` | PASS，26 installed / 0 vulnerabilities，依赖与真实 lockfile 未改 |
+| `npm test` | PASS 52/52，含旧档/原子性/语义/音频终态/部分帮助 |
+| `npm run typecheck` / `npm run typecheck:domain` | PASS |
+| `npm run build` | PASS，JS 321.91kB / gzip105.98kB，历史 decoder 延迟块24.09kB / gzip9.50kB |
+| `npm run check:resources` | PASS，字节/哈希/格式/尺寸/引用校验 |
+| `npm run check:release` | BLOCKED（实跑 exit 1），首个缺失/未审核资源 `bag`；未降低门槛 |
+| `npm run test:browser` | PASS 16/16，正常首页全主线/六变体/组句/存档/触控键盘/异常；未注入通关状态 |
+| 原生桌面后台切页 | PASS，独立 Chromium 临时会话实际 hidden=true / moving=0，恢复后世界一致；默认驱动的虚拟焦点尝试不计通过 |
 | `git diff --check` | PASS |
-| 核心/存档/依赖与 baseline 的定向 diff | PASS，无修改 |
-| GitHub Actions 权限查询 | 实际 `enabled: false`；远端 CI NOT_RUN，未擅自启用 |
+| 双轴代码审查 | 具体报告问题均修复；静态审查，不冒充独立浏览器/儿童验收 |
 
-覆盖 360×640、390×844、768×1024、1024×768、1440×1000 和旋转；实际 CDP touch/cancel/多指/lostcapture，键盘和焦点，场景连续性，词块拖放/重排，完整主线不同准备顺序与不同结局，六活动变体和活动隔离，过路演出中的刷新恢复，资源/音频/存储失败与旧档保护。普通主线监测 console/pageerror/HTTP；故障注入用例明确区分预期失败。
+[证据索引](evidence/animated-play-learning-06/README.md) 含正常速度动作录屏、80/350/650/950/1450ms 过路采样、换父节点首帧数值、示范与实际学习记录、手机/平板/桌面截图、环境与完整源 SHA。测试异常 fixture 只用于明确的旧档/损坏/网络失败用例。
 
-## 最后一次完整体验复查
+性能在同一 Mac14,3 / macOS26.5.2 / Chromium153.0.8010.12 headless、390×844、CPU4x、同一 cat/bag 后 120 次拖动输入场景各三轮。LayoutCount 每轮 122→3，style mutations 238→120；样式重算次数未减少，帧间隔中位数仍约16.7ms。只证明此场景布局工作减少，不宣称 FPS 或真机体验提升；[原始前后记录](evidence/animated-play-learning-06/README.md#同条件性能前后对照)。
 
-在 360×640 生产 HTTP 首页实际走完：唤醒小猫 → 自选先做地图 → 错词原位修正 → 背包/帽子/卡片变帽 → 地图变垫、受阻保护、实际拖过墨迹 → 取回地图 → 草地布置和组句 → 开背包保留句子后重新提交 → 描述核对不改变世界 → 邀请小猫/听音找物 → 自选帽子和收纳 → 结局 → 活动往返 → 刷新。
+## 未执行、阻塞与下一步
 
-按 Agency / Causality / Continuity / Manipulation / Juice / Recovery / Pacing / Replayability 检查，发现并修复了真实平板遮挡、小屏输入可达性、拖放后的键盘点击抑制、句子拖入尾部目标、物品消失后的 focus 和受阻组句重做问题。最终重走无 pageerror/console error；草稿、个人结局和主线隔离恢复已实际确认。截图和两轮记录见证据索引。这是 agent 代入儿童视角的工程试玩，不能替代儿童研究。
-
-## 剩余阻塞与下一包
-
-工程范围无已知未解决阻塞。公开发布仍 BLOCKED：资源审核（检查首先停在 bag）、正式录音/听审与教研未完成。真实 iPhone/Android/iPad、Safari、教研审核、目标儿童试玩、公网部署均 NOT_RUN；开发 TTS 不证明独立听力合格。未调用 Provider，不存在待补“真实 AI”验收。
-
-建议下一包 `WP-CONTENT-DEVICE-ACCEPTANCE-06`（建议，未新立平行规格）：完成素材权利/审核、正式语音和教研，收集目标真机及儿童观察，按真实体验缺口修正操控/节奏后再申请发布验收。当前不新增平台、引擎或账号系统。
+- NOT_RUN：素材权利正式审核、正式录音与发音听审、教研验收、实体 iPhone/iPad/Android/Safari、真实儿童试玩、公网部署。所有资源审核仍 PENDING。
+- NOT_RUN：运行时 Provider（本包范围外）；开发内置图像生成的真实资产来源已登记，不能把它当运行时教学 Provider 验证。
+- BLOCKED：正式发布资源门槛。其余已授权工程工作没有因外部审核而跳过。
+- 动作边界：四帧步态和有限姿态，不是自由物理移动/骨骼系统；开包生成图与旧闭合图有轻微比例差，现有 512px 欢呼图未冒充高清 master。
+- GitHub [PR #12](https://github.com/yuan2go/xueli-english-quest/pull/12) OPEN，未合并。CI **NOT_RUN**：仓库级 `actions/permissions.enabled=false`，该分支无 run/check；四个 workflow 定义状态虽然为 active，仍受仓库总开关阻止。本包未改动任何 Actions 文件或开关，本地 PASS 不冒充 CI。
+- 下一包尚未分配；优先用真实设备、正式音频/教研和儿童观察校准现有玩法，再决定工程迭代。不自动添加平台、账号、后台或新引擎。

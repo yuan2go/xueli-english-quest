@@ -1,6 +1,8 @@
 # WP-WEB-GAME-SHELL-05 · 页面式应用 → Scene-first Web Game
 
-## 唯一目标
+> HISTORICAL：本包已交付合并；当前工作只看 WP06。
+
+## 原目标
 在不重写已验证 Domain/Application/Save 的前提下，将正式 React 产品推进为持续场景、直接操控、上下文工具和游戏反馈统一的网页游戏表面。
 
 ## 开工前
@@ -62,12 +64,8 @@
 - 最后代入儿童视角复查发现“正确句子遇关闭背包后重组”的摩擦，已实现原工具开包、保留词块、显式重试，并重新完整通关。桌面/小屏/平板遮挡和焦点等本轮发现也已修复。
 - `check:release` 仍实际 exit 1（bag 未审核）；远端 Actions 关闭，CI NOT_RUN。实体设备、Safari、教研/正式听审、儿童试玩、公网部署 NOT_RUN。工程完成不等于公开发布或教学验收。
 
-## 追加：贴图动作与运行流畅度 · 用户 2026-09-20 请求
+## HISTORICAL · 动作追加计划已接入 WP06
 
-沿用本包已批准的表现/性能设计；优化基线 `d251e05878537b6e13c8bc92b4a686551a4f30a2`，PR #9 尚未合并。采用现有 WebP + CSS/Web Animations 的小幅待机、姿态衔接、变形和实际实体移动；逐帧角色素材需要另行美术制作，引擎仍无必要性。实际基线为手机 Chromium / CPU 4x：120 次拖动更新产生 122 次 layout（3 次一致），此机器并未观察明显丢帧，不预先声称 FPS 改善。
+PR #9 于 `f230188ad800e497ff39673aaf8608108214813b` 合并。后续独立 PR #11 在开工核对时仍 OPEN，tip `c57945c`；包含 rAF 拖动、实体 FLIP、图片解码和三轮测量，但不是 WP06 的交付证据。
 
-- [ ] `ui/pointer.ts`：坐标留在 ref，requestAnimationFrame 合并事件，仅开始/命中目标改变/结束更新 React；拖影只写 transform，取消时清理待执行帧。三个消费者保持点击/拖放/键盘语义。
-- [ ] `ui/Scene.tsx`、`ui/shell/GameShell.tsx`、局部 motion hook 和 CSS：真实实体提交前后测量，分批读几何后 transform/opacity 补间，消除 left/top 动画及移动副本；移动携带子物品，姿态/变形有连续视觉，世界提交不等待动画。
-- [ ] `ui/Art.tsx` 与 CSS：异步图片解码、已存在姿态的短过渡、小幅待机；后台/暂停/旋转和 reduced-motion 清理或稳定投影，避免持续 JS 帧循环。
-- [ ] 必要验证：同条件三轮 drag profile 前后对照；真实入口新增动作/取消/reduced-motion 回归；原完整 8 项浏览器路径、46 核心测试、typecheck/build/resources；最终看图/动作采样，不虚报真机 FPS。
-- [ ] 将实际设计与结果回写 03/12、STATUS 和本包证据；在同一已授权 PR 分支提交推送，不合并。
+未完成/需复核的动作、过路中间态、取消、附属物和性能工作全部归入 [WP06 唯一实施清单](WP-ANIMATED-PLAY-LEARNING-06.md)。旧基线测量仅 historical，不继续向已合并 PR #9 追加。原计划可从 Git 历史 `368d87e` 追溯。

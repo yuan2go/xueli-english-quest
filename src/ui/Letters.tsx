@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import type { LetterTask } from "../game/interaction.ts";
 import { usePointerDrop } from "./pointer.ts";
 import { letterLayout } from "../game/interaction.ts";
@@ -23,7 +23,22 @@ export function Letters({
   const [slots, setSlots] = useState<(string | null)[]>(initial);
   const [selected, setSelected] = useState<number | null>(null);
   const [lesson, setLesson] = useState(0);
+  const focusTarget = useRef<string | null>(null);
+  useLayoutEffect(() => {
+    const selector = focusTarget.current;
+    focusTarget.current = null;
+    if (selector)
+      surface.current
+        ?.querySelector<HTMLElement>(selector)
+        ?.focus({ preventScroll: true });
+  }, [slots]);
   function move(token: string, destination: number | null) {
+    if (destination !== null && fixed(destination)) return;
+    // The bank button becomes disabled; hand focus to the placed token before paint.
+    focusTarget.current =
+      destination === null
+        ? `[data-letter-token="${token}"]`
+        : `[data-drop="slot-${destination}"]`;
     setLesson((n) =>
       destination === null ? Math.max(n, 2) : n === 0 ? 1 : n >= 2 ? 3 : n,
     );
@@ -99,6 +114,7 @@ export function Letters({
             className="letter stamp"
             disabled={disabled || slots.includes(t.id)}
             aria-label={`字母 ${t.letter}`}
+            data-letter-token={t.id}
             onPointerDown={(e) => pointer.start(e, t.id)}
             onClick={() => pointer.click(() => choose(t.id))}
             lang="en"
@@ -115,7 +131,7 @@ export function Letters({
               "先点一个字母，把印块放进格子。",
               "放进去了！试着点刚才的格子，把字母取回来。",
               "取回来了。现在选择格子，再点字母，就能重新放入或替换。",
-              "你会调整字母了。按 c、a、t 排好，点「施法」叫醒小猫。",
+              `你会调整字母了。按 ${[...step.word].join("、")} 排好，点「施法」试试。`,
             ][lesson]
           }
         </p>
@@ -128,10 +144,7 @@ export function Letters({
         施法 <span aria-hidden="true">✧</span>
       </button>
       {pointer.ghost && (
-        <div
-          className="drag-ghost"
-          style={{ left: pointer.ghost.x, top: pointer.ghost.y }}
-        >
+        <div ref={pointer.ghostRef} className="drag-ghost" aria-hidden="true">
           {tokens.find((t) => t.id === pointer.ghost?.label)?.letter ?? "字母"}
         </div>
       )}

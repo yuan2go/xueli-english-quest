@@ -22,7 +22,7 @@ Browser/App Shell 下分 Start/Pause/Ending/Review 与 Game Shell；Game Shell �
 2. UI interaction state：selected entity、opened tool、focus、未提交字母/词块。
 3. Ephemeral presentation state：drag ghost、animation phase、particle、hover、pressed，不进入存档。
 
-React state 只承担需要 React 渲染的状态。未来若出现高频逐帧对象，不把每帧坐标灌入全局 React state。
+React state 只承担语义开始、目标变化和结束。拖动坐标保留于 ref，经 rAF 合并写 transform，合法目标按世界 revision/来源/包状态/变体重算；高频坐标不进入整棵 React 状态树。
 
 ## 命令与结果
 所有改变世界或学习证据的输入转换为显式 intent，通过现有 adventure command 进入唯一执行链：Pointer/Keyboard → Interaction Adapter → Intent → runAdventure → guards/content semantics → world.transition → atomic commit → goals/evidence → presentation cue。世界阻挡不得被记录成英语错误。
@@ -60,3 +60,5 @@ Desktop：Scene 主区 + Context Tool 侧区。Tablet：Scene 优先，工具按
 每个拖动表面限定命中 scope，捕获后仍以视口坐标命中当前可见元素；关系对象用父对象百分比局部定位。失去 capture、多指、旋转、后台和 Escape 都清理；释放 capture 不触发第二次提交。键盘 Enter/Space 不被上一拖动的合成 click 抑制。句尾有明确落点，已有词块是插入点。
 
 Phone 未开工具时世界占满剩余视口；打开工具后世界至少保留主体区域，底部 sheet 最大约 45%，内部滚动，句子行保持可见便于拖入。窄横屏改侧栏。命中尺寸与遮挡通过实际回归检查，真机范围仍见 STATUS。
+
+动作由提交前后差异生成角色计划；批量读取几何后写 transform/opacity，新父节点位移与比例须在子节点起点中扣除。过路支撑物先落稳，演员独立通过；附属物跟随、终点不另造飞行副本。教学态是有限隔离世界，实际动作/图像/词块呈现条件见 05；不得只观察容器就声明完整示范。

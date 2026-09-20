@@ -26,12 +26,12 @@ npm run check:resources
 npm run test:browser
 ```
 
-浏览器回归从正常首页真实操作，使用生产 HTTP `127.0.0.1:4174`；需已安装 Playwright Chromium。`dist` 是静态构建产物，Vite dev/preview 是本地体验服务。没有公网部署。旧 `/#design` 不再是独立页面；本包只交付正式入口。
+浏览器回归从正常首页真实操作，使用生产 HTTP `127.0.0.1:4174`；先运行 `npx playwright install chromium webkit` 安装所需浏览器。WebKit 回归运行于桌面，不能代替 iPhone 原生长按菜单验收。`dist` 是静态构建产物，Vite dev/preview 是本地体验服务。本分支没有执行公网部署。旧 `/#design` 不再是独立页面；本包只交付正式入口。
 
 ## 当前权威与限制
 
 - [项目状态与本次真实检查](docs/STATUS.md)
-- [本工作包](docs/work-packages/WP-WEB-GAME-SHELL-05.md)
+- [本工作包](docs/work-packages/WP-ANIMATED-PLAY-LEARNING-06.md)
 - [产品与范围](docs/01-product-and-scope.md)、[场景玩法](docs/02-gameplay-and-levels.md)
 - [架构](docs/04-architecture.md)、[运行和存档合同](docs/05-content-and-runtime-contracts.md)
 - [全部文档导航](docs/README.md)、[有效决策](docs/10-decisions-risks-and-sources.md)
@@ -41,3 +41,5 @@ npm run test:browser
 复用带绿围巾、背包和画面颈部右侧白色定位器的狸花猫资产。素材权利、正式录音和教研状态保持 PENDING；浏览器 TTS 明示为开发语音。真机和真实儿童试玩尚未完成，`check:release` 仍阻断未审核资源。旧线性存档会原样备份、可导出，明确重开新目标，绝不把旧 step 映射成新通关。
 
 仓库公开可见不代表获得第三方素材复用许可；不提交密钥、儿童个人信息、内部课件或未经授权的品牌素材。AGENTS.md 与 CLAUDE.md 共用同一工程合同。
+
+本轮动画、教学曝光与性能验收见 [WP06 证据](docs/evidence/animated-play-learning-06/README.md)。当前工程验证通过，正式发布仍受未审核资源阻塞；具体证明范围见 [STATUS](docs/STATUS.md)。

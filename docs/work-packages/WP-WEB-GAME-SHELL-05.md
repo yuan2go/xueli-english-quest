@@ -64,13 +64,15 @@
 
 ## 追加：贴图动作与运行流畅度 · 用户 2026-09-20 请求
 
-沿用本包已批准的表现/性能设计；优化基线 `d251e05878537b6e13c8bc92b4a686551a4f30a2`，PR #9 尚未合并。采用现有 WebP + CSS/Web Animations 的小幅待机、姿态衔接、变形和实际实体移动；逐帧角色素材需要另行美术制作，引擎仍无必要性。实际基线为手机 Chromium / CPU 4x：120 次拖动更新产生 122 次 layout（3 次一致），此机器并未观察明显丢帧，不预先声称 FPS 改善。
+沿用本包已批准的表现/性能设计；优化基线 `d251e05878537b6e13c8bc92b4a686551a4f30a2`，开始时 PR #9 尚未合并；发布核对时发现它已由另一次发布合并，动画追加改用独立后续 PR。采用现有 WebP + CSS/Web Animations 的小幅待机、姿态衔接、变形和实际实体移动；逐帧角色素材需要另行美术制作，引擎仍无必要性。实际基线为手机 Chromium / CPU 4x：120 次拖动更新产生 122 次 layout（3 次一致），此机器并未观察明显丢帧，不预先声称 FPS 改善。
 
 - [x] `ui/pointer.ts`：坐标留在 ref，requestAnimationFrame 合并事件，仅开始/命中目标改变/结束更新 React；拖影只写 transform，取消时清理待执行帧。三个消费者保持点击/拖放/键盘语义。
 - [x] `ui/Scene.tsx`、`ui/shell/GameShell.tsx`、局部 motion hook 和 CSS：真实实体提交前后测量，分批读几何后 transform/opacity 补间，消除 left/top 动画及移动副本；移动携带子物品，姿态/变形有连续视觉，世界提交不等待动画。
 - [x] `ui/Art.tsx` 与 CSS：异步图片解码、已存在姿态的短过渡、小幅待机；后台/暂停/旋转和 reduced-motion 清理或稳定投影，避免持续 JS 帧循环。
 - [x] 必要验证：同条件三轮 drag profile 前后对照；真实入口新增动作/取消/reduced-motion 回归；原完整 8 项浏览器路径、46 核心测试、typecheck/build/resources；最终看图/动作采样，不虚报真机 FPS。
-- [x] 将实际设计与结果回写 03/12、STATUS 和本包证据；在同一已授权 PR 分支提交推送，不合并。
+- [x] 将实际设计与结果回写 03/12、STATUS 和本包证据；在独立动画追加分支提交推送并创建后续 PR，不合并。
 
 
 追加结果：最新实现 `0aaaa303513fda5040392f010b09aa91332e308f`；46 核心 / 10 浏览器回归、typecheck/domain/build/resources PASS。实际测得拖动 LayoutCount 122→4；FPS 与整体耗时提升未证明，总 TaskDuration 样本反而增加，见 [完整性能证据](../evidence/web-game-shell-05/motion/README.md)。真实工程试玩后修复单帧快速释放、禁用按钮焦点丢失，以及铺垫/过路的顺序与空间对齐。未增加逐帧资源、引擎或业务状态路径；外部验收和 bag 发布审核继续保持原边界。
+
+发布边界补充：本轮末接入 `origin/main` 的 PR #9/#10 合并历史，保留新归档；运行源码与已验证 `0aaaa303` 一致。原 PR #9 的 head 只有 `368d87e`，不把本次动画算作已合入。后续分支为 `codex/sprite-motion-performance`。

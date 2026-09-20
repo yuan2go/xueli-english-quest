@@ -47,5 +47,7 @@
       "frameP95": 16.799999999999272,
       "framesOver33ms": 0
     }
-  ]
+  ],
+  "implementationSha": "b50964ee394784fea7063c3ccffa02f48b38170d",
+  "scopeNote": "Profiled home drag path; subsequent trail alignment changes do not alter this path."
 }

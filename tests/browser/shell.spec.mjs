@@ -142,6 +142,10 @@ test("phone full adventure with dragged/reordered sentence tokens and reload dur
   await button(p, "继续冒险").click();
   expect((await snapshot(p)).projection.story.world).toEqual(crossed);
   await expect(p.locator(".presentation")).toHaveCount(0);
+  const pad = await object(p, "route-sheet").boundingBox();
+  const ink = await button(p, "湿墨小径").boundingBox();
+  expect(pad.y + pad.height / 2).toBeGreaterThan(ink.y);
+  expect(pad.y + pad.height / 2).toBeLessThan(ink.y + ink.height);
   await move(p, "route-sheet", "放回地面 / 取出 / 摘下");
   await morph(p, "route-sheet", "p");
   await button(p, "跟着地图去草地 →").click();

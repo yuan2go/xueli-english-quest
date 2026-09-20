@@ -15,27 +15,39 @@
     }
   ],
   "duringCross": {
-    "x": 159.81185913085938,
-    "y": 306.271484375,
-    "width": 103.59375,
+    "x": 159.7671661376953,
+    "y": 369.7577819824219,
+    "width": 103.59373474121094,
     "height": 129.203125
   },
   "afterCross": {
     "x": 254.203125,
-    "y": 264.1953125,
+    "y": 369.7578125,
     "width": 103.59375,
     "height": 129.203125
+  },
+  "pad": {
+    "x": 130.25,
+    "y": 415.046875,
+    "width": 159.09375,
+    "height": 106.9375
+  },
+  "ink": {
+    "x": 143.1875,
+    "y": 416.234375,
+    "width": 125.796875,
+    "height": 105.5625
   },
   "motion": [
     {
       "playState": "running",
-      "progress": 0.6444199310522778,
+      "progress": 0.6443348591937798,
       "keyframes": [
         {
           "offset": null,
           "easing": "linear",
           "composite": "auto",
-          "transform": "translate(-236.812px, 105.562px) matrix(1, 0, 0, 1, -51.7969, -65.1016) scale(1, 1)",
+          "transform": "translate(-236.812px, 0px) matrix(1, 0, 0, 1, -51.7969, -65.1016) scale(1, 1)",
           "computedOffset": 0
         },
         {

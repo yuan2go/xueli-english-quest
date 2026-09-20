@@ -63,7 +63,7 @@ export function Scene({
   const positions: Record<string, [number, number]> = {
     "cat-companion": [
       b.scene === "trail" && b.world.flags.includes("crossed-ink") ? 80 : 16,
-      b.scene === "trail" && b.world.flags.includes("crossed-ink") ? 30 : 47,
+      47,
     ],
     "bag-main": [45, b.scene === "trail" ? 22 : 38],
     "route-sheet": b.scene === "meadow" ? [16, 73] : [80, 80],
@@ -101,7 +101,7 @@ export function Scene({
     );
     const hats = children.filter((x) => x.location.kind === "worn");
     const [x, y] =
-      l.kind === "zone" ? [54, 64] : (positions[item.id] ?? [50, 75]);
+      l.kind === "zone" ? [54, 52.5] : (positions[item.id] ?? [50, 75]);
     const style =
       l.kind === "worn"
         ? { left: "62%", top: "14%" }
